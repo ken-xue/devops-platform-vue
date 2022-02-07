@@ -87,19 +87,19 @@ const actions = {
         let menus = data.filter(menu => menu.menuType == 0 || menu.menuType == 1)
         let tree = treeDataTranslate(menus, 'uuid')
         //开发环境展示
-        if (process.env.NODE_ENV === "development") {
-          let accessedRoutes = [].concat(devRoutes)
-          generaMenu(accessedRoutes, tree)
-          accessedRoutes.sort(function (a, b) {return a.menuOrder - b.menuOrder})
-          commit('SET_ROUTES', accessedRoutes)
-          resolve(accessedRoutes)
-        } else {
+        // if (process.env.NODE_ENV === "development") {
+        //   let accessedRoutes = [].concat(devRoutes)
+        //   generaMenu(accessedRoutes, tree)
+        //   accessedRoutes.sort(function (a, b) {return a.menuOrder - b.menuOrder})
+        //   commit('SET_ROUTES', accessedRoutes)
+        //   resolve(accessedRoutes)
+        // } else {
           let accessedRoutes = [].concat(asyncRoutes)
           generaMenu(accessedRoutes, tree)
           accessedRoutes.sort(function (a, b) {return a.menuOrder - b.menuOrder})
           commit('SET_ROUTES', accessedRoutes)
           resolve(accessedRoutes)
-        }
+        // }
       }).catch(error => {
         console.error(error)
       })
@@ -115,11 +115,12 @@ export function generaMenu(routes, data) {
   data.forEach(item => {
     let menu = {
       // path必须/开通不然会显示空白
-      path: '/' + item.menuUrl + item.id,
+      path: '/' + (item.menuType === 0 ? item.id : item.menuUrl),
       component: item.menuType === 0 ? Layout : (resolve) => require([`@/views/${item.menuUrl}/index`], resolve),
       children: [],
       name: 'menu_' + item.id,
       menuOrder: item.menuOrder,
+      hidden: item.hide,
       meta: {title: item.menuName, icon: item.menuIcon}
     }
     if (item.children) {

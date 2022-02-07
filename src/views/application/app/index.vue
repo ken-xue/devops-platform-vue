@@ -2,8 +2,8 @@
   <div>
     <el-card class="box-card">
       <el-form ref="queryForm" :model="queryParams" :inline="true" label-position="left" label-width="68px">
-        <el-form-item label="用户名" prop="applicationName">
-          <el-input v-model="queryParams.userDTO.applicationName" placeholder="请输入用户名" clearable size="small" @keyup.enter.native="handleQuery" />
+        <el-form-item label="应用名" prop="applicationName">
+          <el-input v-model="queryParams.applicationInfoDTO.applicationName" placeholder="请输入应用名" clearable size="small" @keyup.enter.native="handleQuery" />
         </el-form-item>
         <el-form-item>
           <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
@@ -28,12 +28,17 @@
         </el-table-column>
         <el-table-column label="访问方式" align="center" prop="email" max-width="300" >
           <template slot-scope="scope">
-            <el-tag  size="small" type="success" v-for="(item, index) in accessWays" :key="index" :label="item.label" :value="item.value" :disabled="item.disabled" v-if="scope.row.accessWay===item.value">{{ item.label }}</el-tag>
+            <el-tag  size="small" type="info" v-for="(item, index) in accessWays" :key="index" :label="item.label" :value="item.value" :disabled="item.disabled" v-if="scope.row.accessWay===item.value">{{ item.label }}</el-tag>
           </template>
         </el-table-column>
         <el-table-column label="创建时间" align="center" prop="gmtCreate" :show-overflow-tooltip="true" />
         <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
           <template slot-scope="scope">
+            <router-link :to="'/application/pipeline'">
+              <el-button v-permission="['sys:user:update']" size="mini" type="text" icon="el-icon-s-promotion">流水线</el-button>
+            </router-link>
+            <el-button v-permission="['sys:user:update']" size="mini" type="text" icon="el-icon-setting" @click="handleUpdate(scope.row)">配置</el-button>
+            <el-button v-permission="['sys:user:update']" size="mini" type="text" icon="el-icon-user-solid" @click="handleUpdate(scope.row)">用户</el-button>
             <el-button v-permission="['sys:user:update']" size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)">修改</el-button>
             <el-button v-permission="['sys:user:delete']" size="mini" type="text" style="color: red" icon="el-icon-delete" @click="handleDelete(scope.row)">删除</el-button>
           </template>
@@ -132,8 +137,8 @@ export default {
       queryParams: {
         pageIndex: 1,
         pageSize: 10,
-        userDTO: {
-          userName: ''
+        applicationInfoDTO: {
+          applicationName: ''
         }
       },
       // 表单参数
@@ -231,7 +236,7 @@ export default {
           this.roleIdList = response.data.roleIdList
           this.form.status = String(this.form.status)
           this.open = true
-          this.title = '修改用户'
+          this.title = '修改应用'
           this.isEdit = true
         })
       })
@@ -244,7 +249,7 @@ export default {
           this.form.roleIdList = this.roleIdList
           this.form.userType = parseInt(this.form.userType)
           if (this.form.id !== undefined) {
-            updateAppInfo({'userDTO':this.form}).then(response => {
+            updateAppInfo({'applicationInfoDTO':this.form}).then(response => {
               if (response.code === 2000) {
                 this.msgSuccess('修改成功')
                 this.open = false

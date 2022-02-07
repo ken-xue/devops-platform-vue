@@ -1,9 +1,19 @@
 <template>
   <div>
     <el-card class="box-card">
-      <el-form ref="queryForm" :model="queryParams" :inline="true" label-position="left" label-width="68px">
-        <el-form-item label="名称" prop="jobName">
-          <el-input v-model="queryParams.jobName" placeholder="请输入名称" clearable size="small" @keyup.enter.native="handleQuery" />
+      <el-form ref="queryForm" :model="queryParams" :inline="true" label-position="left" label-width="90px">
+        <el-form-item  label="应用名称">
+          <el-select v-model="value" filterable placeholder="请选择">
+            <el-option
+              v-for="item in options"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="流水线名称" prop="jobName">
+          <el-input v-model="queryParams.jobName" placeholder="请输入流水线名称" clearable size="small" @keyup.enter.native="handleQuery" />
         </el-form-item>
         <el-form-item>
           <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
@@ -14,7 +24,7 @@
       </el-form>
       <el-table v-loading="loading" :data="menuList" @selection-change="handleSelectionChange">
         <el-table-column type="selection" width="55" align="center" />
-        <el-table-column label="序号" align="center" prop="jobId" width="45" :show-overflow-tooltip="true">
+        <el-table-column label="序号" align="center" prop="jobId" width="55" :show-overflow-tooltip="true">
           <template slot-scope="props">
             <p v-text="props.$index+1" />
           </template>
@@ -189,6 +199,23 @@ export default {
       },
       // 表单参数
       form: {},
+      options: [{
+        value: '选项1',
+        label: '黄金糕'
+      }, {
+        value: '选项2',
+        label: '双皮奶'
+      }, {
+        value: '选项3',
+        label: '蚵仔煎'
+      }, {
+        value: '选项4',
+        label: '龙须面'
+      }, {
+        value: '选项5',
+        label: '北京烤鸭'
+      }],
+      value: ''
     }
   },
   created() {

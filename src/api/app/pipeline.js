@@ -1,27 +1,4 @@
 import request from '@/utils/request'
-
-export function login(data) {
-  return request({
-    url: '/login',
-    method: 'post',
-    data
-  })
-}
-
-export function getInfo() {
-  return request({
-    url: '/sys/user/self/info',
-    method: 'get'
-  })
-}
-
-export function logout() {
-  return request({
-    url: '/logout',
-    method: 'post'
-  })
-}
-
 // 查询User列表
 export function pageUser(data) {
   return request({
@@ -60,15 +37,5 @@ export function delUser(data) {
     url: '/sys/user/delete',
     method: 'delete',
     data: data
-  })
-}
-/**
- * 获取授权相关数据菜单
- * @returns {AxiosPromise}
- */
-export function getAuth() {
-  return request({
-    url: '/sys/menu/auth',
-    method: 'get'
   })
 }

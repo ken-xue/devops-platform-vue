@@ -178,9 +178,16 @@
                 <el-input v-model="form.menuPerms" placeholder="授权标识"/>
               </el-form-item>
             </el-col>
-            <el-col>
+            <el-col  :span="12">
               <el-form-item v-if="form.menuType !== 2" label="菜单排序" prop="menuOrder">
                 <el-input-number v-model="form.menuOrder" controls-position="right" :min="0" label="菜单排序"></el-input-number>
+              </el-form-item>
+            </el-col>
+            <el-col v-if="this.form.menuType==1" :span="12">
+              <el-form-item label="是否隐藏" prop="hide">
+                <el-radio-group v-model="form.hide">
+                  <el-radio v-for="type in hideTypeList" :label="type.dictValue" :key="type.dictLabel">{{ type.dictLabel }}</el-radio>
+                </el-radio-group>
               </el-form-item>
             </el-col>
           </el-row>
@@ -255,6 +262,10 @@ export default {
         { dictValue: 1, dictLabel: '菜单' },
         { dictValue: 2, dictLabel: '按钮' }
       ],
+      hideTypeList: [
+        { dictValue: false, dictLabel: '显示' },
+        { dictValue: true, dictLabel: '隐藏' }
+      ],
       statusOptions: [],
       // 查询参数
       queryParams: {
@@ -273,7 +284,8 @@ export default {
         menuPerms: '',
         menuOrder: 0,
         menuName: '',
-        menuIcon: ''
+        menuIcon: '',
+        hide: false
       },
       // 表单校验
       rules: {
@@ -323,7 +335,8 @@ export default {
         menuPerms: '',
         menuOrder: 0,
         menuName: '',
-        menuIcon: ''
+        menuIcon: '',
+        hide: false
       }
       this.resetForm('form')
     },
