@@ -87,7 +87,7 @@
 </template>
 
 <script>
-import { del, info, page,add } from '@/api/app/pipelines'
+import { del, info, page,add } from '@/api/app/pipeline'
 import {addAppInfo, listAppInfo, updateAppInfo} from '@/api/app/app'
 import {nestedGetQuery} from "@/utils";
 
