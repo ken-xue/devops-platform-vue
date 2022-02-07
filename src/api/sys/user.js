@@ -27,7 +27,7 @@ export function pageUser(data) {
   return request({
     url: '/sys/user/page',
     method: 'get',
-    data: data
+    params: data
   })
 }
 // 查询User详细

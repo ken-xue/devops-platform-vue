@@ -1,9 +1,16 @@
 import request from '@/utils/request'
 
-// 查询User列表
+// 查询列表
 export function pageAppInfo(data) {
   return request({
     url: '/app/info/page',
+    method: 'get',
+    data: data
+  })
+}
+export function listAppInfo(data) {
+  return request({
+    url: '/app/info/list',
     method: 'get',
     data: data
   })

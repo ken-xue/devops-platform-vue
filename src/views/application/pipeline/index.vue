@@ -3,41 +3,42 @@
     <el-card class="box-card">
       <el-form ref="queryForm" :model="queryParams" :inline="true" label-position="left" label-width="90px">
         <el-form-item  label="应用名称">
-          <el-select v-model="value" filterable placeholder="请选择">
+          <el-select v-model="queryParams.applicationUuid" filterable placeholder="请选择" @change="handleQuery">
             <el-option
-              v-for="item in options"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
+              v-for="item in appList"
+              :key="item.uuid"
+              :label="item.applicationName"
+              :value="item.uuid">
             </el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="流水线名称" prop="jobName">
-          <el-input v-model="queryParams.jobName" placeholder="请输入流水线名称" clearable size="small" @keyup.enter.native="handleQuery" />
+          <el-input v-model="queryParams.pipelineName" placeholder="请输入流水线名称" clearable size="small" @keyup.enter.native="handleQuery" />
         </el-form-item>
         <el-form-item>
           <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
           <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
+          <el-button v-permission="['sys:user:add']" type="primary" icon="el-icon-plus" size="mini" @click="handleAdd">新增</el-button>
           <el-button v-permission="['sys:user:delete']" type="danger" icon="el-icon-delete" size="mini" :disabled="multiple" @click="handleDelete">删除
           </el-button>
         </el-form-item>
       </el-form>
-      <el-table v-loading="loading" :data="menuList" @selection-change="handleSelectionChange">
+      <el-table v-loading="loading" :data="pipelineList" @selection-change="handleSelectionChange">
         <el-table-column type="selection" width="55" align="center" />
         <el-table-column label="序号" align="center" prop="jobId" width="55" :show-overflow-tooltip="true">
           <template slot-scope="props">
             <p v-text="props.$index+1" />
           </template>
         </el-table-column>
-        <el-table-column label="用户名" align="center" prop="username" :show-overflow-tooltip="true" />
-        <el-table-column label="动作" align="center" prop="operation" width="100"  :show-overflow-tooltip="true"/>
-        <el-table-column label="请求方法" align="center" prop="method" max-width="300"  :show-overflow-tooltip="true"/>
-        <el-table-column label="参数" align="center" prop="params" :show-overflow-tooltip="true" />
-        <el-table-column label="发生时间" align="center" prop="occurTime" :show-overflow-tooltip="true" />
-        <el-table-column label="执行耗时(毫秒)" align="center" prop="executeTime" :show-overflow-tooltip="true"/>
-        <el-table-column label="IP地址" align="center" prop="ip" :show-overflow-tooltip="true"/>
-        <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+        <el-table-column label="名称" align="center" prop="pipelineName" :show-overflow-tooltip="true" />
+        <el-table-column label="创建人" align="center" prop="creator" width="100"  :show-overflow-tooltip="true"/>
+        <el-table-column label="创建时间" align="center" prop="gmtCreate" max-width="300"  :show-overflow-tooltip="true"/>
+        <el-table-column label="修改人" align="center" prop="modifier" :show-overflow-tooltip="true" />
+        <el-table-column label="修改时间" align="center" prop="gmtModified" :show-overflow-tooltip="true" />
+        <el-table-column label="操作" align="center" class-name="small-padding fixed-width"  width="300" >
           <template slot-scope="scope">
+            <el-button v-permission="['sys:user:update']" size="mini" type="text" icon="el-icon-setting" @click="handleUpdate(scope.row)">编排</el-button>
+            <el-button v-permission="['sys:user:update']" size="mini" type="text" icon="el-icon-info" @click="handleInfo(scope.row)">详情</el-button>
             <el-button v-permission="['sys:log:delete']" size="mini" type="text" style="color: red" icon="el-icon-delete" @click="handleDelete(scope.row)">删除</el-button>
           </template>
         </el-table-column>
@@ -49,106 +50,35 @@
         <el-form ref="form" :model="form" label-width="120px">
           <el-row>
             <el-col :span="12">
-              <el-form-item label="名称" prop="jobName">
-                <el-input v-model="form.jobName" placeholder="名称" />
+              <el-form-item  label="应用名称">
+                <el-input v-for="(item,index) in appList" :key="index" v-if="item.uuid === form.applicationUuid" v-text="item.applicationName" v-model="form.applicationUuid" :disabled="true">
+                </el-input>
               </el-form-item>
             </el-col>
             <el-col :span="12">
-              <el-form-item label="任务分组" prop="jobGroup">
-                <el-select v-model="form.jobGroup" placeholder="请选择">
-                  <el-option v-for="dict in jobGroupOptions" :key="dict.dictValue" :label="dict.dictLabel" :value="dict.dictValue" />
-                </el-select>
-              </el-form-item>
-            </el-col>
-            <el-col :span="24">
-              <el-form-item label="调用目标" prop="invokeTarget">
+              <el-form-item label="流水线名称" prop="pipelineName">
                 <span slot="label">
-                  调用目标
+                  流水线名称
                   <el-tooltip placement="top">
                     <div slot="content">
-                      调用示例：func (t *EXEC) ExamplesNoParam(){..} 填写 ExamplesNoParam 即可；
-                      <br>参数说明：目前不支持带参调用
+                      名称示例：dev-1.0.0 即可
                     </div>
                     <i class="el-icon-question" />
                   </el-tooltip>
                 </span>
-                <el-input
-                  v-model="form.invokeTarget"
-                  placeholder="调用目标"
-                />
+                <el-input v-model="form.pipelineName" placeholder="流水线名称" />
               </el-form-item>
             </el-col>
             <el-col :span="24">
-              <el-form-item label="目标参数" prop="args">
-                <span slot="label">
-                  目标参数
-                  <el-tooltip placement="top">
-                    <div slot="content">
-                      参数示例：有参：请以string格式填写；无参：为空；
-                      <br>参数说明：目前仅支持函数调用
-                    </div>
-                    <i class="el-icon-question" />
-                  </el-tooltip>
-                </span>
-                <el-input
-                  v-model="form.args"
-                  placeholder="目标参数"
-                />
-              </el-form-item>
-            </el-col>
-            <el-col :span="12">
-              <el-form-item label="cron表达式" prop="cronExpression">
-                <el-input
-                  v-model="form.cronExpression"
-                  placeholder="cron表达式"
-                />
-              </el-form-item>
-            </el-col>
-            <el-col :span="12">
-              <el-form-item label="是否并发" prop="concurrent">
-                <el-radio-group v-model="form.concurrent" size="small">
-                  <el-radio-button label="0">允许</el-radio-button>
-                  <el-radio-button label="1">禁止</el-radio-button>
-                </el-radio-group>
-              </el-form-item>
-            </el-col>
-            <el-col :span="24">
-              <el-form-item label="调用类型" prop="jobType">
-                <el-radio-group v-model="form.jobType" size="small">
-                  <el-radio-button label="1">接口</el-radio-button>
-                  <el-radio-button label="2">函数</el-radio-button>
-                </el-radio-group>
-              </el-form-item>
-            </el-col>
-
-            <el-col :span="24">
-              <el-form-item label="执行策略" prop="misfirePolicy">
-                <el-radio-group v-model="form.misfirePolicy" size="small">
-                  <el-radio-button label="1">立即执行</el-radio-button>
-                  <el-radio-button label="2">执行一次</el-radio-button>
-                  <el-radio-button label="3">放弃执行</el-radio-button>
-                </el-radio-group>
-              </el-form-item>
-            </el-col>
-            <el-col :span="12">
-              <el-form-item label="状态" prop="status">
-                <el-select
-                  v-model="form.status"
-                  placeholder="请选择"
-                >
-                  <el-option
-                    v-for="dict in statusOptions"
-                    :key="dict.dictValue"
-                    :label="dict.dictLabel"
-                    :value="dict.dictValue"
-                  />
-                </el-select>
+              <el-form-item  label="流程">
+                <el-input v-model="form.pipelineContext">
+                </el-input>
               </el-form-item>
             </el-col>
           </el-row>
         </el-form>
         <div slot="footer" class="dialog-footer">
-          <el-button type="primary" @click="this.visible=false">确 定</el-button>
+          <el-button type="primary" @click="submitForm">确 定</el-button>
           <el-button @click="cancel">取 消</el-button>
         </div>
       </el-dialog>
@@ -157,7 +87,9 @@
 </template>
 
 <script>
-import { delLog, getLog, pageLog } from '@/api/sys/log'
+import { del, info, page,add } from '@/api/app/pipelines'
+import {addAppInfo, listAppInfo, updateAppInfo} from '@/api/app/app'
+import {nestedGetQuery} from "@/utils";
 
 export default {
   name: 'Pipeline',
@@ -167,6 +99,7 @@ export default {
       // 遮罩层
       loading: true,
       id: 0,
+      applicationUuid: '',
       // 选中数组
       ids: [],
       // 非单个禁用
@@ -180,55 +113,38 @@ export default {
       // 是否显示弹出层
       open: false,
       isEdit: false,
-      // 类型数据字典
-      typeOptions: [],
-      menuList: [],
-      jobGroupOptions: [
-        { dictValue: '0', dictLabel: '目录' },
-        { dictValue: '1', dictLabel: '菜单' },
-        { dictValue: '2', dictLabel: '按钮' }
-      ],
-      statusOptions: [],
+      pipelineList: [],
       // 查询参数
       queryParams: {
         pageIndex: 1,
         pageSize: 10,
-        jobName: undefined,
-        jobGroup: undefined,
-        status: undefined
+        applicationUuid: undefined,
+        pipelineName: undefined
       },
       // 表单参数
       form: {},
-      options: [{
-        value: '选项1',
-        label: '黄金糕'
-      }, {
-        value: '选项2',
-        label: '双皮奶'
-      }, {
-        value: '选项3',
-        label: '蚵仔煎'
-      }, {
-        value: '选项4',
-        label: '龙须面'
-      }, {
-        value: '选项5',
-        label: '北京烤鸭'
-      }],
-      value: ''
+      appList: []
     }
   },
   created() {
+    this.queryParams.applicationUuid = this.$route.query.uuid,
+    this.getAppList(),
     this.getList()
   },
   methods: {
     /** 查询参数列表 */
     getList() {
       this.loading = true
-      pageLog(this.queryParams).then(response => {
-        console.log('数据：', JSON.stringify(response.data))
-        this.menuList = response.data
+      page(nestedGetQuery(this.queryParams)).then(response => {
+        this.pipelineList = response.data
         this.total = response.totalCount
+        this.loading = false
+      })
+    },
+    getAppList() {
+      this.loading = true
+      listAppInfo(this.queryParams).then(response => {
+        this.appList = response.data
         this.loading = false
       })
     },
@@ -240,16 +156,9 @@ export default {
     // 表单重置
     reset() {
       this.form = {
-        jobId: undefined,
-        jobName: undefined,
-        jobGroup: undefined,
-        cronExpression: undefined,
-        invokeTarget: undefined,
-        args: undefined,
-        misfirePolicy: 1,
-        concurrent: 1,
-        jobType: 1,
-        status: undefined
+        applicationUuid: undefined,
+        pipelineName: undefined,
+        pipelineContext: undefined
       }
       this.resetForm('form')
     },
@@ -268,8 +177,9 @@ export default {
     handleAdd() {
       this.reset()
       this.open = true
-      this.title = '添加定时任务'
+      this.title = '添加流水线'
       this.isEdit = false
+      this.form.applicationUuid = this.queryParams.applicationUuid
     },
     // 多选框选中数据
     handleSelectionChange(selection) {
@@ -290,6 +200,35 @@ export default {
         this.getList()
         this.msgSuccess('删除成功')
       }).catch(function() {
+      })
+    },
+    /** 提交按钮 */
+    submitForm: function() {
+      console.log(this.form)
+      this.$refs['form'].validate(valid => {
+        if (valid) {
+          if (this.form.id !== undefined) {
+            update({'applicationPipelineDTO':this.form}).then(response => {
+              if (response.code === 2000) {
+                this.msgSuccess('修改成功')
+                this.open = false
+                this.getList()
+              } else {
+                this.msgError(response.msg)
+              }
+            })
+          } else {
+            add({'applicationPipelineDTO':this.form}).then(response => {
+              if (response.code === 2000) {
+                this.msgSuccess('新增成功')
+                this.open = false
+                this.getList()
+              } else {
+                this.msgError(response.msg)
+              }
+            })
+          }
+        }
       })
     }
   }

@@ -34,9 +34,10 @@
         <el-table-column label="创建时间" align="center" prop="gmtCreate" :show-overflow-tooltip="true" />
         <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
           <template slot-scope="scope">
-            <router-link :to="'/application/pipeline'">
-              <el-button v-permission="['sys:user:update']" size="mini" type="text" icon="el-icon-s-promotion">流水线</el-button>
-            </router-link>
+<!--            <router-link :to="'/application/pipeline'">-->
+<!--              <el-button v-permission="['sys:user:update']" size="mini" type="text" icon="el-icon-s-promotion">流水线</el-button>-->
+<!--            </router-link>-->
+            <el-button v-permission="['sys:user:update']" size="mini" type="text" icon="el-icon-s-promotion" @click="pipeline(scope.row)">流水线</el-button>
             <el-button v-permission="['sys:user:update']" size="mini" type="text" icon="el-icon-setting" @click="handleUpdate(scope.row)">配置</el-button>
             <el-button v-permission="['sys:user:update']" size="mini" type="text" icon="el-icon-user-solid" @click="handleUpdate(scope.row)">用户</el-button>
             <el-button v-permission="['sys:user:update']" size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)">修改</el-button>
@@ -286,6 +287,17 @@ export default {
         this.msgSuccess('删除成功')
       }).catch(function() {
       })
+    },
+    // 路由跳转到流水线
+    pipeline(row){
+      this.$router.push(
+        {
+          path: '/application/pipeline',
+          query: {
+            uuid: row.uuid
+          }
+        }
+      )
     }
   }
 }

@@ -25,7 +25,7 @@ export default {
   data() {
     return {
       title: 'cicd-platform',
-      logo: '/img/dev.png'
+      logo: '/favicon.ico'
     }
   }
 }
