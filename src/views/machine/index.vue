@@ -30,7 +30,7 @@
         </el-table-column>
         <el-table-column label="创建时间" align="center" prop="gmtCreate" :show-overflow-tooltip="true" />
         <el-table-column label="更新时间" align="center" prop="gmtModified" :show-overflow-tooltip="true" />
-        <el-table-column label="操作" align="center" class-name="small-padding fixed-width" min-width="150">
+        <el-table-column label="操作" align="center" min-width="150">
           <template slot-scope="scope">
             <el-button v-permission="['sys:user:update']" size="mini" type="text" icon="el-icon-s-platform" @click="terminal(scope.row)">终端</el-button>
             <el-button v-permission="['sys:user:update']" size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)">修改</el-button>
@@ -42,6 +42,9 @@
       <!--页码-->
       <pagination v-show="total>0" style="padding: 0px" :total="total" :page.sync="queryParams.pageIndex" :limit.sync="queryParams.pageSize" @pagination="getList" />
       <!-- 添加或修改对话框 -->
+      <el-dialog :title="title" :visible.sync="terminalVisible" width="80%" append-to-body>
+        <xterm ref="Xterm"></xterm>
+      </el-dialog>
       <el-dialog :title="title" :visible.sync="open" width="700px" append-to-body>
         <el-form ref="form" :model="form" :rules="rules" label-width="120px">
           <el-row>
@@ -99,10 +102,11 @@
 <script>
 import { add, del, testConn, get, page, update} from '@/api/machine/machine'
 import {nestedGetQuery} from "@/utils";
+import Xterm from "@/views/machine/xterm";
 
 export default {
   name: 'MachineInfo',
-  components: {},
+  components: {Xterm},
   data() {
     return {
       // 遮罩层
@@ -122,6 +126,7 @@ export default {
       // 是否显示弹出层
       open: false,
       isEdit: false,
+      terminalVisible: false,
       // 类型数据字典
       typeOptions: [],
       AppInfoList: [],
@@ -240,7 +245,10 @@ export default {
     },
     // 终端
     terminal(row) {
-
+      this.terminalVisible = true
+      this.$nextTick(() => {
+        this.$refs.Xterm.initSocket(row.uuid)
+      })
     },
     // 测试连接服务器
     testConnect () {

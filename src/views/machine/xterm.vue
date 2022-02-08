@@ -1,5 +1,5 @@
 <template>
-  <div id="xterm" class="xterm" />
+  <div style="overflow: hidden" id="xterm" class="xterm" />
 </template>
 <script>
 import 'xterm/css/xterm.css'
@@ -12,11 +12,11 @@ export default {
   props: {
     socketURI: {
       type: String,
-      default: ''
+      default: 'ws://127.0.0.1:8088/terminal'
     },
   },
   mounted() {
-    this.initSocket()
+    // this.initSocket()
   },
   beforeDestroy() {
     this.socket.close()
@@ -37,7 +37,7 @@ export default {
       term.focus();
       this.term = term
     },
-    initSocket() {
+    initSocket(uuid) {
       this.socket = new WebSocket(this.socketURI);
       this.socketOnClose();
       this.socketOnOpen();
