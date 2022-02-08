@@ -2,8 +2,8 @@
   <div>
     <el-card class="box-card">
       <el-form ref="queryForm" :model="queryParams" :inline="true" label-position="left" label-width="98px">
-        <el-form-item label="IP/服务器名" prop="applicationName">
-          <el-input v-model="queryParams.applicationInfoDTO.applicationName" placeholder="请输入IP或者服务器名称" clearable size="small" @keyup.enter.native="handleQuery" />
+        <el-form-item label="IP/服务器名" prop="name">
+          <el-input v-model="queryParams.machineInfoDTO.name" placeholder="请输入IP或者服务器名称" clearable size="small" @keyup.enter.native="handleQuery" />
         </el-form-item>
         <el-form-item>
           <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
@@ -34,7 +34,7 @@
           <template slot-scope="scope">
             <el-button v-permission="['sys:user:update']" size="mini" type="text" icon="el-icon-s-platform" @click="terminal(scope.row)">终端</el-button>
             <el-button v-permission="['sys:user:update']" size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)">修改</el-button>
-            <el-button v-permission="['sys:user:update']" size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)">秘钥</el-button>
+            <el-button v-permission="['sys:user:update']" size="mini" type="text" icon="el-icon-postcard" @click="addSecret(scope.row)">秘钥</el-button>
             <el-button v-permission="['sys:user:delete']" size="mini" type="text" style="color: red" icon="el-icon-delete" @click="handleDelete(scope.row)">删除</el-button>
           </template>
         </el-table-column>
@@ -45,6 +45,7 @@
       <el-dialog :title="title" top="10vh" :visible.sync="terminalVisible" :before-close="closeTerminal" width="80%" append-to-body>
         <xterm ref="Xterm"></xterm>
       </el-dialog>
+<!--      终端-->
       <el-dialog :title="title" :visible.sync="open" width="700px" append-to-body>
         <el-form ref="form" :model="form" :rules="rules" label-width="120px">
           <el-row>
@@ -95,6 +96,32 @@
           <el-button @click="cancel">取 消</el-button>
         </div>
       </el-dialog>
+<!--      添加秘钥-->
+      <el-dialog :title="title" :visible.sync="secretVisible" width="700px" append-to-body>
+        <el-form ref="form" :model="form" :rules="rules" label-width="120px">
+          <el-row>
+            <el-col :span="12">
+              <el-form-item label="服务器名" prop="applicationName">
+                <el-input v-model="form.name" :disabled="true" placeholder="请输入服务器名称" />
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="服务器IP" prop="applicationName">
+                <el-input  :disabled="true" v-model="form.ip" placeholder="请输入服务器IP" />
+              </el-form-item>
+            </el-col>
+            <el-col :span="24">
+              <el-form-item label="访问密钥" prop="accessKey">
+                <el-input type="textarea" :rows="8" v-model="form.accessKey" placeholder="请输入访问密钥" />
+              </el-form-item>
+            </el-col>
+          </el-row>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+          <el-button type="primary" @click="submitForm">添 加</el-button>
+          <el-button @click="secretVisible=!secretVisible">取 消</el-button>
+        </div>
+      </el-dialog>
     </el-card>
   </div>
 </template>
@@ -127,6 +154,7 @@ export default {
       open: false,
       isEdit: false,
       terminalVisible: false,
+      secretVisible: false,
       // 类型数据字典
       typeOptions: [],
       AppInfoList: [],
@@ -146,8 +174,8 @@ export default {
       queryParams: {
         pageIndex: 1,
         pageSize: 10,
-        applicationInfoDTO: {
-          applicationName: ''
+        machineInfoDTO: {
+          name: ''
         }
       },
       // 表单参数
@@ -242,6 +270,16 @@ export default {
           this.title = '修改服务器信息'
           this.isEdit = true
         })
+    },
+    addSecret(row) {
+      this.reset()
+      const id = row.id || this.id
+      get(id).then(response => {
+        this.form = response.data
+        this.secretVisible = true
+        this.title = '添加访问秘钥'
+        this.isEdit = true
+      })
     },
     // 终端
     terminal(row) {

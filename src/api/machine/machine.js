@@ -5,7 +5,7 @@ export function page(data) {
   return request({
     url: '/app/machine/page',
     method: 'get',
-    data: data
+    params: data
   })
 }
 export function list(data) {
