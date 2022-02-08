@@ -42,7 +42,7 @@
       <!--页码-->
       <pagination v-show="total>0" style="padding: 0px" :total="total" :page.sync="queryParams.pageIndex" :limit.sync="queryParams.pageSize" @pagination="getList" />
       <!-- 添加或修改对话框 -->
-      <el-dialog :title="title" :visible.sync="terminalVisible" :before-close="closeTerminal" width="80%" append-to-body>
+      <el-dialog :title="title" top="10vh" :visible.sync="terminalVisible" :before-close="closeTerminal" width="80%" append-to-body>
         <xterm ref="Xterm"></xterm>
       </el-dialog>
       <el-dialog :title="title" :visible.sync="open" width="700px" append-to-body>
