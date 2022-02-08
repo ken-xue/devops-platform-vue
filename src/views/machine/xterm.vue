@@ -12,7 +12,7 @@ export default {
   props: {
     socketURI: {
       type: String,
-      default: 'ws://127.0.0.1:8088/terminal'
+      default: 'ws://127.0.0.1:8088/terminal?f1944396bf43402aaa501b5856f67379'
     },
   },
   mounted() {
@@ -26,7 +26,10 @@ export default {
     initTerm() {
       const term = new Terminal({
         fontSize: 14,
-        cursorBlink: true
+        rows: 33,
+        cursorBlink: true,
+        windowsMode: true,
+        disableStdin: false
       });
       const attachAddon = new AttachAddon(this.socket);
       const fitAddon = new FitAddon();
@@ -38,7 +41,8 @@ export default {
       this.term = term
     },
     initSocket(uuid) {
-      this.socket = new WebSocket(this.socketURI);
+      // this.socketURI.default = 'ws://127.0.0.1:8088/terminal?'+uuid
+      this.socket = new WebSocket('ws://127.0.0.1:8088/terminal?'+uuid);
       this.socketOnClose();
       this.socketOnOpen();
       this.socketOnError();
@@ -58,6 +62,10 @@ export default {
       this.socket.onerror = () => {
         // console.log('socket 链接失败')
       }
+    },
+    beforeDestroy() {
+      this.socket.close()
+      this.term.dispose()
     }
   }
 }

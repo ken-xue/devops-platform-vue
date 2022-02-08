@@ -13,7 +13,7 @@
           </el-button>
         </el-form-item>
       </el-form>
-      <el-table v-loading="loading" :data="userList" @selection-change="handleSelectionChange">
+      <el-table v-loading="loading" :data="machineList" @selection-change="handleSelectionChange">
         <el-table-column type="selection" width="55" align="center" />
         <el-table-column label="序号" align="center" prop="userId" width="55" :show-overflow-tooltip="true">
           <template slot-scope="props">
@@ -42,7 +42,7 @@
       <!--页码-->
       <pagination v-show="total>0" style="padding: 0px" :total="total" :page.sync="queryParams.pageIndex" :limit.sync="queryParams.pageSize" @pagination="getList" />
       <!-- 添加或修改对话框 -->
-      <el-dialog :title="title" :visible.sync="terminalVisible" width="80%" append-to-body>
+      <el-dialog :title="title" :visible.sync="terminalVisible" :before-close="closeTerminal" width="80%" append-to-body>
         <xterm ref="Xterm"></xterm>
       </el-dialog>
       <el-dialog :title="title" :visible.sync="open" width="700px" append-to-body>
@@ -131,7 +131,7 @@ export default {
       typeOptions: [],
       AppInfoList: [],
       roleIdList: [],
-      roleList: [],
+      machineList: [],
       applicationTypes: [
         { value: 'Java', label: 'Java应用' },
         { value: 'Go', label: 'Go应用' },
@@ -171,7 +171,7 @@ export default {
     getList() {
       this.loading = true
       page(nestedGetQuery(this.queryParams)).then(response => {
-        this.userList = response.data
+        this.machineList = response.data
         this.total = response.totalCount
         this.loading = false
       })
@@ -246,8 +246,15 @@ export default {
     // 终端
     terminal(row) {
       this.terminalVisible = true
+      this.title = '终端'
       this.$nextTick(() => {
         this.$refs.Xterm.initSocket(row.uuid)
+      })
+    },
+    closeTerminal(){
+      this.terminalVisible = false
+      this.$nextTick(() => {
+        this.$refs.Xterm.beforeDestroy()
       })
     },
     // 测试连接服务器
