@@ -46,7 +46,10 @@
       <!--页码-->
       <pagination v-show="total>0" style="padding: 0px" :total="total" :page.sync="queryParams.pageIndex" :limit.sync="queryParams.pageSize" @pagination="getList" />
       <!-- 添加或修改对话框 -->
-      <el-dialog :title="title" :visible.sync="open" width="700px" append-to-body>
+<!--      <el-dialog :title="title" :visible.sync="open" width="700px" append-to-body>-->
+<!--        <flowchart></flowchart>-->
+<!--      </el-dialog>-->
+      <el-dialog :title="title" top="5vh" :visible.sync="open" width="90%" append-to-body>
         <el-form ref="form" :model="form" label-width="120px">
           <el-row>
             <el-col :span="12">
@@ -69,19 +72,22 @@
                 <el-input v-model="form.pipelineName" placeholder="流水线名称" />
               </el-form-item>
             </el-col>
-            <el-col :span="24">
-              <el-form-item  label="流程">
-                <el-input v-model="form.pipelineContext">
-                </el-input>
-              </el-form-item>
-            </el-col>
+<!--            <el-col :span="24">-->
+<!--              <el-form-item  label="流程">-->
+<!--                <el-input v-model="form.pipelineContext">-->
+<!--                </el-input>-->
+<!--              </el-form-item>-->
+<!--            </el-col>-->
           </el-row>
         </el-form>
+<!--        <flowchart></flowchart>-->
+        <flow-index></flow-index>
         <div slot="footer" class="dialog-footer">
           <el-button type="primary" @click="submitForm">确 定</el-button>
           <el-button @click="cancel">取 消</el-button>
         </div>
       </el-dialog>
+
     </el-card>
   </div>
 </template>
@@ -90,10 +96,12 @@
 import { del, info, page,add } from '@/api/app/pipeline'
 import {addAppInfo, listAppInfo, updateAppInfo} from '@/api/app/app'
 import {nestedGetQuery} from "@/utils";
+import Flowchart from "@/views/application/pipeline/flowchart";
+import FlowIndex from "@/views/application/pipeline/flowIndex";
 
 export default {
   name: 'Pipeline',
-  components: {},
+  components: {FlowIndex, Flowchart},
   data() {
     return {
       // 遮罩层
