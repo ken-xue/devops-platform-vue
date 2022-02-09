@@ -5,7 +5,7 @@ import Node from './Node.vue';
 import contextMenu from './contextMenu';
 import instance from './instance';
 import model from './model';
-import FlowChart from './index';
+import FlowChart from './flowChartIndexData';
 import { EventCenter } from './EventCenter';
 import { sourceEndpoint, targetEndpoint } from './style';
 import { isEndpoint, createUuid } from './Utils';

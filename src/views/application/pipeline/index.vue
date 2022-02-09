@@ -96,8 +96,8 @@
 import { del, info, page,add } from '@/api/app/pipeline'
 import {addAppInfo, listAppInfo, updateAppInfo} from '@/api/app/app'
 import {nestedGetQuery} from "@/utils";
-import Flowchart from "@/views/application/pipeline/flowchart";
-import FlowIndex from "@/views/application/pipeline/flowIndex";
+import Flowchart from "@/views/application/pipeline/flowChartCanvas";
+import FlowIndex from "@/views/application/pipeline/flowChartIndex";
 
 export default {
   name: 'Pipeline',
@@ -189,6 +189,20 @@ export default {
       this.isEdit = false
       this.form.applicationUuid = this.queryParams.applicationUuid
     },
+    handleUpdate() {
+      this.reset()
+      this.open = true
+      this.title = '修改流水线'
+      this.isEdit = false
+      this.form.applicationUuid = this.queryParams.applicationUuid
+    },
+    handleInfo(){
+      this.reset()
+      this.open = true
+      this.title = '修改流水线'
+      this.isEdit = false
+      this.form.applicationUuid = this.queryParams.applicationUuid
+    },
     // 多选框选中数据
     handleSelectionChange(selection) {
       this.userIds = selection.map(item => item.userId)
@@ -203,7 +217,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(function() {
-        return delUser({ 'ids': Ids })
+        return del({ 'ids': Ids })
       }).then(() => {
         this.getList()
         this.msgSuccess('删除成功')

@@ -8,22 +8,12 @@
                active-text-color="#9aaeba"
                :collapse="true"
                @select="handleSelect">
-<!--        <el-menu-item index="home">-->
-<!--          <i class="el-icon-s-home"></i>-->
-<!--          <span slot="title">首页</span>-->
-<!--        </el-menu-item>-->
-<!--        <el-menu-item index="ExperimentTree">-->
-<!--          <i class="el-icon-takeaway-box"></i>-->
-<!--          <span slot="title">实验</span>-->
-<!--        </el-menu-item>-->
         <el-menu-item index="ComponentTree">
-          <i class="el-icon-magic-stick"></i>
-          <span slot="title">组件</span>
+          <div style="margin-left: 0px!important;margin-right: 40px!important;">
+            <i class="el-icon-menu"> 组件</i>
+            <span slot="title">组件</span>
+          </div>
         </el-menu-item>
-<!--        <el-menu-item index="setting">-->
-<!--          <i class="el-icon-setting"></i>-->
-<!--          <span slot="title">设置</span>-->
-<!--        </el-menu-item>-->
       </el-menu>
     </el-aside>
     <el-main>
@@ -35,9 +25,10 @@
 </template>
 
 <script>
-import FlowChart from './flowchart';
+import FlowChart from './flowChartCanvas';
 
 export default {
+  name: 'flowChartIndex',
   components: { FlowChart },
   data() {
     return { sidebarComponentName: 'ExperimentTree' }; // 默认展示组件
@@ -58,12 +49,16 @@ export default {
 <style lang="scss">
 .indexWrap{
   .fy_el-aside {
-    background: #21232b;
+    background: #dcdee5;
+    width: 148px!important;
+    padding: 1px 1px!important;
+    margin: 1px 1px!important;
     overflow-x: hidden;
     .el-menu--collapse {
-      width: 48px;
+      width: 148px;
       .el-menu-item {
         padding-left: 0 !important;
+        margin-left: 0 !important;
         padding: 0px !important;
         height: 48px;
         text-align: center;
@@ -75,7 +70,7 @@ export default {
         }
         &.is-active {
           .el-tooltip {
-            background: #121319;
+            background: #aeb0bb;
             &::after {
               content: "";
               width: 3px;
@@ -95,6 +90,7 @@ export default {
   }
   .el-main{
     padding: 0;
+    min-height: 450px;
   }
 }
 

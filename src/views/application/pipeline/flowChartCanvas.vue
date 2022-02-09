@@ -6,17 +6,17 @@
     <el-main>
       <el-container>
         <!-- 2.1 头部tab -->
-        <el-header height="40px"
-                   class="tabsNav">
-          <el-tabs v-model="activeName"
-                   type="card"
-                   closable>
-            <el-tab-pane name="first">
-              <span slot="label">
-                <i class="el-icon-s-promotion"></i>流程一</span>
-            </el-tab-pane>
-          </el-tabs>
-        </el-header>
+<!--        <el-header height="40px"-->
+<!--                   class="tabsNav">-->
+<!--          <el-tabs v-model="activeName"-->
+<!--                   type="card"-->
+<!--                   closable>-->
+<!--            <el-tab-pane name="first">-->
+<!--              <span slot="label">-->
+<!--                <i class="el-icon-s-promotion"></i>流程一</span>-->
+<!--            </el-tab-pane>-->
+<!--          </el-tabs>-->
+<!--        </el-header>-->
         <!-- 2.2 画布内容 -->
         <el-container>
           <!-- 2.2.1 flow面板 -->
@@ -102,7 +102,7 @@
                 <div>
                   <div v-show="toolBarShow==='component'">
                     <div v-show="!isShowNode">
-                      <div class="title">实验属性</div>
+                      <div class="title">属性</div>
                       <div class="model-attr">
                         <p>
                           <span class="item">项目名称</span>
@@ -177,13 +177,14 @@ import Vue from 'vue';
 import ComponentTree from '@/views/application/pipeline/ComponentTree.vue';
 import ExperimentTree from '@/views/application/pipeline/ExperimentTree.vue';
 import API from './api';
-import FlowChart from './index';
+import FlowChart from './flowChartIndexData';
 import PluginFlowExec from './pluginFlowExec';
 import {getFlowChartData} from "@/views/application/pipeline/mock";
 
 FlowChart.use(PluginFlowExec);
 
 export default Vue.extend({
+  name: 'flowchartcanvas',
   components: { ComponentTree, ExperimentTree },
   props: {
     sidebarComponentName: String,

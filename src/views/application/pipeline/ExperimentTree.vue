@@ -19,7 +19,7 @@
                ref="tree2"
                :highlight-current="true"
                :props="defaultProps"></el-tree>
-      <el-button class="btn-new" icon="el-icon-plus">新建实验</el-button>
+      <el-button class="btn-new" icon="el-icon-plus">新建</el-button>
     </el-aside>
 </template>
 
@@ -202,6 +202,8 @@ export default Vue.extend({
 <style lang="scss" scoped>
 .left {
   position: relative;
+  margin: 0px!important;
+  padding: 0px!important;
   .btn-new {
     position: absolute;
     bottom: 0;
