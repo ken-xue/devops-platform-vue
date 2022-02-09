@@ -69,7 +69,7 @@ export default Vue.extend({
     ];
   },
   methods: {
-    renderContentFunction(h, node, data) {
+    renderContentFunction(h, { node, data, store}) {
       const className = node.expanded ? 'el-icon-folder-opened' : 'el-icon-folder';
       const classNameChild = (!data.children && data.icon) ? data.icon : '';
       return h('div', {

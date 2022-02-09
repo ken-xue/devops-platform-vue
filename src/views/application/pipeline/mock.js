@@ -152,7 +152,7 @@ const getFlowChartData = {
 
 const getMenuData = [
   {
-    label: '源 / 目标',
+    label: '代码检查',
     id: 'source',
     children: [{
       label: '写数据表',
@@ -176,7 +176,7 @@ const getMenuData = [
       icon: 'el-icon-coin',
     }],
   }, {
-    label: '数据预处理',
+    label: '开发环境',
     id: 'preHandle',
     children: [{
       label: '采样与过滤',
@@ -227,7 +227,7 @@ const getMenuData = [
       icon: 'el-icon-magic-stick',
     }],
   }, {
-    label: '特征工程',
+    label: '测试环境',
     id: 'sign',
     children: [{
       label: '特征变换',
@@ -281,7 +281,7 @@ const getMenuData = [
       ],
     }],
   }, {
-    label: '机器学习',
+    label: '预发环境',
     id: 'learn',
     children: [{
       label: '二分类',
