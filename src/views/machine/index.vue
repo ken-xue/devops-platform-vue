@@ -34,7 +34,7 @@
           <template slot-scope="scope">
             <el-button v-permission="['sys:user:update']" size="mini" type="text" icon="el-icon-s-platform" @click="terminal(scope.row)">终端</el-button>
             <el-button v-permission="['sys:user:update']" size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)">修改</el-button>
-            <el-button v-permission="['sys:user:update']" size="mini" type="text" icon="el-icon-postcard" @click="addSecret(scope.row)">秘钥</el-button>
+            <el-button v-permission="['sys:user:update']" size="mini" type="text" icon="el-icon-circle-plus-outline" @click="openAddSecret(scope.row)">秘钥</el-button>
             <el-button v-permission="['sys:user:delete']" size="mini" type="text" style="color: red" icon="el-icon-delete" @click="handleDelete(scope.row)">删除</el-button>
           </template>
         </el-table-column>
@@ -98,27 +98,27 @@
       </el-dialog>
 <!--      添加秘钥-->
       <el-dialog :title="title" :visible.sync="secretVisible" width="700px" append-to-body>
-        <el-form ref="form" :model="form" :rules="rules" label-width="120px">
+        <el-form ref="secretForm" :model="form" :rules="secretRules" label-width="120px">
           <el-row>
             <el-col :span="12">
-              <el-form-item label="服务器名" prop="applicationName">
+              <el-form-item label="服务器名" prop="name">
                 <el-input v-model="form.name" :disabled="true" placeholder="请输入服务器名称" />
               </el-form-item>
             </el-col>
             <el-col :span="12">
-              <el-form-item label="服务器IP" prop="applicationName">
+              <el-form-item label="服务器IP" prop="ip">
                 <el-input  :disabled="true" v-model="form.ip" placeholder="请输入服务器IP" />
               </el-form-item>
             </el-col>
             <el-col :span="24">
               <el-form-item label="访问密钥" prop="accessKey">
-                <el-input type="textarea" :rows="8" v-model="form.accessKey" placeholder="请输入访问密钥" />
+                <el-input type="textarea" :rows="10" v-model="form.accessKey" placeholder="请输入访问密钥" />
               </el-form-item>
             </el-col>
           </el-row>
         </el-form>
         <div slot="footer" class="dialog-footer">
-          <el-button type="primary" @click="submitForm">添 加</el-button>
+          <el-button type="primary" @click="addSecret">添 加</el-button>
           <el-button @click="secretVisible=!secretVisible">取 消</el-button>
         </div>
       </el-dialog>
@@ -127,7 +127,7 @@
 </template>
 
 <script>
-import { add, del, testConn, get, page, update} from '@/api/machine/machine'
+import {add, del, testConn, get, page, update, addSecret} from '@/api/machine/machine'
 import {nestedGetQuery} from "@/utils";
 import Xterm from "@/views/machine/xterm";
 
@@ -188,6 +188,9 @@ export default {
         userPassword: [{ required: true, message: '密码不能为空', trigger: 'blur' }],
         confirmPassword: [{ required: true, message: '确认不能为空', trigger: 'blur' }],
         status: [{ required: true, message: '状态不能为空', trigger: 'blur' }]
+      },
+      secretRules: {
+        accessKey: [{ required: true, message: '秘钥不能为空', trigger: 'blur' }],
       }
     }
   },
@@ -271,12 +274,13 @@ export default {
           this.isEdit = true
         })
     },
-    addSecret(row) {
+    openAddSecret(row) {
       this.reset()
       const id = row.id || this.id
       get(id).then(response => {
         this.form = response.data
         this.secretVisible = true
+        this.accessKey = ''
         this.title = '添加访问秘钥'
         this.isEdit = true
       })
@@ -307,6 +311,21 @@ export default {
                 this.msgError(response.msg)
               }
             })
+        }
+      })
+    },
+    addSecret () {
+      this.$refs['secretForm'].validate(valid => {
+        if (valid) {
+          addSecret({'machineInfoDTO': this.form}).then(response => {
+            if (response.code === 2000) {
+              this.msgSuccess('添加成功')
+              this.open = false
+              this.getList()
+            } else {
+              this.msgError(response.msg)
+            }
+          })
         }
       })
     },

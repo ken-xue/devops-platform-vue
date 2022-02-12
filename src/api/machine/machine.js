@@ -34,7 +34,15 @@ export function add(data) {
 // 测试连接
 export function testConn(data) {
   return request({
-    url: '/app/machine/testConn',
+    url: '/app/machine/test/conn/ssh',
+    method: 'post',
+    data: data
+  })
+}
+// 添加秘钥
+export function addSecret(data) {
+  return request({
+    url: '/app/machine/add/secret',
     method: 'post',
     data: data
   })
