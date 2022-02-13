@@ -50,9 +50,11 @@
             v-for="(item, index) in editableTabs"
             :label="item.title"
             :name="item.name">
+
+            <div style="overflow: hidden" :id="item.name" class="xterm" />
 <!--            <xterm ref="Xterm"></xterm>-->
           </el-tab-pane>
-          <xterm ref="Xterm"></xterm>
+<!--          <xterm ref="Xterm"></xterm>-->
         </el-tabs>
       </el-dialog>
 
@@ -142,6 +144,11 @@ import {add, del, testConn, get, page, update, addSecret} from '@/api/machine/ma
 import {nestedGetQuery} from "@/utils";
 import Xterm from "@/views/machine/xterm";
 
+import 'xterm/css/xterm.css'
+import { Terminal } from 'xterm'
+import { FitAddon } from 'xterm-addon-fit'
+import { AttachAddon } from 'xterm-addon-attach'
+
 export default {
   name: 'MachineInfo',
   components: {Xterm},
@@ -150,6 +157,7 @@ export default {
       // 遮罩层
       loading: true,
       id: 0,
+      terminalUuid: '',
       // 选中数组
       ids: [],
       // 非单个禁用
@@ -307,16 +315,14 @@ export default {
         name: '1',
         content: 'Tab 1 content'
       }]
-      this.$nextTick(() => {
-        this.$refs.Xterm.initSocket(row.uuid)
-      })
+      this.terminalUuid = row.uuid;
+      this.initSocket(row.uuid,1)
     },
     closeTerminal(){
       this.terminalVisible = false
       this.editableTabs = []
-      this.$nextTick(() => {
-        this.$refs.Xterm.beforeDestroy()
-      })
+      this.socket.close()
+      this.term.dispose()
     },
     // 测试连接服务器
     testConnect () {
@@ -416,9 +422,10 @@ export default {
         this.editableTabs.push({
           title: title,
           name: newTabName,
-          content: 'New Tab content'
+          content: title
         });
         this.editableTabsValue = newTabName;
+        this.initSocket(this.terminalUuid,newTabName)
       }
       if (action === 'remove') {
         let tabs = this.editableTabs;
@@ -433,10 +440,53 @@ export default {
             }
           });
         }
-
         this.editableTabsValue = activeName;
         this.editableTabs = tabs.filter(tab => tab.name !== targetName);
       }
+    },
+    initTerm(id) {
+      const term = new Terminal({
+        fontSize: 14,
+        rows: 33,
+        cursorBlink: true,
+        windowsMode: true,
+        disableStdin: false
+      });
+      const attachAddon = new AttachAddon(this.socket);
+      const fitAddon = new FitAddon();
+      term.loadAddon(attachAddon);
+      term.loadAddon(fitAddon);
+      term.open(document.getElementById(id));
+      fitAddon.fit();
+      term.focus();
+      this.term = term
+    },
+    initSocket(uuid,id) {
+      // this.socket = new WebSocket(this.socketURI);
+      this.socket = new WebSocket('ws://127.0.0.1:8088/terminal?'+uuid);
+      this.socketOnClose();
+      this.socketOnOpen(id);
+      this.socketOnError();
+    },
+    socketOnOpen(id) {
+      this.socket.onopen = () => {
+        // 链接成功后
+        this.initTerm(id)
+      }
+    },
+    socketOnClose() {
+      this.socket.onclose = () => {
+        // console.log('close socket')
+      }
+    },
+    socketOnError() {
+      this.socket.onerror = () => {
+        // console.log('socket 链接失败')
+      }
+    },
+    beforeDestroy() {
+      this.socket.close()
+      this.term.dispose()
     }
   }
 }
