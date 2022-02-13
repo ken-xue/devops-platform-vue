@@ -41,11 +41,22 @@
       </el-table>
       <!--页码-->
       <pagination v-show="total>0" style="padding: 0px" :total="total" :page.sync="queryParams.pageIndex" :limit.sync="queryParams.pageSize" @pagination="getList" />
-      <!-- 添加或修改对话框 -->
+
+      <!--终端-->
       <el-dialog :title="title" top="10vh" :visible.sync="terminalVisible" :before-close="closeTerminal" width="80%" append-to-body>
-        <xterm ref="Xterm"></xterm>
+        <el-tabs v-model="editableTabsValue" type="card" editable @edit="handleTabsEdit">
+          <el-tab-pane
+            :key="item.name"
+            v-for="(item, index) in editableTabs"
+            :label="item.title"
+            :name="item.name">
+<!--            <xterm ref="Xterm"></xterm>-->
+          </el-tab-pane>
+          <xterm ref="Xterm"></xterm>
+        </el-tabs>
       </el-dialog>
-<!--      终端-->
+
+      <!-- 添加或修改对话框 -->
       <el-dialog :title="title" :visible.sync="open" width="700px" append-to-body>
         <el-form ref="form" :model="form" :rules="rules" label-width="120px">
           <el-row>
@@ -160,11 +171,6 @@ export default {
       AppInfoList: [],
       roleIdList: [],
       machineList: [],
-      applicationTypes: [
-        { value: 'Java', label: 'Java应用' },
-        { value: 'Go', label: 'Go应用' },
-        { value: 'NodeJS', label: 'NodeJS应用' }
-      ],
       accessWays: [
         { value: 'PASSWORD', label: '密码' },
         { value: 'ACCESS_KEY', label: '秘钥' }
@@ -191,7 +197,14 @@ export default {
       },
       secretRules: {
         accessKey: [{ required: true, message: '秘钥不能为空', trigger: 'blur' }],
-      }
+      },
+      editableTabsValue: '1',
+      editableTabs: [{
+        title: '终端1',
+        name: '1',
+        content: 'Tab 1 content'
+      }],
+      tabIndex: 1
     }
   },
   created() {
@@ -289,12 +302,18 @@ export default {
     terminal(row) {
       this.terminalVisible = true
       this.title = '终端'
+      this.editableTabs = [{
+        title: '终端1',
+        name: '1',
+        content: 'Tab 1 content'
+      }]
       this.$nextTick(() => {
         this.$refs.Xterm.initSocket(row.uuid)
       })
     },
     closeTerminal(){
       this.terminalVisible = false
+      this.editableTabs = []
       this.$nextTick(() => {
         this.$refs.Xterm.beforeDestroy()
       })
@@ -368,7 +387,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(function() {
-        return delAppInfo({ 'ids': Ids })
+        return del({ 'ids': Ids })
       }).then(() => {
         this.getList()
         this.msgSuccess('删除成功')
@@ -385,6 +404,39 @@ export default {
           }
         }
       )
+    },
+    handleTabsEdit(targetName, action) {
+      if (action === 'add') {
+        if (this.editableTabs.length >= 12 ){
+          this.msgError('最大只能开12个终端')
+          return
+        }
+        let newTabName = ++this.tabIndex + '';
+        let title = '终端'+ (this.tabIndex);
+        this.editableTabs.push({
+          title: title,
+          name: newTabName,
+          content: 'New Tab content'
+        });
+        this.editableTabsValue = newTabName;
+      }
+      if (action === 'remove') {
+        let tabs = this.editableTabs;
+        let activeName = this.editableTabsValue;
+        if (activeName === targetName) {
+          tabs.forEach((tab, index) => {
+            if (tab.name === targetName) {
+              let nextTab = tabs[index + 1] || tabs[index - 1];
+              if (nextTab) {
+                activeName = nextTab.name;
+              }
+            }
+          });
+        }
+
+        this.editableTabsValue = activeName;
+        this.editableTabs = tabs.filter(tab => tab.name !== targetName);
+      }
     }
   }
 }

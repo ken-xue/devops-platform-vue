@@ -41,7 +41,7 @@ export default {
       this.term = term
     },
     initSocket(uuid) {
-      // this.socketURI.default = 'ws://127.0.0.1:8088/terminal?'+uuid
+      // this.socket = new WebSocket(this.socketURI);
       this.socket = new WebSocket('ws://127.0.0.1:8088/terminal?'+uuid);
       this.socketOnClose();
       this.socketOnOpen();
