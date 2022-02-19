@@ -22,10 +22,18 @@ export function logout() {
   })
 }
 
-// 查询User列表
+// 分页查询User列表
 export function pageUser(data) {
   return request({
     url: '/sys/user/page',
+    method: 'get',
+    params: data
+  })
+}
+//查询列表
+export function list(data) {
+  return request({
+    url: '/sys/user/list',
     method: 'get',
     params: data
   })
