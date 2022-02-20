@@ -5,7 +5,7 @@ export function pageAppInfo(data) {
   return request({
     url: '/app/info/page',
     method: 'get',
-    data: data
+    params: data
   })
 }
 export function listAppInfo(data) {

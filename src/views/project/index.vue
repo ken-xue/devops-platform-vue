@@ -28,18 +28,13 @@
         </el-table-column>
         <el-table-column label="项目名称" align="center" prop="projectName" :show-overflow-tooltip="true"/>
         <el-table-column label="负责人" align="center" prop="username" width="100"/>
-        <el-table-column label="描述" align="center" prop="projectDesc" width="400" :show-overflow-tooltip="true"/>
+        <el-table-column label="描述" align="center" prop="projectDesc" width="300" :show-overflow-tooltip="true"/>
         <el-table-column label="创建时间" align="center" prop="gmtCreate" :show-overflow-tooltip="true"/>
         <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
           <template slot-scope="scope">
-            <el-button v-permission="['sys:user:update']" size="mini" type="text" icon="el-icon-s-promotion"
-                       @click="pipeline(scope.row)">应用
-            </el-button>
-            <el-button v-permission="['sys:user:update']" size="mini" type="text" icon="el-icon-edit"
-                       @click="handleUpdate(scope.row)">修改
-            </el-button>
-            <el-button v-permission="['sys:user:delete']" size="mini" type="text" style="color: red"
-                       icon="el-icon-delete" @click="handleDelete(scope.row)">删除
+            <el-button v-permission="['sys:user:update']" size="mini" type="text" icon="el-icon-s-promotion" @click="pipeline(scope.row)">应用</el-button>
+            <el-button v-permission="['sys:user:update']" size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)">修改</el-button>
+            <el-button v-permission="['sys:user:delete']" size="mini" type="text" style="color: red" icon="el-icon-delete" @click="handleDelete(scope.row)">删除
             </el-button>
           </template>
         </el-table-column>
@@ -75,19 +70,21 @@
                 </el-select>
               </el-form-item>
             </el-col>
-            <el-col :span="20">
-              <el-form-item label="项目成员" prop="userUuid">
+            <el-col :span="24">
+              <el-form-item label="项目成员" prop="userMembers">
                 <el-select
+                  style="width: 100%"
                   v-model="form.userMembers"
                   filterable
                   remote
+                  size="medium"
                   multiple
                   reserve-keyword
                   placeholder="请输入关键词"
-                  :remote-method="remoteMethod"
-                  :loading="searchLoading">
+                  :remote-method="queryMembers"
+                  :loading="memberSearchLoading">
                   <el-option
-                    v-for="item in userList"
+                    v-for="item in membersList"
                     :key="item.value"
                     :label="item.userName"
                     :value="item.uuid">
@@ -124,6 +121,7 @@ export default {
       // 遮罩层
       loading: true,
       searchLoading: false,
+      memberSearchLoading: false,
       id: 0,
       // 选中数组
       ids: [],
@@ -141,6 +139,7 @@ export default {
       // 类型数据字典
       typeOptions: [],
       userList: [],
+      membersList: [],
       AppInfoList: [],
       statusOptions: [],
       // 查询参数
@@ -297,7 +296,7 @@ export default {
     pipeline(row) {
       this.$router.push(
         {
-          path: '/application/pipeline',
+          path: '/application/app',
           query: {
             uuid: row.uuid
           }
@@ -315,6 +314,20 @@ export default {
             this.userList = []
           }
           this.searchLoading = false;
+        })
+      }
+    },
+    queryMembers(query) {
+      if (query !== '') {
+        this.memberSearchLoading = true;
+        listUser(query).then(response => {
+          if (response.code === 2000) {
+            this.membersList = response.data
+          } else {
+            this.msgError(response.msg)
+            this.membersList = []
+          }
+          this.memberSearchLoading = false;
         })
       }
     }

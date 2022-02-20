@@ -1,10 +1,13 @@
 <template>
   <el-container class="flowChartWrap">
+<!--        <el-input v-model="currentNodeId" placeholder="流水线名称" />-->
     <!-- 1. 左侧搜索树 -->
-    <component :is="sidebarComponentName" :key="sidebarComponentName"></component>
+<!--    <component :is="sidebarComponentName" :key="sidebarComponentName"></component>-->
+<!--    <ComponentTree></ComponentTree>-->
     <!-- 2. 右侧面板 -->
     <el-main>
       <el-container>
+        <ComponentTree></ComponentTree>
         <!-- 2.1 头部tab -->
 <!--        <el-header height="40px"-->
 <!--                   class="tabsNav">-->
@@ -44,59 +47,40 @@
                              circle></el-button>
                 </el-tooltip>
                 <el-tooltip content="放大">
-                  <el-button icon="el-icon-zoom-in"
-                             @click="zoomOut"
-                             circle></el-button>
+                  <el-button icon="el-icon-zoom-in" @click="zoomOut" circle></el-button>
                 </el-tooltip>
                 <el-tooltip content="缩小">
-                  <el-button icon="el-icon-zoom-out"
-                             @click="zoomIn"
-                             circle></el-button>
+                  <el-button icon="el-icon-zoom-out" @click="zoomIn" circle></el-button>
                 </el-tooltip>
                 <el-tooltip content="自动布局">
-                  <el-button icon="el-icon-bangzhu"
-                             circle></el-button>
+                  <el-button icon="el-icon-bangzhu" circle></el-button>
                 </el-tooltip>
-                <!-- <el-tooltip content="适应画布">
-                  <el-button icon="el-icon-money"
-                             circle></el-button>
-                </el-tooltip> -->
+                <el-tooltip content="适应画布">
+                  <el-button icon="el-icon-money" circle></el-button>
+                </el-tooltip>
                 <el-tooltip content="全屏">
-                  <el-button icon="el-icon-full-screen"
-                             circle></el-button>
+                  <el-button icon="el-icon-full-screen" circle></el-button>
                 </el-tooltip>
               </div>
             </div>
             <!-- 2.2.1.2 画布容器 -->
-            <div class="mainContainer"
-                 @drop="dropHandle"
-                 @dragover="dragoverHandle">
-              <div id="mainContainer"
-                   @click="clickBgHandle"></div>
+            <div class="mainContainer" @drop="dropHandle" @dragover="dragoverHandle">
+              <div id="mainContainer" @click="clickBgHandle"></div>
             </div>
-            <el-dialog title="数据探查-（仅显示前100条）"
-                       :visible.sync="dialogTableVisible">
+            <el-dialog title="数据探查-（仅显示前100条）" :visible.sync="dialogTableVisible" append-to-body>
               <el-table :data="gridData">
-                <el-table-column property="date"
-                                 label="日期"
-                                 width="150"></el-table-column>
-                <el-table-column property="name"
-                                 label="姓名"
-                                 width="200"></el-table-column>
-                <el-table-column property="address"
-                                 label="地址"></el-table-column>
+                <el-table-column property="date" label="日期" width="150"></el-table-column>
+                <el-table-column property="name" label="姓名" width="200"></el-table-column>
+                <el-table-column property="address" label="地址"></el-table-column>
               </el-table>
-              <div slot="footer"
-                   class="dialog-footer">
-                <el-button type="primary"
-                           @click="dialogTableVisible = false">复 制</el-button>
+              <div slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="dialogTableVisible = false">复 制</el-button>
                 <el-button @click="dialogTableVisible = false">取 消</el-button>
               </div>
             </el-dialog>
           </el-main>
           <!-- 2.2.2 组件属性设置 -->
-          <el-aside width="300px"
-                    class="right">
+          <el-aside width="300px" class="right">
             <el-container id="mainNodeInfo">
               <el-main>
                 <div>
@@ -162,7 +146,7 @@
                 <div :class="{'tool':true, 'message':true, 'acitve': toolBarShow==='message'}"
                      @click="toolBarShow='message'">
                   <i class="el-icon-chat-dot-round"></i>
-                  <span> 消息提醒</span>
+                  <span> 消息管理</span>
                 </div>
               </el-aside>
             </el-container>
@@ -175,7 +159,6 @@
 <script>
 import Vue from 'vue';
 import ComponentTree from '@/views/application/pipeline/ComponentTree.vue';
-import ExperimentTree from '@/views/application/pipeline/ExperimentTree.vue';
 import API from './api';
 import FlowChart from './flowChartIndexData';
 import PluginFlowExec from './pluginFlowExec';
@@ -185,7 +168,7 @@ FlowChart.use(PluginFlowExec);
 
 export default Vue.extend({
   name: 'flowchartcanvas',
-  components: { ComponentTree, ExperimentTree },
+  components: { ComponentTree },
   props: {
     sidebarComponentName: String,
   },
@@ -233,7 +216,13 @@ export default Vue.extend({
         }, {
           time: '2019/6/5 下午3:00:09',
           message: '模型不存在,请生成模型后重试',
-        },
+        },{
+          time: '2019/6/5 下午3:00:09',
+          message: '模型不存在,请生成模型后重试',
+        }, {
+          time: '2019/6/5 下午3:00:09',
+          message: '模型不存在,请生成模型后重试',
+        }
       ],
     };
   },
@@ -293,7 +282,7 @@ export default Vue.extend({
 
 <style lang="scss">
 .flowChartWrap {
-  height: 100%;
+  height: 500px;
   .left {
     border-right: 1px solid #e5e5e5;
     height: 100%;
@@ -304,11 +293,17 @@ export default Vue.extend({
   }
   .right {
     border-left: 1px solid #e5e5e5;
+    border-top: 1px solid #e5e5e5;
+    margin-bottom: 0px;
+  }
+  .el-main {
+    padding: 0px!important;
   }
   .main {
     #mainMenu {
       height: 41px;
       border-bottom: 1px solid #e1e1e1;
+      border-top: 1px solid #e1e1e1;
       .tool-left {
         float: left;
         .el-button {
@@ -347,6 +342,7 @@ export default Vue.extend({
   }
   #mainNodeInfo {
     .nodeInfoToolBar {
+      margin-bottom: 0px;
       border-left: 1px solid #e5e5e5;
       overflow: hidden;
       .tool {
@@ -418,17 +414,21 @@ export default Vue.extend({
   }
   .el-aside {
     background: #f8f8f8;
+    padding: 0px 0px;
     .search {
-      height: 40px;
+      height: 42px;
       background-color: #f3f3f3;
-      padding: 8px 12px;
+      //padding: 8px 12px;
       box-sizing: border-box;
       border-bottom: 1px solid #e5e5e5;
       .el-input {
         height: 24px;
         .el-input__inner {
-          height: 24px;
+          height: 42px;
         }
+      }
+      .el-input__prefix{
+        top: 5px;
       }
       .el-input--small .el-input__icon {
         line-height: 24px;

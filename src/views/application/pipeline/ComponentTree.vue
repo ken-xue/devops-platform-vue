@@ -1,27 +1,34 @@
 <template>
   <el-aside width="240px"
-              class="left">
-      <div class="search">
-        <el-input placeholder="搜索"
-                  size="small"
-                  v-model="filterText">
-          <i slot="prefix"
-             class="el-input__icon el-icon-search"></i>
-        </el-input>
-      </div>
-      <el-tree :data="nodeData"
-               node-key="id"
-               :default-expanded-keys="['source','preHandle','sign','learn']"
-               icon-class="el-icon-arrow-right"
-               :render-content="renderContentFunction"
-               :filter-node-method="filterNode"
-               ref="tree2"
-               :props="defaultProps"></el-tree>
-    </el-aside>
+            class="left">
+    <div class="search">
+      <el-input placeholder="搜索节点"
+                size="small"
+                v-model="filterText">
+        <i slot="prefix"
+           class="el-input__icon el-icon-search"></i>
+      </el-input>
+    </div>
+<!--    <el-tree :data="nodeData"-->
+<!--             node-key="id"-->
+<!--             :default-expanded-keys="['source','preHandle','sign','learn']"-->
+<!--             icon-class="el-icon-arrow-right"-->
+<!--             :render-content="renderContentFunction"-->
+<!--             :filter-node-method="filterNode"-->
+<!--             ref="tree2"-->
+<!--             :props="defaultProps"></el-tree>-->
+    <el-tree :data="nodeData"
+             node-key="id"
+             icon-class="el-icon-arrow-right"
+             :render-content="renderContentFunction"
+             :filter-node-method="filterNode"
+             ref="tree2"
+             :props="defaultProps"></el-tree>
+  </el-aside>
 </template>
 
 <script>
-import Vue, { CreateElement } from 'vue';
+import Vue, {CreateElement} from 'vue';
 import API from './api';
 import {getMenuData} from './mock';
 
@@ -48,11 +55,11 @@ export default Vue.extend({
     // });
   },
   methods: {
-    renderContentFunction(h, { node, data, store}) {
+    renderContentFunction(h, {node, data, store}) {
       const className = node.expanded ? 'el-icon-folder-opened' : 'el-icon-folder';
       const classNameChild = (!data.children && data.icon) ? data.icon : '';
       return h('div', {
-        class: { leafNode: !data.children },
+        class: {leafNode: !data.children},
         style: {
           height: '38px',
           lineHeight: '38px',

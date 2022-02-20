@@ -2,6 +2,16 @@
   <div>
     <el-card class="box-card">
       <el-form ref="queryForm" :model="queryParams" :inline="true" label-position="left" label-width="68px">
+        <el-form-item  label="项目名称">
+          <el-select v-model="queryParams.applicationInfoDTO.projectUuid" filterable placeholder="请选择" @change="handleQuery">
+            <el-option
+              v-for="item in projectList"
+              :key="item.uuid"
+              :label="item.projectName"
+              :value="item.uuid">
+            </el-option>
+          </el-select>
+        </el-form-item>
         <el-form-item label="应用名" prop="applicationName">
           <el-input v-model="queryParams.applicationInfoDTO.applicationName" placeholder="请输入应用名" clearable size="small" @keyup.enter.native="handleQuery" />
         </el-form-item>
@@ -57,9 +67,19 @@
               </el-form-item>
             </el-col>
             <el-col :span="12">
+              <el-form-item label="所属项目" prop="projectUuid">
+                <el-select v-model="form.projectUuid" placeholder="请选择下拉选择" clearable :style="{width: '100%'}">
+                  <el-option n v-for="item in projectList"
+                             :key="item.uuid"
+                             :label="item.projectName"
+                             :value="item.uuid"></el-option>
+                </el-select>
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
               <el-form-item label="应用类型" prop="applicationType">
                 <el-select v-model="form.applicationType" placeholder="请选择下拉选择" clearable :style="{width: '100%'}">
-                  <el-option v-for="(item, index) in applicationTypes" :key="index" :label="item.label" :value="item.value" :disabled="item.disabled"></el-option>
+                  <el-option  v-for="(item, index) in applicationTypes" :key="index" :label="item.label" :value="item.value" :disabled="item.disabled"></el-option>
                 </el-select>
               </el-form-item>
             </el-col>
@@ -93,9 +113,10 @@
 </template>
 
 <script>
-import { addAppInfo, delAppInfo, getAppInfo, pageAppInfo, updateAppInfo } from '@/api/app/app'
+import {addAppInfo, delAppInfo, getAppInfo, listAppInfo, pageAppInfo, updateAppInfo} from '@/api/app/app'
 import {listRole} from "@/api/sys/role";
 import {nestedGetQuery} from "@/utils";
+import { list as ProjectList } from '@/api/project/project'
 
 export default {
   name: 'AppInfo',
@@ -123,6 +144,7 @@ export default {
       AppInfoList: [],
       roleIdList: [],
       roleList: [],
+      projectList: [],
       applicationTypes: [
         { value: 'Java', label: 'Java应用' },
         { value: 'Go', label: 'Go应用' },
@@ -146,16 +168,19 @@ export default {
       form: {},
       // 表单校验
       rules: {
-        userId: [{ required: true, message: '编码不能为空', trigger: 'blur' }],
-        userName: [{ required: true, message: '名称不能为空', trigger: 'blur' }],
+        applicationName: [{ required: true, message: '应用名称不能为空', trigger: 'blur' }],
+        applicationType: [{ required: true, message: '名称不能为空', trigger: 'blur' }],
         email: [{ required: true, message: '邮箱不能为空', trigger: 'blur' }],
         userPassword: [{ required: true, message: '密码不能为空', trigger: 'blur' }],
         confirmPassword: [{ required: true, message: '确认不能为空', trigger: 'blur' }],
-        status: [{ required: true, message: '状态不能为空', trigger: 'blur' }]
+        status: [{ required: true, message: '状态不能为空', trigger: 'blur' }],
+        projectUuid: [{ required: true, message: '所属项目不能为空', trigger: 'blur' }]
       }
     }
   },
   created() {
+    this.queryParams.applicationInfoDTO.projectUuid = this.$route.query.uuid,
+    this.getProjectList(),
     this.getList()
   },
   methods: {
@@ -298,6 +323,13 @@ export default {
           }
         }
       )
+    },
+    getProjectList(){
+      this.loading = true
+      ProjectList(this.queryParams).then(response => {
+        this.projectList = response.data
+        this.loading = false
+      })
     }
   }
 }

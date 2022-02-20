@@ -46,16 +46,12 @@
       <!--页码-->
       <pagination v-show="total>0" style="padding: 0px" :total="total" :page.sync="queryParams.pageIndex" :limit.sync="queryParams.pageSize" @pagination="getList" />
       <!-- 添加或修改对话框 -->
-<!--      <el-dialog :title="title" :visible.sync="open" width="700px" append-to-body>-->
-<!--        <flowchart></flowchart>-->
-<!--      </el-dialog>-->
       <el-dialog :title="title" top="5vh" :visible.sync="open" width="90%" append-to-body>
         <el-form ref="form" :model="form" label-width="120px">
           <el-row>
             <el-col :span="12">
               <el-form-item  label="应用名称">
-                <el-input v-for="(item,index) in appList" :key="index" v-if="item.uuid === form.applicationUuid" v-text="item.applicationName" v-model="form.applicationUuid" :disabled="true">
-                </el-input>
+                <el-input v-for="(item,index) in appList" :key="index" v-if="item.uuid === form.applicationUuid" v-text="item.applicationName" v-model="form.applicationUuid" :disabled="true"></el-input>
               </el-form-item>
             </el-col>
             <el-col :span="12">
@@ -80,8 +76,7 @@
 <!--            </el-col>-->
           </el-row>
         </el-form>
-<!--        <flowchart></flowchart>-->
-        <flow-index></flow-index>
+        <Flowchartcanvas></Flowchartcanvas>
         <div slot="footer" class="dialog-footer">
           <el-button type="primary" @click="submitForm">确 定</el-button>
           <el-button @click="cancel">取 消</el-button>
@@ -97,11 +92,11 @@ import { del, info, page,add } from '@/api/app/pipeline'
 import {addAppInfo, listAppInfo, updateAppInfo} from '@/api/app/app'
 import {nestedGetQuery} from "@/utils";
 import Flowchart from "@/views/application/pipeline/flowChartCanvas";
-import FlowIndex from "@/views/application/pipeline/flowChartIndex";
+import Flowchartcanvas from "@/views/application/pipeline/flowChartCanvas";
 
 export default {
   name: 'Pipeline',
-  components: {FlowIndex, Flowchart},
+  components: {Flowchartcanvas, Flowchart},
   data() {
     return {
       // 遮罩层
