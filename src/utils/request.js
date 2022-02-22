@@ -40,7 +40,6 @@ service.interceptors.response.use(
    */
   response => {
     const res = response.data
-    console.log('request=' + JSON.stringify(response))
     const token = response.headers['authorization']
     if (token) {
       setToken(token)
