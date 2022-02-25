@@ -31,6 +31,9 @@
 import Vue, {CreateElement} from 'vue';
 import API from './api';
 import {getMenuData} from './mock';
+import {list} from '@/api/app/node'
+import {pageAppInfo} from "@/api/app/app";
+import {nestedGetQuery} from "@/utils";
 
 export default Vue.extend({
   data() {
@@ -48,8 +51,16 @@ export default Vue.extend({
       this.$refs.tree2.filter(val);
     },
   },
+  created() {
+    list().then(response => {
+      this.nodeData = response.data
+    })
+  },
   mounted() {
-    this.nodeData = getMenuData
+    // list({}).then(response=> {
+    //   this.nodeData = response.data
+    // })
+    // this.nodeData = getMenuData
     // API.getMenuData().then((data) => {
     //   this.nodeData = data.data;
     // });

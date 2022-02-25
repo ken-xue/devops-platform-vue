@@ -94,6 +94,7 @@ function generateNodeMenu() {
     role: 'rename',
     clickHandle: () => {
       const nodeEl = document.getElementById(currentComponent);
+      ContextMenu.hide()
       const cComp = nodeEl.vNode.$children[0];
       MessageBox.prompt('请输入新名称', '重命名', {
         confirmButtonText: '确定',
@@ -109,6 +110,7 @@ function generateNodeMenu() {
     icon: 'el-icon-copy-document',
     role: 'delete',
     clickHandle: () => {
+      ContextMenu.hide()
       copiedNodeId = currentComponent;
       Message.success({
         message: '复制成功！',
@@ -120,6 +122,7 @@ function generateNodeMenu() {
     icon: 'el-icon-delete',
     role: 'delete',
     clickHandle: () => {
+      ContextMenu.hide()
       deleteHandle(currentComponent);
     },
   });
@@ -129,6 +132,7 @@ function generateNodeMenu() {
     icon: 'el-icon-view',
     role: 'view',
     clickHandle: () => {
+      ContextMenu.hide()
       // const nodeEl = document.getElementById(currentComponent);
       // const cComp = nodeEl.vNode.$children[0];
       editor.emitShowNodeData(currentComponent);
@@ -159,6 +163,7 @@ function generateBgMenu() {
     icon: 'el-icon-download',
     role: 'paste',
     clickHandle: () => {
+      ContextMenu.hide()
       if (copiedNodeId) {
         exec(
           PasteNodeCommand,
@@ -226,6 +231,7 @@ function init() {
 const ContextMenu = {
   init,
   show,
+  hide,
 };
 
 export default ContextMenu;
