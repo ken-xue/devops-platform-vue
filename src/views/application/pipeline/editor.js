@@ -479,9 +479,9 @@ function bindEvent() {
 
 
   // 点击连接线变换样式
-  // instance.bind('click', (c) => {
-  // c.canvas.classList.add('active');
-  // });
+  instance.bind('click', (c) => {
+    c.canvas.classList.add('active');
+  });
 }
 
 /**

@@ -2,7 +2,7 @@
   <el-tooltip :disabled="tooltipDisabled"
               placement="right">
     <div slot="content"
-         class="fy_tooltip_content">节点信息：{{text}}</div>
+         class="fy_tooltip_content">节点配置：{{text}}</div>
     <div @mousedown="tooltipDisabled=true"
          @mouseup="tooltipDisabled=false">
       <span class="blue_line"></span>

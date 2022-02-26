@@ -18,7 +18,7 @@
         <el-form-item>
           <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
           <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
-          <el-button v-permission="['sys:user:add']" type="primary" icon="el-icon-plus" size="mini" @click="handleAdd">新增</el-button>
+          <el-button v-permission="['sys:user:add']" type="primary" icon="el-icon-plus" size="mini" @click="addHandle">新增</el-button>
           <el-button v-permission="['sys:user:delete']" type="danger" icon="el-icon-delete" size="mini" :disabled="multiple" @click="handleDelete">删除
           </el-button>
         </el-form-item>
@@ -46,57 +46,20 @@
       <!--页码-->
       <pagination v-show="total>0" style="padding: 0px" :total="total" :page.sync="queryParams.pageIndex" :limit.sync="queryParams.pageSize" @pagination="getList" />
       <!-- 添加或修改对话框 -->
-      <el-dialog :title="title" top="5vh" :visible.sync="open" width="90%" append-to-body>
-        <el-form ref="form" :model="form" label-width="120px">
-          <el-row>
-            <el-col :span="12">
-              <el-form-item  label="应用名称">
-                <el-input v-for="(item,index) in appList" :key="index" v-if="item.uuid === form.applicationUuid" v-text="item.applicationName" v-model="form.applicationUuid" :disabled="true"></el-input>
-              </el-form-item>
-            </el-col>
-            <el-col :span="12">
-              <el-form-item label="流水线名称" prop="pipelineName">
-                <span slot="label">
-                  流水线名称
-                  <el-tooltip placement="top">
-                    <div slot="content">
-                      名称示例：dev-1.0.0 即可
-                    </div>
-                    <i class="el-icon-question" />
-                  </el-tooltip>
-                </span>
-                <el-input v-model="form.pipelineName" placeholder="流水线名称" />
-              </el-form-item>
-            </el-col>
-<!--            <el-col :span="24">-->
-<!--              <el-form-item  label="流程">-->
-<!--                <el-input v-model="form.pipelineContext">-->
-<!--                </el-input>-->
-<!--              </el-form-item>-->
-<!--            </el-col>-->
-          </el-row>
-        </el-form>
-        <Flowchartcanvas></Flowchartcanvas>
-        <div slot="footer" class="dialog-footer">
-          <el-button type="primary" @click="submitForm">确 定</el-button>
-          <el-button @click="cancel">取 消</el-button>
-        </div>
-      </el-dialog>
-
+      <flowchart  v-if="addVisible" ref="Flowchart" @refreshDataList="getList"></flowchart>
     </el-card>
   </div>
 </template>
 
 <script>
-import { del, info, page,add } from '@/api/app/pipeline'
-import {addAppInfo, listAppInfo, updateAppInfo} from '@/api/app/app'
+import { del, page,add } from '@/api/app/pipeline'
+import {listAppInfo} from '@/api/app/app'
 import {nestedGetQuery} from "@/utils";
 import Flowchart from "@/views/application/pipeline/flowChartCanvas";
-import Flowchartcanvas from "@/views/application/pipeline/flowChartCanvas";
 
 export default {
   name: 'Pipeline',
-  components: {Flowchartcanvas, Flowchart},
+  components: {Flowchart},
   data() {
     return {
       // 遮罩层
@@ -116,6 +79,7 @@ export default {
       // 是否显示弹出层
       open: false,
       isEdit: false,
+      addVisible:false,
       pipelineList: [],
       // 查询参数
       queryParams: {
@@ -184,12 +148,17 @@ export default {
       this.isEdit = false
       this.form.applicationUuid = this.queryParams.applicationUuid
     },
-    handleUpdate() {
-      this.reset()
-      this.open = true
-      this.title = '修改流水线'
-      this.isEdit = false
-      this.form.applicationUuid = this.queryParams.applicationUuid
+    addHandle () {
+      this.addVisible = true
+      this.$nextTick(() => {
+        this.$refs.Flowchart.init(this.queryParams.applicationUuid,null)
+      })
+    },
+    handleUpdate(row) {
+      this.addVisible = true
+      this.$nextTick(() => {
+        this.$refs.Flowchart.init(row.applicationUuid,row.id)
+      })
     },
     handleInfo(){
       this.reset()

@@ -9,7 +9,7 @@ function init() {
   const pan = panzoom(mainContainer, {
     smoothScroll: false,
     bounds: true,
-    // autocenter: true,
+    autocenter: true,
     zoomDoubleClickSpeed: 1,
     minZoom: 0.5,
     maxZoom: 2,

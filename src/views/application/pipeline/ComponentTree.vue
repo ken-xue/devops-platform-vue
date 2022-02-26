@@ -18,6 +18,7 @@
 <!--             ref="tree2"-->
 <!--             :props="defaultProps"></el-tree>-->
     <el-tree :data="nodeData"
+             :accordion="true"
              node-key="id"
              icon-class="el-icon-arrow-right"
              :render-content="renderContentFunction"
@@ -29,7 +30,6 @@
 
 <script>
 import Vue, {CreateElement} from 'vue';
-import API from './api';
 import {getMenuData} from './mock';
 import {list} from '@/api/app/node'
 import {pageAppInfo} from "@/api/app/app";
