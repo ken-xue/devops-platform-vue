@@ -33,6 +33,7 @@
         <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
           <template slot-scope="scope">
             <el-button v-permission="['sys:user:update']" size="mini" type="text" icon="el-icon-s-promotion" @click="pipeline(scope.row)">应用</el-button>
+            <el-button v-permission="['sys:user:update']" size="mini" type="text" icon="el-icon-s-data" @click="pipeline(scope.row)">数据</el-button>
             <el-button v-permission="['sys:user:update']" size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)">修改</el-button>
             <el-button v-permission="['sys:user:delete']" size="mini" type="text" style="color: red" icon="el-icon-delete" @click="handleDelete(scope.row)">删除
             </el-button>

@@ -151,13 +151,13 @@ export default {
     addHandle () {
       this.addVisible = true
       this.$nextTick(() => {
-        this.$refs.Flowchart.init(this.queryParams.applicationUuid,null)
+        this.$refs.Flowchart.init(this.queryParams.applicationUuid,null,false)
       })
     },
     handleUpdate(row) {
       this.addVisible = true
       this.$nextTick(() => {
-        this.$refs.Flowchart.init(row.applicationUuid,row.id)
+        this.$refs.Flowchart.init(row.applicationUuid,row.id,false)
       })
     },
     handleInfo(row){
