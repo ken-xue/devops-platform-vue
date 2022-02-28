@@ -3,12 +3,12 @@
     <el-container class="flowChartWrap">
       <el-main>
         <el-container>
-          <ComponentTree></ComponentTree>
+          <ComponentTree v-if="!info"></ComponentTree>
           <el-container>
             <!-- 2.2.1 flow面板 -->
             <el-main class="main">
               <!-- 2.2.1.1操作按钮 -->
-              <div id="mainMenu">
+              <div id="mainMenu"  v-if="!info">
                 <div class="tool-left">
                   <el-button icon="el-icon-brush" @click="resetFlow" size="small">重置</el-button>
                   <el-button icon="el-icon-video-play" @click="execModel" :disabled="isExecDisable" size="small">执行</el-button>
@@ -152,6 +152,7 @@ export default Vue.extend({
     return {
       isShowNode: false,
       open: false,
+      info: false,
       pipelineId: '',
       currentNodeId: '',
       isUndoDisable: true,
@@ -224,7 +225,8 @@ export default Vue.extend({
   //   // });
   // },
   methods: {
-    init(applicationUuid, id) {
+    init(applicationUuid, id,info) {
+      this.info = info
       this.open = true
       this.pipelineId = id || 0
       id = id == null ? 0 :id

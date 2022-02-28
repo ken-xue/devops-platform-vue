@@ -160,12 +160,11 @@ export default {
         this.$refs.Flowchart.init(row.applicationUuid,row.id)
       })
     },
-    handleInfo(){
-      this.reset()
-      this.open = true
-      this.title = '修改流水线'
-      this.isEdit = false
-      this.form.applicationUuid = this.queryParams.applicationUuid
+    handleInfo(row){
+      this.addVisible = true
+      this.$nextTick(() => {
+        this.$refs.Flowchart.init(row.applicationUuid,row.id,true)
+      })
     },
     // 多选框选中数据
     handleSelectionChange(selection) {

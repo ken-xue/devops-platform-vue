@@ -19,7 +19,7 @@
           </el-button>
         </el-form-item>
       </el-form>
-      <el-table v-loading="loading" :data="userList" @selection-change="handleSelectionChange">
+      <el-table v-loading="loading" :data="projectList" @selection-change="handleSelectionChange">
         <el-table-column type="selection" width="55" align="center"/>
         <el-table-column label="序号" align="center" prop="userId" width="55" :show-overflow-tooltip="true">
           <template slot-scope="props">
@@ -138,6 +138,7 @@ export default {
       isEdit: false,
       // 类型数据字典
       typeOptions: [],
+      projectList: [],
       userList: [],
       membersList: [],
       AppInfoList: [],
@@ -169,7 +170,7 @@ export default {
     getList() {
       this.loading = true
       page(nestedGetQuery(this.queryParams)).then(response => {
-        this.userList = response.data
+        this.projectList = response.data
         this.total = response.totalCount
         this.loading = false
       })
