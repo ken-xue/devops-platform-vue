@@ -2,12 +2,12 @@
   <el-tooltip :disabled="tooltipDisabled"
               placement="right">
     <div slot="content"
-         class="fy_tooltip_content">节点配置：{{text}}</div>
+         class="fy_tooltip_content">{{text}}</div>
     <div @mousedown="tooltipDisabled=true"
          @mouseup="tooltipDisabled=false">
       <span class="blue_line"></span>
       <div class="content">
-        <i :class="iconCLassName"></i>
+        <i :class="iconCLassName" :name="nodeName"></i>
         <span class="text">{{text}}</span>
         <i v-if="state==='loading'" class="el-icon-loading node-state"></i>
         <i v-else-if="state==='success'" class="el-icon-circle-check node-state"></i>
@@ -30,6 +30,7 @@ export default {
   props: [
     'nodeState',
     'iconCLassName',
+    'nodeName',
     'contentText',
   ],
   methods: {

@@ -1,9 +1,9 @@
 /* eslint-disable import/no-cycle */
 import { MessageBox, Message } from 'element-ui';
-import { EventCenter } from './EventCenter';
+import { EventCenter } from './eventcenter';
 import exec, {
   RenameNodeCommand, PasteNodeCommand, RemoveNodeCommand, RemoveConnectorCommand,
-} from './Command';
+} from './command';
 import editor from './editor';
 
 class MenuItem {
@@ -94,7 +94,7 @@ function generateNodeMenu() {
     role: 'rename',
     clickHandle: () => {
       const nodeEl = document.getElementById(currentComponent);
-      ContextMenu.hide()
+      Contextmenu.hide()
       const cComp = nodeEl.vNode.$children[0];
       MessageBox.prompt('请输入新名称', '重命名', {
         confirmButtonText: '确定',
@@ -110,7 +110,7 @@ function generateNodeMenu() {
     icon: 'el-icon-copy-document',
     role: 'delete',
     clickHandle: () => {
-      ContextMenu.hide()
+      Contextmenu.hide()
       copiedNodeId = currentComponent;
       Message.success({
         message: '复制成功！',
@@ -122,7 +122,7 @@ function generateNodeMenu() {
     icon: 'el-icon-delete',
     role: 'delete',
     clickHandle: () => {
-      ContextMenu.hide()
+      Contextmenu.hide()
       deleteHandle(currentComponent);
     },
   });
@@ -132,7 +132,7 @@ function generateNodeMenu() {
     icon: 'el-icon-view',
     role: 'view',
     clickHandle: () => {
-      ContextMenu.hide()
+      Contextmenu.hide()
       // const nodeEl = document.getElementById(currentComponent);
       // const cComp = nodeEl.vNode.$children[0];
       editor.emitShowNodeData(currentComponent);
@@ -149,6 +149,7 @@ function generateConnectorMenu() {
     icon: 'el-icon-delete',
     role: 'delete',
     clickHandle: () => {
+      Contextmenu.hide()
       deleteHandle(currentComponent);
     },
   });
@@ -163,7 +164,7 @@ function generateBgMenu() {
     icon: 'el-icon-download',
     role: 'paste',
     clickHandle: () => {
-      ContextMenu.hide()
+      Contextmenu.hide()
       if (copiedNodeId) {
         exec(
           PasteNodeCommand,
@@ -228,10 +229,10 @@ function init() {
 }
 
 
-const ContextMenu = {
+const Contextmenu = {
   init,
   show,
   hide,
 };
 
-export default ContextMenu;
+export default Contextmenu;

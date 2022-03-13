@@ -1,9 +1,9 @@
 /* eslint-disable no-unused-expressions */
-import { addCssRules } from './Utils';
+import { addCssRules } from './utils';
 
 addCssRules`
 #mainContainer .tooltip{
-    
+
 }
 
 #mainContainer .sourcePoint .tooltip .tooltip-arrow{
@@ -191,7 +191,7 @@ addCssRules`
     animation-duration: 2s;
     animation-timing-function: linear;
     animation-iteration-count: infinite;
-    stroke-dasharray:5; 
+    stroke-dasharray:5;
 }
 @keyframes ring {
     from {

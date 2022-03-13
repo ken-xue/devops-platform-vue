@@ -20,6 +20,7 @@
     <el-tree :data="nodeData"
              :accordion="true"
              node-key="id"
+             :default-expanded-keys="[10]"
              icon-class="el-icon-arrow-right"
              :render-content="renderContentFunction"
              :filter-node-method="filterNode"
@@ -89,6 +90,7 @@ export default Vue.extend({
             attrs: {
               draggable: !data.children,
               id: data.id,
+              name:data.name,
             },
             on: {
               dragstart: this.dragHandle,

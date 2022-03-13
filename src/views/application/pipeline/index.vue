@@ -46,7 +46,7 @@
       <!--页码-->
       <pagination v-show="total>0" style="padding: 0px" :total="total" :page.sync="queryParams.pageIndex" :limit.sync="queryParams.pageSize" @pagination="getList" />
       <!-- 添加或修改对话框 -->
-      <flowchart  v-if="addVisible" ref="Flowchart" @refreshDataList="getList"></flowchart>
+      <flowcanvas  v-if="addVisible" ref="flowcanvas" @refreshDataList="getList"></flowcanvas>
     </el-card>
   </div>
 </template>
@@ -55,11 +55,11 @@
 import { del, page,add } from '@/api/app/pipeline'
 import {listAppInfo} from '@/api/app/app'
 import {nestedGetQuery} from "@/utils";
-import Flowchart from "@/views/application/pipeline/flowChartCanvas";
+import flowcanvas from "@/views/application/pipeline/flowcanvas";
 
 export default {
   name: 'Pipeline',
-  components: {Flowchart},
+  components: {flowcanvas},
   data() {
     return {
       // 遮罩层
@@ -149,21 +149,22 @@ export default {
       this.form.applicationUuid = this.queryParams.applicationUuid
     },
     addHandle () {
+      this.form.applicationUuid = this.queryParams.applicationUuid
       this.addVisible = true
       this.$nextTick(() => {
-        this.$refs.Flowchart.init(this.queryParams.applicationUuid,null,false)
+        this.$refs.flowcanvas.init(this.queryParams.applicationUuid,null,false)
       })
     },
     handleUpdate(row) {
       this.addVisible = true
       this.$nextTick(() => {
-        this.$refs.Flowchart.init(row.applicationUuid,row.id,false)
+        this.$refs.flowcanvas.init(row.applicationUuid,row.id,false)
       })
     },
     handleInfo(row){
       this.addVisible = true
       this.$nextTick(() => {
-        this.$refs.Flowchart.init(row.applicationUuid,row.id,true)
+        this.$refs.flowcanvas.init(row.applicationUuid,row.id,true)
       })
     },
     // 多选框选中数据

@@ -1,16 +1,16 @@
 /* eslint-disable import/no-cycle */
 import Tooltip from 'tooltip.js';
 import Vue from 'vue';
-import Node from './Node.vue';
-import contextMenu from './contextMenu';
+import Node from './node.vue';
+import contextMenu from './contextmenu';
 import instance from './instance';
 import model from './model';
-import FlowChart from './flowChartIndexData';
-import { EventCenter } from './EventCenter';
+import FlowChart from './flowchart';
+import { EventCenter } from './eventcenter';
 import { sourceEndpoint, targetEndpoint } from './style';
-import { isEndpoint, createUuid } from './Utils';
+import { isEndpoint, createUuid } from './utils';
 import { CONNECTORSEPARATESYMBOL } from './const';
-import exec, { AddConnectorCommand, MoveNodeCommand } from './Command';
+import exec, { AddConnectorCommand, MoveNodeCommand } from './command';
 
 
 let container = null;
@@ -173,7 +173,7 @@ function getConnectorByUuids(uuids) {
  * @param {string} html
  * @returns {Element} 返回生成的节点
  */
-function generateNode(left, top, id, iconCLassName, contentText, nodeState) {
+function generateNode(left, top, id, iconCLassName, contentText, nodeState,nodeName) {
   // 节点最外层div
   const newNode = document.createElement('div');
   newNode.classList.add('fy_node');
@@ -181,6 +181,8 @@ function generateNode(left, top, id, iconCLassName, contentText, nodeState) {
   newNode.style.top = `${top}px`;
 
   newNode.id = id;
+  newNode.name = nodeName
+  console.log('nodename'+nodeName)
   container.appendChild(newNode);
 
   // 右键菜单
@@ -213,6 +215,7 @@ function generateNode(left, top, id, iconCLassName, contentText, nodeState) {
           iconCLassName,
           contentText,
           nodeState,
+          nodeName,
         },
       });
     },
@@ -230,7 +233,7 @@ function generateNode(left, top, id, iconCLassName, contentText, nodeState) {
  * @param {*} value
  * @returns
  */
-function addNodeByAction(action, position, icon, value) {
+function addNodeByAction(action, position, icon, value,nodeName) {
   const containerRect = container.getBoundingClientRect();
   const scale = getScale();
   const id = `node-${createUuid()}`;
@@ -257,6 +260,7 @@ function addNodeByAction(action, position, icon, value) {
     data: {
       icon,
       value,
+      nodeName,
     },
   });
   [...targetEndpoints].concat([...sourceEndpoints]).forEach((point) => {
@@ -285,7 +289,8 @@ function addNodeByDrag(position, elId) {
   const copeNode = document.getElementById(elId);
   const contentText = copeNode.lastElementChild.innerHTML;
   const icon = copeNode.firstElementChild.className;
-  return addNodeByAction('drag', position, icon, contentText);
+  const nodeName = copeNode.getAttribute('name');
+  return addNodeByAction('drag', position, icon, contentText,nodeName);
 }
 
 /**
@@ -295,8 +300,8 @@ function addNodeByDrag(position, elId) {
  */
 function addNodeByCopy(position, nodeId) {
   const nodeData = model.getNodeDataByNodeId(nodeId);
-  const { icon, value } = nodeData.data;
-  return addNodeByAction('copy', position, icon, value);
+  const { icon, value,nodeName } = nodeData.data;
+  return addNodeByAction('copy', position, icon, value,nodeName);
 }
 
 /**
@@ -308,7 +313,8 @@ function addNodeByData(nodeData) {
   const {
     id, position, points, data,
   } = nodeData;
-  generateNode(position.left, position.top, id, data.icon, data.value, data.nodeState);
+  console.log('---->>>>>'+data.name)
+  generateNode(position.left, position.top, id, data.icon, data.value, data.nodeState,data.name);
   const { targets, sources } = points;
   const targetsData = endpoints.filter(item => targets.indexOf(item.id) > -1);
   const sourcesData = endpoints.filter(item => sources.indexOf(item.id) > -1);
@@ -480,7 +486,7 @@ function bindEvent() {
 
   // 点击连接线变换样式
   instance.bind('click', (c) => {
-    c.canvas.classList.add('active');
+    // c.canvas.classList.add('active');
   });
 }
 

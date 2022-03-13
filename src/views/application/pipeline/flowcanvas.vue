@@ -1,19 +1,20 @@
 <template>
-  <el-dialog :title="!pipelineId ? '新增' : '修改'" top="3vh" :visible.sync="open" width="90%" append-to-body destroy-on-close :close-on-click-modal="false">
+  <el-dialog :title="!pipelineId ? '新增' : '修改'" top="3vh" :visible.sync="open" width="90%" append-to-body destroy-on-close @close=closeDialog :close-on-click-modal="false">
     <el-container class="flowChartWrap">
       <el-main>
         <el-container>
-          <ComponentTree v-if="!infoVisible"></ComponentTree>
+          <ComponentTree v-if="nodeTreeVisible"></ComponentTree>
           <el-container>
             <!-- 2.2.1 flow面板 -->
             <el-main class="main">
               <!-- 2.2.1.1操作按钮 -->
               <div id="mainMenu"  v-if="!infoVisible">
                 <div class="tool-left">
+                  <el-button icon="el-icon-d-arrow-left" @click="nodeTreeVisible=!nodeTreeVisible" size="small">隐藏</el-button>
                   <el-button icon="el-icon-brush" @click="resetFlow" size="small">重置</el-button>
-                  <el-button icon="el-icon-video-play" @click="execModel" :disabled="isExecDisable" size="small">执行</el-button>
                   <el-button icon="el-icon-takeaway-box" @click="saveData" size="small">保存</el-button>
                   <el-button icon="el-icon-upload" size="small">部署</el-button>
+                  <el-button icon="el-icon-video-play" @click="execModel" :disabled="isExecDisable" size="small">执行</el-button>
                 </div>
                 <div class="tool-right">
                   <el-tooltip content="撤销">
@@ -53,7 +54,7 @@
               </el-dialog>
             </el-main>
             <!-- 2.2.2 组件属性设置 -->
-            <el-aside width="300px" class="right">
+            <el-aside width="300px" class="right" v-show="isShowNode">
               <el-container id="mainNodeInfo">
                 <el-main>
                   <div>
@@ -71,38 +72,32 @@
                           </p>
                           <p>
                             <span class="item">流水线名称</span>
-                            <el-input size="small"
-                                      v-model="modelName"></el-input>
+                            <el-input size="small" v-model="modelName"></el-input>
                           </p>
                           <p>
                             <span class="item">描述</span>
-                            <el-input type="textarea"
-                                      :rows="10"
-                                      size="small"
-                                      v-model="modelDescription"></el-input>
+                            <el-input type="textarea" :rows="10" size="small" v-model="modelDescription"></el-input>
                           </p>
                         </div>
                       </div>
                       <div v-show="isShowNode">
                         <div class="title">节点配置</div>
-                        <div class="node-attr">
-                          <p>
-                            <span class="item">节点ID</span>
-                            <span class="value">{{ currentNodeId }}</span>
-                          </p>
-                        </div>
+<!--                        <div class="node-attr">-->
+<!--                          <p>-->
+<!--                            <span class="item">节点ID</span>-->
+<!--                            <span class="value">{{ currentNodeId }}</span>-->
+<!--                          </p>-->
+<!--                        </div>-->
+                        <java-build v-if="javaBuildVisible"></java-build>
                       </div>
                     </div>
                     <div v-show="toolBarShow==='message'">
                       <div class="title">执行记录</div>
                       <div>
-                        <el-card class="messageInfo"
-                                 v-for="(m,idx) in messagesList"
-                                 :key="idx">
+                        <el-card class="messageInfo" v-for="(m,idx) in messagesList" :key="idx">
                           <p>{{ m.time }}</p>
                           <div>
-                            <i class="el-icon-circle-close"
-                               style="color:red;font-size:26px;position:relative;top:5px;"></i>
+                            <i class="el-icon-circle-close" style="color:red;font-size:26px;position:relative;top:5px;"></i>
                             {{ m.message }}
                           </div>
                         </el-card>
@@ -133,18 +128,19 @@
 </template>
 <script>
 import Vue from 'vue';
-import ComponentTree from '@/views/application/pipeline/ComponentTree.vue';
-import FlowChart from './flowChartIndexData';
-import PluginFlowExec from './pluginFlowExec';
+import ComponentTree from '@/views/application/pipeline/menu.vue';
+import FlowChart from './flowchart';
+import PluginFlowExec from './pluginflowexec';
 import {add, info} from "@/api/app/pipeline";
 import instance from './instance';
 import {getFlowChartData} from "@/views/application/pipeline/mock";
+import JavaBuild from "@/views/application/pipeline/config/java-build";
 
 FlowChart.use(PluginFlowExec);
 
 export default Vue.extend({
-  name: 'flowchartcanvas',
-  components: {ComponentTree},
+  name: 'flowcanvas',
+  components: {JavaBuild, ComponentTree},
   props: {
     sidebarComponentName: String,
   },
@@ -153,6 +149,8 @@ export default Vue.extend({
       isShowNode: false,
       open: false,
       infoVisible: false,
+      nodeTreeVisible: true,
+      javaBuildVisible: false,
       pipelineId: '',
       currentNodeId: '',
       isUndoDisable: true,
@@ -204,26 +202,6 @@ export default Vue.extend({
       ],
     };
   },
-  // mounted() {
-  //   FlowChart.setContainer('mainContainer');
-  //   FlowChart.on('commandListEmpty', () => {
-  //     this.isUndoDisable = true;
-  //   });
-  //   FlowChart.on('showNodeData', () => {
-  //     this.dialogTableVisible = true;
-  //   });
-  //   FlowChart.on('addCommand', () => {
-  //     this.isUndoDisable = false;
-  //   });
-  //   FlowChart.on('selectNode', (data) => {
-  //     this.isShowNode = true;
-  //     this.currentNodeId = data;
-  //   });
-  //   FlowChart.loadData(getFlowChartData);
-  //   // API.getFlowChartData().then((data) => {
-  //   //   FlowChart.loadData(data.data);
-  //   // });
-  // },
   methods: {
     init(applicationUuid, id, infoVisible) {
       this.infoVisible = infoVisible || 0
@@ -246,8 +224,21 @@ export default Vue.extend({
             this.isUndoDisable = false;
           });
           FlowChart.on('selectNode', (data) => {
-            this.isShowNode = true;
             this.currentNodeId = data;
+            let nodeData = FlowChart.getNodeDataByNodeId(data)
+            const { value,nodeName } = nodeData.data;
+            console.log('///////////')
+            console.log(nodeName)
+            this.isShowNode = true;
+            if (nodeName === 'JAVA_BUILD'){
+                this.javaBuildVisible = true
+            }else{
+              this.javaBuildVisible = false
+            }
+            switch (nodeName){
+              case 'JAVA_BUILD': this.javaBuildVisible = true
+              default: this.isShowNode = true;
+            }
           });
           FlowChart.loadData(JSON.parse(response.data.pipelineContext))
         } else {
@@ -280,10 +271,6 @@ export default Vue.extend({
       });
     },
     resetFlow (){
-      // FlowChart.loadData({'nodes':[],
-      //   'endpoints':[],
-      //   'edges':[],
-      //   'head':''})
       instance.reset()
       FlowChart.loadData(getFlowChartData)
     },
@@ -297,13 +284,14 @@ export default Vue.extend({
       }).then(response => {
         if (response.code === 2000) {
           this.msgSuccess('操作成功')
-          this.open = false
-          this.$emit('refreshDataList')
         } else {
           this.msgError(response.msg)
         }
       })
     },
+    closeDialog(){
+      this.$emit('refreshDataList')
+    }
   },
 });
 </script>

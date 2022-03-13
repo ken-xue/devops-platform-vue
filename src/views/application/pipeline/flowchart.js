@@ -1,12 +1,12 @@
 /* eslint-disable import/no-cycle */
-import './editorCss';
+import './editorcss';
 import instance from './instance';
-import extendsEvent, { EventCenter } from './EventCenter';
-import panZoom from './moveAndZoom';
-import contentMenu from './contextMenu';
+import extendsEvent, { EventCenter } from './eventcenter';
+import panZoom from './moveandzoom';
+import contentMenu from './contextmenu';
 import editor from './editor';
 import model from './model';
-import exec, { undo, AddNodeCommand } from './Command';
+import exec, { undo, AddNodeCommand } from './command';
 
 const FlowChart = {
   /**
@@ -89,6 +89,10 @@ const FlowChart = {
       contentMenu,
     }].concat(args));
   },
+
+  getNodeDataByNodeId(nodeId) {
+    return model.getNodeDataByNodeId(nodeId);
+  }
 };
 
 extendsEvent(FlowChart);
