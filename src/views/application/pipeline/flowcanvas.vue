@@ -88,7 +88,7 @@
 <!--                            <span class="value">{{ currentNodeId }}</span>-->
 <!--                          </p>-->
 <!--                        </div>-->
-                        <java-build v-if="javaBuildVisible"></java-build>
+                        <java-build ref="JavaBuild" v-if="javaBuildVisible"></java-build>
                       </div>
                     </div>
                     <div v-show="toolBarShow==='message'">
@@ -231,12 +231,17 @@ export default Vue.extend({
             console.log(nodeName)
             this.isShowNode = true;
             if (nodeName === 'JAVA_BUILD'){
+
                 this.javaBuildVisible = true
             }else{
-              this.javaBuildVisible = false
+                this.javaBuildVisible = false
             }
             switch (nodeName){
-              case 'JAVA_BUILD': this.javaBuildVisible = true
+              case 'JAVA_BUILD':
+                this.$nextTick(() => {
+                  this.$refs.JavaBuild.init(this.currentNodeId)
+                })
+                this.javaBuildVisible = true
               default: this.isShowNode = true;
             }
           });

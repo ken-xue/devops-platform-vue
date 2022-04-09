@@ -40,5 +40,6 @@ export function createUuid() {
   while (uuid.includes(CONNECTORSEPARATESYMBOL)) {
     uuid = uuidv1();
   }
+  uuid = uuid.replaceAll('-','')
   return uuid;
 }

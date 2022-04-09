@@ -39,3 +39,27 @@ export function del(data) {
     data: data
   })
 }
+// 节点详情
+export function nodeInfo(uuid) {
+  return request({
+    url: '/pipeline/node/info/info',
+    method: 'get',
+    params: { 'nodeUuid': uuid }
+  })
+}
+// 新增
+export function addNodeInfo(data) {
+  return request({
+    url: '/pipeline/node/info/add',
+    method: 'post',
+    data: data
+  })
+}
+// 修改
+export function updateInfo(data) {
+  return request({
+    url: '/pipeline/node/info/update',
+    method: 'put',
+    data: data
+  })
+}
