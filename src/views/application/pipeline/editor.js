@@ -173,7 +173,7 @@ function getConnectorByUuids(uuids) {
  * @param {string} html
  * @returns {Element} 返回生成的节点
  */
-function generateNode(left, top, id, iconCLassName, contentText, nodeState,nodeName) {
+function generateNode(left, top, id, iconCLassName, contentText,nodeName, nodeState) {
   // 节点最外层div
   const newNode = document.createElement('div');
   newNode.classList.add('fy_node');
@@ -182,7 +182,6 @@ function generateNode(left, top, id, iconCLassName, contentText, nodeState,nodeN
 
   newNode.id = id;
   newNode.name = nodeName
-  console.log('nodename'+nodeName)
   container.appendChild(newNode);
 
   // 右键菜单
@@ -206,7 +205,6 @@ function generateNode(left, top, id, iconCLassName, contentText, nodeState,nodeN
   EventCenter.on('document.click', () => {
     removeClassNameSelected();
   });
-
   // 插入容器
   const component = new Vue({
     render(h) {
@@ -245,7 +243,7 @@ function addNodeByAction(action, position, icon, value,nodeName) {
   }
   const targetEndpoints = [{ id: `target-${createUuid()}`, data: { value: '输入' } }];
   const sourceEndpoints = [{ id: `source-${createUuid()}`, data: { value: '输出' } }];
-  generateNode(left, top, id, icon, value);
+  generateNode(left, top, id, icon, value,nodeName,'');
   addTargetEndpoints(id, targetEndpoints);
   addSourceEndpoints(id, sourceEndpoints);
   model.addNode({
@@ -257,10 +255,10 @@ function addNodeByAction(action, position, icon, value,nodeName) {
     position: {
       left, top,
     },
+    name: nodeName,
     data: {
       icon,
-      value,
-      nodeName,
+      value
     },
   });
   [...targetEndpoints].concat([...sourceEndpoints]).forEach((point) => {
@@ -310,11 +308,8 @@ function addNodeByCopy(position, nodeId) {
  */
 function addNodeByData(nodeData) {
   const { endpoints } = model.getData();
-  const {
-    id, position, points, data,
-  } = nodeData;
-  console.log('---->>>>>'+data.name)
-  generateNode(position.left, position.top, id, data.icon, data.value, data.nodeState,data.name);
+  const {id, nodeName,position, points, data} = nodeData;
+  generateNode(position.left, position.top, id, data.icon, data.value,nodeName, data.nodeState);
   const { targets, sources } = points;
   const targetsData = endpoints.filter(item => targets.indexOf(item.id) > -1);
   const sourcesData = endpoints.filter(item => sources.indexOf(item.id) > -1);

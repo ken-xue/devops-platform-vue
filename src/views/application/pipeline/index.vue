@@ -148,23 +148,29 @@ export default {
       this.isEdit = false
       this.form.applicationUuid = this.queryParams.applicationUuid
     },
+    getApplicationName(applicationUuid){
+      return this.appList.find(item => {
+        return item.uuid === applicationUuid
+      }).applicationName
+    },
     addHandle () {
       this.form.applicationUuid = this.queryParams.applicationUuid
+      let appUuid = this.queryParams.applicationUuid
       this.addVisible = true
       this.$nextTick(() => {
-        this.$refs.flowcanvas.init(this.queryParams.applicationUuid,null,false)
+        this.$refs.flowcanvas.init(this.getApplicationName(appUuid),appUuid,null,false)
       })
     },
     handleUpdate(row) {
       this.addVisible = true
       this.$nextTick(() => {
-        this.$refs.flowcanvas.init(row.applicationUuid,row.id,false)
+        this.$refs.flowcanvas.init(this.getApplicationName(row.applicationUuid),row.applicationUuid,row.id,false)
       })
     },
     handleInfo(row){
       this.addVisible = true
       this.$nextTick(() => {
-        this.$refs.flowcanvas.init(row.applicationUuid,row.id,true)
+        this.$refs.flowcanvas.init(this.getApplicationName(row.applicationUuid),row.applicationUuid,row.id,true)
       })
     },
     // 多选框选中数据
