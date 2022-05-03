@@ -241,8 +241,22 @@ function addNodeByAction(action, position, icon, value,nodeName) {
     left -= 86;
     top -= 18;
   }
-  const targetEndpoints = [{ id: `target-${createUuid()}`, data: { value: '输入' } }];
-  const sourceEndpoints = [{ id: `source-${createUuid()}`, data: { value: '输出' } }];
+
+  let targetEndpoints = [{ id: `target-${createUuid()}`, data: { value: '输入' } }];
+  let sourceEndpoints = [{ id: `source-${createUuid()}`, data: { value: '输出' } }];
+
+  // 如果是开始节点不设置target
+  if (nodeName==='START'){
+    targetEndpoints = []
+  }
+
+  // 如果是结束节点不设置source
+  if (nodeName==='END'){
+    sourceEndpoints = []
+    targetEndpoints.push({ id: `target-${createUuid()}`, data: { value: '输入' } })
+    targetEndpoints.push({ id: `target-${createUuid()}`, data: { value: '输入' } })
+  }
+
   generateNode(left, top, id, icon, value,nodeName,'');
   addTargetEndpoints(id, targetEndpoints);
   addSourceEndpoints(id, sourceEndpoints);
@@ -420,6 +434,7 @@ function render() {
  * @param {array} uuids [sourceUuid,targetId]
  */
 function execAddConnectorCommand(uuids) {
+  console.error("执行增加连接线命令"+uuids)
   exec(AddConnectorCommand, uuids);
   model.addEdge(uuids.join(CONNECTORSEPARATESYMBOL));
 }

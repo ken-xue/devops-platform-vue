@@ -65,7 +65,6 @@ const FlowChart = {
    * @description 加载数据
    */
   loadData(data) {
-    console.log('response data='+JSON.stringify(data))
     model.setData(data);
     editor.render();
   },

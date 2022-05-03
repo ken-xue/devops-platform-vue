@@ -300,7 +300,13 @@ export default Vue.extend({
       })
     },
     execute () {
-      // 需要与后台建立socket连接 实时回显完成的节点
+      execute({'id': this.pipelineId}).then(response => {
+        if (response.code === 2000) {
+          this.msgSuccess('操作成功')
+        } else {
+          this.msgError(response.msg)
+        }
+      })
     },
     saveData() {
       const modelData = FlowChart.getModelData();
