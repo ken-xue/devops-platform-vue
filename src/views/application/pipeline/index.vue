@@ -154,6 +154,10 @@ export default {
       }).applicationName
     },
     addHandle () {
+      if (!this.queryParams.applicationUuid){
+        this.msgError('请选择应用')
+        return
+      }
       this.form.applicationUuid = this.queryParams.applicationUuid
       let appUuid = this.queryParams.applicationUuid
       this.addVisible = true

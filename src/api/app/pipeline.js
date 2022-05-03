@@ -63,3 +63,21 @@ export function updateInfo(data) {
     data: data
   })
 }
+
+// 部署
+export function deploy(data) {
+  return request({
+    url: '/app/pipeline/deploy',
+    method: 'post',
+    data: data
+  })
+}
+
+// 执行
+export function execute(data) {
+  return request({
+    url: '/app/pipeline/execute',
+    method: 'post',
+    data: data
+  })
+}

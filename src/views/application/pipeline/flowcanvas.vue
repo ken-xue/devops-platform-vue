@@ -15,8 +15,9 @@
                   </el-button>
                   <el-button icon="el-icon-brush" @click="resetFlow" size="small">重置</el-button>
                   <el-button icon="el-icon-takeaway-box" @click="saveData" size="small">保存</el-button>
-                  <el-button icon="el-icon-upload" size="small">部署</el-button>
-                  <el-button icon="el-icon-video-play" @click="execModel" :disabled="isExecDisable" size="small">执行
+                  <el-button icon="el-icon-upload" size="small" @click="deploy">部署</el-button>
+<!--                  <el-button icon="el-icon-video-play" @click="execModel" :disabled="isExecDisable" size="small">执行-->
+                  <el-button icon="el-icon-video-play" @click="execute" :disabled="isExecDisable" size="small">执行
                   </el-button>
                 </div>
                 <div class="tool-right">
@@ -79,7 +80,7 @@
                           </p>
                           <p>
                             <span class="item">描述</span>
-                            <el-input type="textarea" :rows="10" size="small" v-model="modelDescription"></el-input>
+                            <el-input type="textarea" :rows="10" size="small" v-model="description"></el-input>
                           </p>
                         </div>
                       </div>
@@ -136,7 +137,7 @@ import Vue from 'vue';
 import ComponentTree from '@/views/application/pipeline/menu.vue';
 import FlowChart from './flowchart';
 import PluginFlowExec from './pluginflowexec';
-import {add, info} from "@/api/app/pipeline";
+import {add, info, execute,deploy} from "@/api/app/pipeline";
 import instance from './instance';
 import {getFlowChartData} from "@/views/application/pipeline/mock";
 import JavaBuild from "@/views/application/pipeline/config/java-build";
@@ -167,7 +168,7 @@ export default Vue.extend({
       activeName: 'first',
       toolBarShow: 'component',
       modelName: '你你您',
-      modelDescription: '你你您你你您你你您你你您',
+      description: '描述',
       gridData: [
         {
           date: '2016-05-02',
@@ -221,6 +222,7 @@ export default Vue.extend({
       info(id).then(response => {
         if (response.code === 2000) {
           console.log(response.data)
+          this.pipelineName = response.data.pipelineName
           instance.reset()
           FlowChart.setContainer('mainContainer');
           FlowChart.on('commandListEmpty', () => {
@@ -288,11 +290,24 @@ export default Vue.extend({
       instance.reset()
       FlowChart.loadData(getFlowChartData)
     },
+    deploy () {
+      deploy({'id': this.pipelineId}).then(response => {
+        if (response.code === 2000) {
+          this.msgSuccess('操作成功')
+        } else {
+          this.msgError(response.msg)
+        }
+      })
+    },
+    execute () {
+      // 需要与后台建立socket连接 实时回显完成的节点
+    },
     saveData() {
       const modelData = FlowChart.getModelData();
       add({
         'applicationPipelineDTO': {
           'pipelineName': this.pipelineName,
+          'description' : this.description,
           'applicationUuid': this.applicationUuid,
           'graph': modelData
         }
