@@ -79,6 +79,13 @@
                             <el-input size="small" v-model="pipelineName"></el-input>
                           </p>
                           <p>
+                            <span class="item">触发条件</span>
+                            <el-select v-model="trigger" placeholder="请选择触发条件" clearable :style="{width: '100%'}">
+                              <el-option v-for="(item, index) in triggerList" :key="index" :label="item.label" :value="item.value"
+                                         :disabled="item.disabled"></el-option>
+                            </el-select>
+                          </p>
+                          <p>
                             <span class="item">描述</span>
                             <el-input type="textarea" :rows="10" size="small" v-model="description"></el-input>
                           </p>
@@ -164,6 +171,7 @@ export default Vue.extend({
       pipelineId: '',
       pipelineName: '',
       currentNodeId: '',
+      trigger: '',
       isUndoDisable: true,
       isExecDisable: false,
       applicationUuid: '',
@@ -172,6 +180,10 @@ export default Vue.extend({
       toolBarShow: 'component',
       modelName: '你你您',
       description: '描述',
+      triggerList: [
+        {value: 'code', label: '提交代码'},
+        {value: 'hand', label: '手动触发'},
+      ],
       gridData: [
         {
           date: '2016-05-02',
