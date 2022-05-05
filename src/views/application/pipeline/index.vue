@@ -38,7 +38,7 @@
         <el-table-column label="操作" align="center" class-name="small-padding fixed-width"  width="300" >
           <template slot-scope="scope">
             <el-button v-permission="['sys:user:update']" size="mini" type="text" icon="el-icon-setting" @click="handleUpdate(scope.row)">编排</el-button>
-            <el-button v-permission="['sys:user:update']" size="mini" type="text" icon="el-icon-info" @click="handleInfo(scope.row)">详情</el-button>
+            <el-button v-permission="['sys:user:update']" size="mini" type="text" icon="el-icon-s-order" @click="handleRecord(scope.row)">记录</el-button>
             <el-button v-permission="['sys:log:delete']" size="mini" type="text" style="color: red" icon="el-icon-delete" @click="handleDelete(scope.row)">删除</el-button>
           </template>
         </el-table-column>
@@ -47,6 +47,7 @@
       <pagination v-show="total>0" style="padding: 0px" :total="total" :page.sync="queryParams.pageIndex" :limit.sync="queryParams.pageSize" @pagination="getList" />
       <!-- 添加或修改对话框 -->
       <flowcanvas  v-if="addVisible" ref="flowcanvas" @refreshDataList="getList"></flowcanvas>
+      <record v-if="recordVisible" ref="record" @refreshDataList="getList"></record>
     </el-card>
   </div>
 </template>
@@ -56,10 +57,11 @@ import { del, page,add } from '@/api/app/pipeline'
 import {listAppInfo} from '@/api/app/app'
 import {nestedGetQuery} from "@/utils";
 import flowcanvas from "@/views/application/pipeline/flowcanvas";
+import record from "@/views/application/pipeline/record/record";
 
 export default {
   name: 'Pipeline',
-  components: {flowcanvas},
+  components: {flowcanvas,record},
   data() {
     return {
       // 遮罩层
@@ -80,6 +82,7 @@ export default {
       open: false,
       isEdit: false,
       addVisible:false,
+      recordVisible:false,
       pipelineList: [],
       // 查询参数
       queryParams: {
@@ -171,10 +174,10 @@ export default {
         this.$refs.flowcanvas.init(this.getApplicationName(row.applicationUuid),row.applicationUuid,row.id,false)
       })
     },
-    handleInfo(row){
-      this.addVisible = true
+    handleRecord(row){
+      this.recordVisible = true
       this.$nextTick(() => {
-        this.$refs.flowcanvas.init(this.getApplicationName(row.applicationUuid),row.applicationUuid,row.id,true)
+        this.$refs.record.init(row.uuid)
       })
     },
     // 多选框选中数据
