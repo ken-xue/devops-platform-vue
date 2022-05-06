@@ -1,5 +1,5 @@
 <template>
-  <el-dialog :title="'执行记录'" top="3vh" :visible.sync="open" width="90%" append-to-body destroy-on-close @close=closeDialog :close-on-click-modal="false">
+  <el-drawer :title="'执行记录'" top="3vh" :visible.sync="open" size="80%" append-to-body destroy-on-close @close=closeDialog :close-on-click-modal="false">
 <!--    <el-container class="flowChartWrap">-->
       <div>
 <!--        <el-card class="box-card">-->
@@ -29,7 +29,7 @@
 <!--        </el-card>-->
       </div>
 <!--    </el-container>-->
-  </el-dialog>
+  </el-drawer>
 </template>
 <script>
 import Vue from 'vue';
@@ -168,7 +168,7 @@ export default Vue.extend({
 
 <style lang="scss">
 .flowChartWrap {
-  height: 650px;
+  height: 100%;
 
   .left {
     border-right: 1px solid #e5e5e5;

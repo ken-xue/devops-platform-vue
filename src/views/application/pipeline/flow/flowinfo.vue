@@ -1,5 +1,5 @@
 <template>
-  <el-dialog title="详情" top="3vh" :visible.sync="open" width="90%" append-to-body
+  <el-drawer title="详情" top="3vh" :visible.sync="open" size="80%" append-to-body
              destroy-on-close @close=closeDialog :close-on-click-modal="false">
     <el-container class="flowChartWrap">
       <el-main>
@@ -119,7 +119,7 @@
         </el-container>
       </el-main>
     </el-container>
-  </el-dialog>
+  </el-drawer>
 </template>
 <script>
 import Vue from 'vue';

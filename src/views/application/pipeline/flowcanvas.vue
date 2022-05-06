@@ -1,5 +1,5 @@
 <template>
-  <el-dialog :title="!pipelineId ? '新增' : '修改'" top="3vh" :visible.sync="open" width="90%" append-to-body
+  <el-drawer :title="!pipelineId ? '新增' : '编排'" top="3vh" :visible.sync="open" size="80%" append-to-body
              destroy-on-close @close=closeDialog :close-on-click-modal="false">
     <el-container class="flowChartWrap">
       <el-main>
@@ -11,14 +11,12 @@
               <!-- 2.2.1.1操作按钮 -->
               <div id="mainMenu" v-if="!infoVisible">
                 <div class="tool-left">
-                  <el-button icon="el-icon-d-arrow-left" @click="nodeTreeVisible=!nodeTreeVisible" size="small">隐藏
-                  </el-button>
+                  <el-button :icon="hideOrShowIcon" @click="hideOrShowTree" size="small">{{hideOrShowText}}</el-button>
                   <el-button icon="el-icon-brush" @click="resetFlow" size="small">重置</el-button>
                   <el-button icon="el-icon-takeaway-box" @click="saveData" size="small">保存</el-button>
-                  <el-button icon="el-icon-upload" size="small" @click="deploy">部署</el-button>
-<!--                  <el-button icon="el-icon-video-play" @click="execModel" :disabled="isExecDisable" size="small">执行-->
-                  <el-button icon="el-icon-video-play" @click="execute" :disabled="isExecDisable" size="small">执行
-                  </el-button>
+<!--                  <el-button icon="el-icon-upload" size="small" @click="deploy">部署</el-button>-->
+<!--                  <el-button icon="el-icon-video-play" @click="execModel" :disabled="isExecDisable" size="small">执行</el-button>-->
+                  <el-button icon="el-icon-video-play" @click="execute" :disabled="isExecDisable" size="small">执行</el-button>
                 </div>
                 <div class="tool-right">
                   <el-tooltip content="撤销">
@@ -39,6 +37,10 @@
                   <el-tooltip content="全屏">
                     <el-button icon="el-icon-full-screen" circle></el-button>
                   </el-tooltip>
+                  <el-tooltip :content="hideOrShowConfigText">
+                    <el-button :icon="hideOrShowConfigIcon" circle @click="hideOrShowConfig"></el-button>
+<!--                    <el-button icon="el-icon-full-screen" circle></el-button>-->
+                  </el-tooltip>
                 </div>
               </div>
               <!-- 2.2.1.2 画布容器 -->
@@ -58,7 +60,7 @@
               </el-dialog>
             </el-main>
             <!-- 2.2.2 组件属性设置 -->
-            <el-aside width="300px" class="right">
+            <el-aside v-show="nodeConfigVisible" width="300px" class="right">
               <el-container id="mainNodeInfo">
                 <el-main>
                   <div>
@@ -138,7 +140,7 @@
         </el-container>
       </el-main>
     </el-container>
-  </el-dialog>
+  </el-drawer>
 </template>
 <script>
 import Vue from 'vue';
@@ -166,8 +168,13 @@ export default Vue.extend({
       open: false,
       infoVisible: false,
       nodeTreeVisible: true,
+      nodeConfigVisible: true,
       javaBuildVisible: false,
       hostDeployVisible: false,
+      hideOrShowText: '隐藏',
+      hideOrShowConfigText: '隐藏',
+      hideOrShowConfigIcon: 'el-icon-caret-right',
+      hideOrShowIcon: 'el-icon-d-arrow-left',
       pipelineId: '',
       pipelineName: '',
       currentNodeId: '',
@@ -302,7 +309,7 @@ export default Vue.extend({
     undo() {
       FlowChart.undo();
     },
-    execModel() {
+    execModel(data) {
       this.isExecDisable = true;
       FlowChart.execModel().then(() => {
         this.isExecDisable = false;
@@ -311,6 +318,16 @@ export default Vue.extend({
     resetFlow() {
       instance.reset()
       FlowChart.loadData(getFlowChartData)
+    },
+    hideOrShowTree(){
+      this.nodeTreeVisible=!this.nodeTreeVisible
+      this.hideOrShowText = this.nodeTreeVisible ? '隐藏':'显示'
+      this.hideOrShowIcon = this.nodeTreeVisible ? 'el-icon-d-arrow-left' : 'el-icon-d-arrow-right'
+    },
+    hideOrShowConfig(){
+      this.nodeConfigVisible=!this.nodeConfigVisible
+      this.hideOrShowConfigText = this.nodeConfigVisible ? '隐藏':'显示'
+      this.hideOrShowConfigIcon = this.nodeConfigVisible ? 'el-icon-caret-right' : 'el-icon-caret-left'
     },
     deploy () {
       deploy({'id': this.pipelineId}).then(response => {
@@ -324,11 +341,51 @@ export default Vue.extend({
     execute () {
       execute({'id': this.pipelineId}).then(response => {
         if (response.code === 2000) {
-          this.msgSuccess('操作成功')
+          const data = response.data
+          this.execModel(data)
+          // this.initSocket(data.uuid)
         } else {
           this.msgError(response.msg)
         }
       })
+    },
+    initSocket(uuid) {
+      this.socket = new WebSocket('ws://127.0.0.1:8088/pipeline?'+uuid);
+      this.socketOnOpen();
+      this.socketOnMessage()
+      this.socketOnClose();
+      this.socketOnError();
+    },
+    socketOnMessage() {
+      this.socket.onmessage = e => {
+        const data = e.data
+        console.log('接收到数据')
+        console.log(data)
+        this.execModel(data)
+        // this.isExecDisable = true;
+        // FlowChart.execModel(data).then(() => {
+        //   this.isExecDisable = false;
+        // });
+      }
+    },
+    socketOnOpen() {
+      this.socket.onopen = () => {
+        console.log('开启socket连接')
+      }
+    },
+    socketOnClose() {
+      this.socket.onclose = () => {
+        console.log('关闭 socket')
+      }
+    },
+    socketOnError() {
+      this.socket.onerror = () => {
+        console.log('socket 连接失败')
+      }
+    },
+    beforeDestroy() {
+      this.socket.close()
+      this.term.dispose()
     },
     saveData() {
       const modelData = FlowChart.getModelData();
