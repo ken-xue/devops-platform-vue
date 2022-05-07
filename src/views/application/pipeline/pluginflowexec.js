@@ -36,7 +36,7 @@ export default function flowExec({ instance }) {
 
     edges.forEach((edge) => {
       const c = getConnectorByUuids(edge.split(CONNECTORSEPARATESYMBOL));
-      c.canvas.classList.add('active');
+      if (c&&c.canvas)c.canvas.classList.add('active');
     });
   }
 
@@ -62,11 +62,10 @@ export default function flowExec({ instance }) {
   //       blingConnectors(['source-e4b4a041caef11ec9199672631f691b0&&target-f30d4391caef11ec9199672631f691b0']);
   //     }, 5000));
   // };
-  this.execModel = (e)=> {
-    const data = JSON.parse(e)
-    console.log('--------节点执行状态接收数据------')
-    console.log(data)
-    console.log('--------节点执行状态接收数据------')
+  this.execModel = (data)=> {
+    // console.log('--------节点执行状态接收数据------')
+    // console.log(data)
+    // console.log('--------节点执行状态接收数据------')
     changeStateByNodeId(data.nodes.id,data.nodes.data.nodeState)
     blingConnectors(data.edges)
   };

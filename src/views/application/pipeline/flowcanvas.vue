@@ -1,6 +1,8 @@
 <template>
   <el-drawer :title="!pipelineId ? '新增' : '编排'" top="3vh" :visible.sync="open" size="80%" append-to-body
-             destroy-on-close @close=closeDialog :close-on-click-modal="false">
+             :wrapperClosable="false"
+             :destroy-on-close="true"
+             @close=closeDialog :close-on-click-modal="false">
     <el-container class="flowChartWrap">
       <el-main>
         <el-container>
@@ -14,8 +16,6 @@
                   <el-button :icon="hideOrShowIcon" @click="hideOrShowTree" size="small">{{hideOrShowText}}</el-button>
                   <el-button icon="el-icon-brush" @click="resetFlow" size="small">重置</el-button>
                   <el-button icon="el-icon-takeaway-box" @click="saveData" size="small">保存</el-button>
-<!--                  <el-button icon="el-icon-upload" size="small" @click="deploy">部署</el-button>-->
-<!--                  <el-button icon="el-icon-video-play" @click="execModel" :disabled="isExecDisable" size="small">执行</el-button>-->
                   <el-button icon="el-icon-video-play" @click="execute" :disabled="isExecDisable" size="small">执行</el-button>
                 </div>
                 <div class="tool-right">
@@ -39,7 +39,6 @@
                   </el-tooltip>
                   <el-tooltip :content="hideOrShowConfigText">
                     <el-button :icon="hideOrShowConfigIcon" circle @click="hideOrShowConfig"></el-button>
-<!--                    <el-button icon="el-icon-full-screen" circle></el-button>-->
                   </el-tooltip>
                 </div>
               </div>
@@ -237,6 +236,7 @@ export default Vue.extend({
   },
   methods: {
     init(appName,applicationUuid, id, infoVisible) {
+      this.isExecDisable = false
       this.applicationName = appName
       this.infoVisible = infoVisible || 0
       this.open = true
@@ -311,12 +311,6 @@ export default Vue.extend({
     undo() {
       FlowChart.undo();
     },
-    execModel(data) {
-      this.isExecDisable = true;
-      FlowChart.execModel(data).then(() => {
-        this.isExecDisable = false;
-      });
-    },
     resetFlow() {
       instance.reset()
       FlowChart.loadData(getFlowChartData)
@@ -341,12 +335,14 @@ export default Vue.extend({
       })
     },
     execute () {
+      this.isExecDisable = true
       execute({'id': this.pipelineId}).then(response => {
         if (response.code === 2000) {
           const data = response.data
           this.initSocket(data.uuid)
         } else {
           this.msgError(response.msg)
+          this.isExecDisable = false
         }
       })
     },
@@ -359,15 +355,15 @@ export default Vue.extend({
     },
     socketOnMessage() {
       this.socket.onmessage = e => {
-        const data = e.data
-        console.log('接收到数据')
+        const data = JSON.parse(e.data)
+        console.log('接收到数据 = '+data.nodes.name +' status = '+data.nodes.data.nodeState)
         console.log(data)
         this.execModel(data)
-        // this.isExecDisable = true;
-        // FlowChart.execModel(data).then(() => {
-        //   this.isExecDisable = false;
-        // });
       }
+    },
+    execModel(data) {
+      this.isExecDisable = true;
+      FlowChart.execModel(data)
     },
     socketOnOpen() {
       this.socket.onopen = () => {
@@ -377,11 +373,13 @@ export default Vue.extend({
     socketOnClose() {
       this.socket.onclose = () => {
         console.log('关闭 socket')
+        this.isExecDisable = false;
       }
     },
     socketOnError() {
       this.socket.onerror = () => {
         console.log('socket 连接失败')
+        this.isExecDisable = false;
       }
     },
     beforeDestroy() {
