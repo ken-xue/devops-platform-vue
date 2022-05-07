@@ -167,8 +167,10 @@ export default Vue.extend({
       isShowNodeConfig: false,
       open: false,
       infoVisible: false,
-      nodeTreeVisible: true,
-      nodeConfigVisible: true,
+      // nodeTreeVisible: true,
+      nodeTreeVisible: false,
+      // nodeConfigVisible: true,
+      nodeConfigVisible: false,
       javaBuildVisible: false,
       hostDeployVisible: false,
       hideOrShowText: '隐藏',
@@ -311,7 +313,7 @@ export default Vue.extend({
     },
     execModel(data) {
       this.isExecDisable = true;
-      FlowChart.execModel().then(() => {
+      FlowChart.execModel(data).then(() => {
         this.isExecDisable = false;
       });
     },
@@ -342,8 +344,7 @@ export default Vue.extend({
       execute({'id': this.pipelineId}).then(response => {
         if (response.code === 2000) {
           const data = response.data
-          this.execModel(data)
-          // this.initSocket(data.uuid)
+          this.initSocket(data.uuid)
         } else {
           this.msgError(response.msg)
         }
@@ -436,6 +437,7 @@ export default Vue.extend({
   }
 
   .main {
+    overflow: hidden;
     #mainMenu {
       height: 41px;
       border-bottom: 1px solid #e1e1e1;
