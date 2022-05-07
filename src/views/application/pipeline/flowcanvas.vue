@@ -364,6 +364,9 @@ export default Vue.extend({
     execModel(data) {
       this.isExecDisable = true;
       FlowChart.execModel(data)
+      if (data.nodes.name==='END'&&data.nodes.data.nodeState!='loading'){
+        this.isExecDisable = false
+      }
     },
     socketOnOpen() {
       this.socket.onopen = () => {
