@@ -1,6 +1,5 @@
 <template>
   <el-drawer :title="!pipelineId ? '新增' : '编排'" top="3vh" :visible.sync="open" size="80%" append-to-body
-             :wrapperClosable="false"
              :destroy-on-close="true"
              @close=closeDialog :close-on-click-modal="false">
     <el-container class="flowChartWrap">
@@ -13,10 +12,12 @@
               <!-- 2.2.1.1操作按钮 -->
               <div id="mainMenu" v-if="!infoVisible">
                 <div class="tool-left">
-                  <el-button :icon="hideOrShowIcon" @click="hideOrShowTree" size="small">{{hideOrShowText}}</el-button>
+                  <el-button :icon="hideOrShowIcon" @click="hideOrShowTree" size="small">{{ hideOrShowText }}
+                  </el-button>
                   <el-button icon="el-icon-brush" @click="resetFlow" size="small">重置</el-button>
-                  <el-button icon="el-icon-takeaway-box" @click="saveData" size="small">保存</el-button>
-                  <el-button icon="el-icon-video-play" @click="execute" :disabled="isExecDisable" size="small">执行</el-button>
+                  <el-button icon="el-icon-takeaway-box" @click="saveOrUpdate" size="small">保存</el-button>
+                  <el-button icon="el-icon-video-play" @click="execute" :disabled="isExecDisable" size="small">执行
+                  </el-button>
                 </div>
                 <div class="tool-right">
                   <el-tooltip content="撤销">
@@ -46,17 +47,8 @@
               <div class="mainContainer" @drop="dropHandle" @dragover="dragoverHandle">
                 <div id="mainContainer" @click="clickBgHandle"></div>
               </div>
-              <el-dialog title="数据探查-（仅显示前100条）" :visible.sync="dialogTableVisible" append-to-body>
-                <el-table :data="gridData">
-                  <el-table-column property="date" label="日期" width="150"></el-table-column>
-                  <el-table-column property="name" label="姓名" width="200"></el-table-column>
-                  <el-table-column property="address" label="地址"></el-table-column>
-                </el-table>
-                <div slot="footer" class="dialog-footer">
-                  <el-button type="primary" @click="dialogTableVisible = false">复 制</el-button>
-                  <el-button @click="dialogTableVisible = false">取 消</el-button>
-                </div>
-              </el-dialog>
+              <!--节点执行日志-->
+              <log v-if="nodeExecuteLogVisible" ref="Log"></log>
             </el-main>
             <!-- 2.2.2 组件属性设置 -->
             <el-aside v-show="nodeConfigVisible" width="300px" class="right">
@@ -65,7 +57,7 @@
                   <div>
                     <div v-show="toolBarShow==='component'">
                       <div v-show="isShowNode">
-                        <div class="title">基本信息</div>
+                        <div class="title">流水线基本信息</div>
                         <div class="model-attr">
                           <p>
                             <span class="item">所属应用</span>
@@ -82,7 +74,8 @@
                           <p>
                             <span class="item">触发条件</span>
                             <el-select v-model="trigger" placeholder="请选择触发条件" clearable :style="{width: '100%'}">
-                              <el-option v-for="(item, index) in triggerList" :key="index" :label="item.label" :value="item.value"
+                              <el-option v-for="(item, index) in triggerList" :key="index" :label="item.label"
+                                         :value="item.value"
                                          :disabled="item.disabled"></el-option>
                             </el-select>
                           </p>
@@ -146,30 +139,30 @@ import Vue from 'vue';
 import ComponentTree from '@/views/application/pipeline/menu.vue';
 import FlowChart from './flowchart';
 import PluginFlowExec from './pluginflowexec';
-import {add, info, execute,deploy} from "@/api/app/pipeline";
+import {add, info,update, execute, deploy} from "@/api/app/pipeline";
 import instance from './instance';
 import {getFlowChartData} from "@/views/application/pipeline/mock";
 import JavaBuild from "@/views/application/pipeline/config/java-build";
 import HostDeploy from '@/views/application/pipeline/config/host-deploy'
+import Log from "@/views/application/pipeline/log/log";
 
 FlowChart.use(PluginFlowExec);
 
 export default Vue.extend({
   name: 'FlowCanvas',
-  components: {JavaBuild,HostDeploy, ComponentTree},
+  components: {JavaBuild, HostDeploy, ComponentTree, Log},
   props: {
     sidebarComponentName: String,
   },
   data() {
     return {
+      id: 0,
       isShowNode: true,
       isShowNodeConfig: false,
       open: false,
       infoVisible: false,
-      // nodeTreeVisible: true,
-      nodeTreeVisible: false,
-      // nodeConfigVisible: true,
-      nodeConfigVisible: false,
+      nodeTreeVisible: true,
+      nodeConfigVisible: true,
       javaBuildVisible: false,
       hostDeployVisible: false,
       hideOrShowText: '隐藏',
@@ -211,6 +204,7 @@ export default Vue.extend({
           address: '上海市普陀区金沙江路 1518 弄',
         }],
       dialogTableVisible: false,
+      nodeExecuteLogVisible: false,
       messagesList: [
         {
           time: '2019/6/5 下午3:17:29',
@@ -235,15 +229,15 @@ export default Vue.extend({
     };
   },
   methods: {
-    init(appName,applicationUuid, id, infoVisible) {
+    init(appName, applicationUuid, id, infoVisible) {
       this.isExecDisable = false
       this.applicationName = appName
       this.infoVisible = infoVisible || 0
       this.open = true
       this.pipelineId = id || 0
-      id = id == null ? 0 : id
+      this.id = id == null ? 0 : id
       this.applicationUuid = applicationUuid
-      info(id).then(response => {
+      info(this.id).then(response => {
         if (response.code === 2000) {
           console.log(response.data)
           this.pipelineName = response.data.pipelineName
@@ -252,8 +246,8 @@ export default Vue.extend({
           FlowChart.on('commandListEmpty', () => {
             this.isUndoDisable = true;
           });
-          FlowChart.on('showNodeData', () => {
-            this.dialogTableVisible = true;
+          FlowChart.on('showNodeData', (nodeId) => {
+            this.nodeExecuteLog(nodeId)
           });
           FlowChart.on('addCommand', () => {
             this.isUndoDisable = false;
@@ -315,17 +309,17 @@ export default Vue.extend({
       instance.reset()
       FlowChart.loadData(getFlowChartData)
     },
-    hideOrShowTree(){
-      this.nodeTreeVisible=!this.nodeTreeVisible
-      this.hideOrShowText = this.nodeTreeVisible ? '隐藏':'显示'
+    hideOrShowTree() {
+      this.nodeTreeVisible = !this.nodeTreeVisible
+      this.hideOrShowText = this.nodeTreeVisible ? '隐藏' : '显示'
       this.hideOrShowIcon = this.nodeTreeVisible ? 'el-icon-d-arrow-left' : 'el-icon-d-arrow-right'
     },
-    hideOrShowConfig(){
-      this.nodeConfigVisible=!this.nodeConfigVisible
-      this.hideOrShowConfigText = this.nodeConfigVisible ? '隐藏':'显示'
+    hideOrShowConfig() {
+      this.nodeConfigVisible = !this.nodeConfigVisible
+      this.hideOrShowConfigText = this.nodeConfigVisible ? '隐藏' : '显示'
       this.hideOrShowConfigIcon = this.nodeConfigVisible ? 'el-icon-caret-right' : 'el-icon-caret-left'
     },
-    deploy () {
+    deploy() {
       deploy({'id': this.pipelineId}).then(response => {
         if (response.code === 2000) {
           this.msgSuccess('操作成功')
@@ -334,7 +328,7 @@ export default Vue.extend({
         }
       })
     },
-    execute () {
+    execute() {
       this.isExecDisable = true
       execute({'id': this.pipelineId}).then(response => {
         if (response.code === 2000) {
@@ -347,7 +341,7 @@ export default Vue.extend({
       })
     },
     initSocket(uuid) {
-      this.socket = new WebSocket('ws://127.0.0.1:8088/pipeline?'+uuid);
+      this.socket = new WebSocket('ws://127.0.0.1:8088/pipeline?' + uuid);
       this.socketOnOpen();
       this.socketOnMessage()
       this.socketOnClose();
@@ -356,7 +350,7 @@ export default Vue.extend({
     socketOnMessage() {
       this.socket.onmessage = e => {
         const data = JSON.parse(e.data)
-        console.log('接收到数据 = '+data.nodes.name +' status = '+data.nodes.data.nodeState)
+        console.log('接收到数据 = ' + data.nodes.name + ' status = ' + data.nodes.data.nodeState)
         console.log(data)
         this.execModel(data)
       }
@@ -364,7 +358,8 @@ export default Vue.extend({
     execModel(data) {
       this.isExecDisable = true;
       FlowChart.execModel(data)
-      if (data.nodes.name==='END'&&data.nodes.data.nodeState!='loading'){
+      const status = data.nodes.data.nodeState
+      if ((data.nodes.name === 'END' && status != 'loading') || status == 'failed') {
         this.isExecDisable = false
       }
     },
@@ -389,28 +384,52 @@ export default Vue.extend({
       this.socket.close()
       this.term.dispose()
     },
-    saveData() {
-      const modelData = FlowChart.getModelData();
-      add({
-        'applicationPipelineDTO': {
+    saveOrUpdate() {
+      const graph = FlowChart.getModelData();
+      const data = {
+        'pipelineDTO': {
+          'id':this.id == 0 ? null : this.id,
           'pipelineName': this.pipelineName,
-          'description' : this.description,
+          'trigger': this.trigger,
+          'description': this.description,
           'applicationUuid': this.applicationUuid,
-          'graph': modelData
+          'graph': graph
         }
-      }).then(response => {
-        if (response.code === 2000) {
-          this.msgSuccess('操作成功')
-        } else {
-          this.msgError(response.msg)
-        }
-      })
+      }
+      if (this.id==0) {
+        add(data).then(response => {
+          if (response.code === 2000) {
+            console.error(response.data.id)
+            this.msgSuccess('添加成功')
+            this.id = response.data
+          } else {
+            this.msgError(response.msg)
+          }
+        })
+      } else {
+        update(data).then(response => {
+          if (response.code === 2000) {
+            this.msgSuccess('修改成功')
+          } else {
+            this.msgError(response.msg)
+          }
+        })
+      }
     },
     closeDialog() {
       this.$emit('refreshDataList')
     }
+    ,
+    nodeExecuteLog(data) {
+      this.nodeExecuteLogVisible = true
+      this.$nextTick(() => {
+        this.$refs.Log.init(data)
+      })
+    }
+    ,
   },
-});
+})
+;
 </script>
 
 <style lang="scss">
@@ -439,6 +458,7 @@ export default Vue.extend({
 
   .main {
     overflow: hidden;
+
     #mainMenu {
       height: 41px;
       border-bottom: 1px solid #e1e1e1;
@@ -515,7 +535,7 @@ export default Vue.extend({
 
     .title {
       border-bottom: 1px solid #e5e5e5;
-      height: 41px;
+      height: 40px;
       font-size: 12px;
       // color: #999;
       line-height: 40px;
@@ -607,6 +627,7 @@ export default Vue.extend({
 
     .el-tree {
       background: transparent;
+      //margin-left: 2px;
     }
   }
 

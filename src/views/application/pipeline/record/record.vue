@@ -1,17 +1,13 @@
 <template>
   <el-drawer :title="'执行记录'" top="3vh" :visible.sync="open" size="80%" append-to-body destroy-on-close @close=closeDialog :close-on-click-modal="false">
-<!--    <el-container class="flowChartWrap">-->
-      <div>
-<!--        <el-card class="box-card">-->
-          <el-table v-loading="loading" :data="pipelineList">
+      <div  style="height: 50px!important;">
+          <el-table  :max-height="650" v-loading="loading" :data="pipelineList">
             <el-table-column type="selection" width="55" align="center" />
             <el-table-column label="序号" align="center" prop="jobId" width="55" :show-overflow-tooltip="true">
               <template slot-scope="props">
                 <p v-text="props.$index+1" />
               </template>
             </el-table-column>
-            <el-table-column label="名称" align="center" prop="pipelineName" :show-overflow-tooltip="true" />
-            <el-table-column label="创建人" align="center" prop="creator" width="100"  :show-overflow-tooltip="true"/>
             <el-table-column label="触发时间" align="center" prop="gmtCreate" max-width="300"  :show-overflow-tooltip="true"/>
             <el-table-column label="触发人" align="center" prop="modifier" :show-overflow-tooltip="true" />
             <el-table-column label="结束时间" align="center" prop="gmtModified" :show-overflow-tooltip="true" />
@@ -26,9 +22,7 @@
           <pagination v-show="total>0" style="padding: 0px" :total="total" :page.sync="queryParams.pageIndex" :limit.sync="queryParams.pageSize" @pagination="getList" />
           <!-- 添加或修改对话框 -->
           <FlowInfo  v-if="addVisible" ref="flowinfo" @refreshDataList="getList"></FlowInfo>
-<!--        </el-card>-->
       </div>
-<!--    </el-container>-->
   </el-drawer>
 </template>
 <script>
@@ -36,9 +30,8 @@ import Vue from 'vue';
 import ComponentTree from '@/views/application/pipeline/menu.vue';
 import FlowChart from '../flowchart';
 import PluginFlowExec from '../pluginflowexec';
-import {add, info, execute, deploy, page} from "@/api/app/pipeline";
+import {add, info, update, page} from "@/views/application/pipeline/record/record";
 import instance from '../instance';
-import {getFlowChartData} from "@/views/application/pipeline/mock";
 import JavaBuild from "@/views/application/pipeline/config/java-build";
 import {nestedGetQuery} from "@/utils";
 import FlowInfo from "@/views/application/pipeline/flow/flowinfo";
@@ -130,8 +123,7 @@ export default Vue.extend({
       queryParams: {
         pageIndex: 1,
         pageSize: 10,
-        applicationUuid: undefined,
-        pipelineName: undefined
+        pipelineUuid: undefined
       },
       // 表单参数
       form: {},
@@ -139,10 +131,9 @@ export default Vue.extend({
     };
   },
   methods: {
-    init(id) {
+    init(uuid) {
       this.open = true
-      this.pipelineId = id || 0
-      id = id == null ? 0 : id
+      this.queryParams.pipelineUuid = uuid
       this.getList()
     },
     getList() {

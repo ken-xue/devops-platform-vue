@@ -422,7 +422,7 @@ export default Vue.extend({
 
     .title {
       border-bottom: 1px solid #e5e5e5;
-      height: 41px;
+      height: 40px;
       font-size: 12px;
       // color: #999;
       line-height: 40px;

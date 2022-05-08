@@ -207,7 +207,7 @@ export default {
       this.$refs['form'].validate(valid => {
         if (valid) {
           if (this.form.id !== undefined) {
-            update({'applicationPipelineDTO':this.form}).then(response => {
+            update({'pipelineDTO':this.form}).then(response => {
               if (response.code === 2000) {
                 this.msgSuccess('修改成功')
                 this.open = false
@@ -217,7 +217,7 @@ export default {
               }
             })
           } else {
-            add({'applicationPipelineDTO':this.form}).then(response => {
+            add({'pipelineDTO':this.form}).then(response => {
               if (response.code === 2000) {
                 this.msgSuccess('新增成功')
                 this.open = false

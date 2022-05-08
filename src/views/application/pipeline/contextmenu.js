@@ -88,23 +88,23 @@ function generateMenuItem(opt) {
  * @description 生成节点的右键菜单
  */
 function generateNodeMenu() {
-  generateMenuItem({
-    text: '重命名',
-    icon: 'el-icon-edit',
-    role: 'rename',
-    clickHandle: () => {
-      const nodeEl = document.getElementById(currentComponent);
-      Contextmenu.hide()
-      const cComp = nodeEl.vNode.$children[0];
-      MessageBox.prompt('请输入新名称', '重命名', {
-        confirmButtonText: '确定',
-        inputValue: cComp.text,
-        cancelButtonText: '取消',
-      }).then(({ value }) => {
-        exec(RenameNodeCommand, currentComponent, cComp.text, value);
-      }).catch(() => {});
-    },
-  });
+  // generateMenuItem({
+  //   text: '重命名',
+  //   icon: 'el-icon-edit',
+  //   role: 'rename',
+  //   clickHandle: () => {
+  //     const nodeEl = document.getElementById(currentComponent);
+  //     Contextmenu.hide()
+  //     const cComp = nodeEl.vNode.$children[0];
+  //     MessageBox.prompt('请输入新名称', '重命名', {
+  //       confirmButtonText: '确定',
+  //       inputValue: cComp.text,
+  //       cancelButtonText: '取消',
+  //     }).then(({ value }) => {
+  //       exec(RenameNodeCommand, currentComponent, cComp.text, value);
+  //     }).catch(() => {});
+  //   },
+  // });
   generateMenuItem({
     text: '复制',
     icon: 'el-icon-copy-document',
@@ -128,7 +128,7 @@ function generateNodeMenu() {
   });
   generateMenuDivideLine();
   generateMenuItem({
-    text: '查看数据',
+    text: '查看日志',
     icon: 'el-icon-view',
     role: 'view',
     clickHandle: () => {
