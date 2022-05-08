@@ -106,7 +106,7 @@ function generateNodeMenu() {
   //   },
   // });
   generateMenuItem({
-    text: '复制',
+    text: '复制节点',
     icon: 'el-icon-copy-document',
     role: 'delete',
     clickHandle: () => {
@@ -118,7 +118,7 @@ function generateNodeMenu() {
     },
   });
   generateMenuItem({
-    text: '删除',
+    text: '删除节点',
     icon: 'el-icon-delete',
     role: 'delete',
     clickHandle: () => {

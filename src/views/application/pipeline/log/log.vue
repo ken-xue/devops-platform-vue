@@ -1,51 +1,89 @@
 <template>
-  <el-drawer title="数据探查-（仅显示前100条）" :visible.sync="nodeExecuteLogVisible" append-to-body>
-    <el-table :data="gridData">
-      <el-table-column property="date" label="日期" width="150"></el-table-column>
-      <el-table-column property="name" label="姓名" width="200"></el-table-column>
-      <el-table-column property="address" label="地址"></el-table-column>
-    </el-table>
-    <div slot="footer" class="dialog-footer">
-      <el-button type="primary" @click="dialogTableVisible = false">复 制</el-button>
-      <el-button @click="dialogTableVisible = false">取 消</el-button>
-    </div>
+  <el-drawer title="日志" size="75%"  :visible.sync="nodeExecuteLogVisible" append-to-body :destroy-on-close="true">
+
+    <el-card class="box-card">
+    <div style="overflow: hidden" id="xterm" class="xterm" />
+    </el-card>
   </el-drawer>
 </template>
 
 <script>
+import 'xterm/css/xterm.css'
+import { Terminal } from 'xterm'
+import { FitAddon } from 'xterm-addon-fit'
+import { AttachAddon } from 'xterm-addon-attach'
+
 export default {
-  name: "log",
+  name: 'xterm',
+  props: {
+    socketURI: {
+      type: String,
+      default: 'ws://127.0.0.1:8088/terminal?f1944396bf43402aaa501b5856f67379'
+    },
+  },
   data(){
     return{
-      nodeExecuteLogVisible: false,
-      gridData: [
-        {
-          date: '2016-05-02',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄',
-        }, {
-          date: '2016-05-04',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄',
-        }, {
-          date: '2016-05-01',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄',
-        }, {
-          date: '2016-05-03',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄',
-        }],
+      nodeExecuteLogVisible: false
     }
   },
+  mounted() {
+    // this.initSocket()
+  },
+  beforeDestroy() {
+    this.socket.close()
+    this.term.dispose()
+  },
   methods: {
-    init(){
+    initSocket() {
+      const term = new Terminal({
+        fontSize: 14,
+        rows: 48,
+        cursorBlink: true,
+        windowsMode: true,
+        disableStdin: false
+      });
+      const attachAddon = new AttachAddon(this.socket);
+      const fitAddon = new FitAddon();
+      term.loadAddon(attachAddon);
+      term.loadAddon(fitAddon);
+      term.open(document.getElementById('xterm'));
+      fitAddon.fit();
+      term.focus();
+      this.term = term
+    },
+    init(uuid) {
       this.nodeExecuteLogVisible = true
+      this.socket = new WebSocket('ws://127.0.0.1:8088/logger?'+uuid);
+      this.socketOnClose();
+      this.socketOnOpen();
+      this.socketOnError();
+    },
+    socketOnOpen() {
+      this.socket.onopen = () => {
+        // 链接成功后
+        this.initSocket()
+      }
+    },
+    socketOnClose() {
+      this.socket.onclose = () => {
+        console.log('close socket')
+      }
+    },
+    socketOnError() {
+      this.socket.onerror = () => {
+        console.log('socket 链接失败')
+      }
+    },
+    beforeDestroy() {
+      this.socket.close()
+      this.term.dispose()
     }
   }
 }
 </script>
 
 <style scoped>
-
+  .box-card {
+    height: 90%;
+  }
 </style>
