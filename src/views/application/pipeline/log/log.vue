@@ -37,7 +37,7 @@ export default {
     initSocket() {
       const term = new Terminal({
         fontSize: 14,
-        rows: 48,
+        rows: 45,
         cursorBlink: true,
         windowsMode: true,
         disableStdin: false
@@ -51,9 +51,9 @@ export default {
       term.focus();
       this.term = term
     },
-    init(uuid) {
+    init(nodeUUID,executeLoggerUUID) {
       this.nodeExecuteLogVisible = true
-      this.socket = new WebSocket('ws://127.0.0.1:8088/logger?'+uuid);
+      this.socket = new WebSocket('ws://127.0.0.1:8088/logger?nodeUUID='+nodeUUID+'&executeLoggerUUID='+executeLoggerUUID);
       this.socketOnClose();
       this.socketOnOpen();
       this.socketOnError();

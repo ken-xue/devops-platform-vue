@@ -12,7 +12,7 @@ export function list(data) {
   return request({
     url: '/app/machine/list',
     method: 'get',
-    data: data
+    params: data
   })
 }
 // 查询详细

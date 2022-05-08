@@ -5,6 +5,7 @@ import exec, {
   RenameNodeCommand, PasteNodeCommand, RemoveNodeCommand, RemoveConnectorCommand,
 } from './command';
 import editor from './editor';
+import model from "@/views/application/pipeline/model";
 
 class MenuItem {
   constructor(opt) {
@@ -105,28 +106,32 @@ function generateNodeMenu() {
   //     }).catch(() => {});
   //   },
   // });
-  generateMenuItem({
-    text: '复制节点',
-    icon: 'el-icon-copy-document',
-    role: 'delete',
-    clickHandle: () => {
-      Contextmenu.hide()
-      copiedNodeId = currentComponent;
-      Message.success({
-        message: '复制成功！',
-      });
-    },
-  });
-  generateMenuItem({
-    text: '删除节点',
-    icon: 'el-icon-delete',
-    role: 'delete',
-    clickHandle: () => {
-      Contextmenu.hide()
-      deleteHandle(currentComponent);
-    },
-  });
-  generateMenuDivideLine();
+  const node = model.getNodeDataByNodeId(currentComponent);
+  //start和end节点不支持复制删除
+  if('START' !== node.name && 'END' !== node.name) {
+    generateMenuItem({
+      text: '复制节点',
+      icon: 'el-icon-copy-document',
+      role: 'delete',
+      clickHandle: () => {
+        Contextmenu.hide()
+        copiedNodeId = currentComponent;
+        Message.success({
+          message: '复制成功',
+        });
+      },
+    });
+    generateMenuItem({
+      text: '删除节点',
+      icon: 'el-icon-delete',
+      role: 'delete',
+      clickHandle: () => {
+        Contextmenu.hide()
+        deleteHandle(currentComponent);
+      },
+    });
+    generateMenuDivideLine();
+  }
   generateMenuItem({
     text: '查看日志',
     icon: 'el-icon-view',

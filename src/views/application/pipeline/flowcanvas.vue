@@ -139,7 +139,7 @@ import Vue from 'vue';
 import ComponentTree from '@/views/application/pipeline/menu.vue';
 import FlowChart from './flowchart';
 import PluginFlowExec from './pluginflowexec';
-import {add, info,update, execute, deploy} from "@/api/app/pipeline";
+import {add, info, update, execute, deploy} from "@/api/app/pipeline";
 import instance from './instance';
 import {getFlowChartData} from "@/views/application/pipeline/mock";
 import JavaBuild from "@/views/application/pipeline/config/java-build";
@@ -157,6 +157,7 @@ export default Vue.extend({
   data() {
     return {
       id: 0,
+      executeLoggerUuid: 0,//当前执行记录uuid
       isShowNode: true,
       isShowNodeConfig: false,
       open: false,
@@ -239,7 +240,6 @@ export default Vue.extend({
       this.applicationUuid = applicationUuid
       info(this.id).then(response => {
         if (response.code === 2000) {
-          console.log(response.data)
           this.pipelineName = response.data.pipelineName
           instance.reset()
           FlowChart.setContainer('mainContainer');
@@ -253,38 +253,42 @@ export default Vue.extend({
             this.isUndoDisable = false;
           });
           FlowChart.on('selectNode', (data) => {
-            this.isShowNode = false
-            this.isShowNodeConfig = true
             this.currentNodeId = data;
-            let nodeData = FlowChart.getNodeDataByNodeId(data)
-            console.log('data=' + JSON.stringify(nodeData))
-            const name = nodeData.name;
-            console.log('click node =' + name)
-            switch (name) {
-              case 'JAVA_BUILD':
-                this.javaBuildVisible = true
-                this.$nextTick(() => {
-                  this.$refs.JavaBuild.init(this.currentNodeId)
-                })
-                this.isShowNode = false
-                break;
-              case 'HOST_DEPLOY':
-                this.hostDeployVisible = true
-                this.$nextTick(() => {
-                  this.$refs.HostDeploy.init(this.currentNodeId)
-                })
-                this.isShowNode = false
-                break;
-              default:
-                this.isShowNode = true
-                this.isShowNodeConfig = false
-            }
+            this.showNodeConfig(data)
           });
           FlowChart.loadData(JSON.parse(response.data.pipelineContext))
         } else {
           this.msgError(response.msg)
         }
       });
+    },
+    showNodeConfig(data) {
+      this.isShowNode = false
+      this.isShowNodeConfig = true
+      let node = FlowChart.getNodeDataByNodeId(data)
+      const name = node.name;
+      console.log('click node =' + name)
+      switch (name) {
+        case 'JAVA_BUILD':
+          this.hostDeployVisible = false
+          this.javaBuildVisible = true
+          this.$nextTick(() => {
+            this.$refs.JavaBuild.init(this.currentNodeId)
+          })
+          this.isShowNode = false
+          break;
+        case 'HOST_DEPLOY':
+          this.javaBuildVisible = false
+          this.hostDeployVisible = true
+          this.$nextTick(() => {
+            this.$refs.HostDeploy.init(this.currentNodeId)
+          })
+          this.isShowNode = false
+          break;
+        default:
+          this.isShowNode = true
+          this.isShowNodeConfig = false
+      }
     },
     dragoverHandle(ev) {
       ev.preventDefault();
@@ -333,6 +337,7 @@ export default Vue.extend({
       execute({'id': this.pipelineId}).then(response => {
         if (response.code === 2000) {
           const data = response.data
+          this.executeLoggerUuid = data.uuid
           this.initSocket(data.uuid)
         } else {
           this.msgError(response.msg)
@@ -388,7 +393,7 @@ export default Vue.extend({
       const graph = FlowChart.getModelData();
       const data = {
         'pipelineDTO': {
-          'id':this.id == 0 ? null : this.id,
+          'id': this.id == 0 ? null : this.id,
           'pipelineName': this.pipelineName,
           'trigger': this.trigger,
           'description': this.description,
@@ -396,7 +401,7 @@ export default Vue.extend({
           'graph': graph
         }
       }
-      if (this.id==0) {
+      if (this.id == 0) {
         add(data).then(response => {
           if (response.code === 2000) {
             console.error(response.data.id)
@@ -418,15 +423,18 @@ export default Vue.extend({
     },
     closeDialog() {
       this.$emit('refreshDataList')
-    }
-    ,
-    nodeExecuteLog(data) {
+    },
+    //查看当前节点的执行日志
+    nodeExecuteLog(nodeId) {
       this.nodeExecuteLogVisible = true
+      if (this.executeLoggerUuid==null||this.executeLoggerUuid===0){
+        this.msgError('当前流水线未执行')
+        return
+      }
       this.$nextTick(() => {
-        this.$refs.Log.init(data)
+        this.$refs.Log.init(nodeId,this.executeLoggerUuid)
       })
-    }
-    ,
+    },
   },
 })
 ;

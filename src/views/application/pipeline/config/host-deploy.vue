@@ -3,6 +3,29 @@
     <el-form ref="form" :model="form" :rules="rules" label-position="top" size="mini">
       <el-row>
         <el-col :span="24">
+          <el-form-item label="主机" prop="host">
+            <el-select
+              style="width: 100%"
+              v-model="form.host"
+              multiple
+              filterable
+              remote
+              reserve-keyword
+              placeholder="请输入关键词"
+              :remote-method="getHostList"
+              :loading="loading">
+              <el-option
+                v-for="item in hostList"
+                :key="item.uuid"
+                :label="item.name"
+                :value="item.uuid">
+                <span style="float: left">{{ item.name }}</span>
+                <span style="float: right; color: #8492a6; font-size: 8px">{{ item.ip }}</span>
+              </el-option>
+            </el-select>
+          </el-form-item>
+        </el-col>
+        <el-col :span="24">
           <el-form-item label="下载路径" prop="packagePath">
                 <span slot="label">
                   下载路径
@@ -36,14 +59,13 @@
             </div>
           </el-form-item>
         </el-col>
-        <el-col :span="24">
-          <el-form-item label="通知" prop="notice">
-            <el-select v-model="form.notice" placeholder="请选择通知方式" clearable :style="{width: '100%'}">
-              <el-option v-for="(item, index) in noticeWays" :key="index" :label="item.label" :value="item.value"
-                         :disabled="item.disabled"></el-option>
-            </el-select>
-          </el-form-item>
-        </el-col>
+<!--        <el-col :span="24">-->
+<!--          <el-form-item label="通知" prop="notice">-->
+<!--            <el-select v-model="form.notice" placeholder="请选择通知方式" clearable :style="{width: '100%'}">-->
+<!--              <el-option v-for="(item, index) in noticeWays" :key="index" :label="item.label" :value="item.value" :disabled="item.disabled"></el-option>-->
+<!--            </el-select>-->
+<!--          </el-form-item>-->
+<!--        </el-col>-->
       </el-row>
     </el-form>
     <div slot="footer" class="dialog-footer">
@@ -58,6 +80,7 @@ import {Ace as AceEditor, Split as SplitEditor} from 'vue2-brace-editor';
 
 import 'brace/mode/sh';
 import 'brace/theme/monokai';
+import {list as searchHostList} from '@/api/machine/machine'
 
 import {nodeInfo, addNodeInfo, updateNodeInfo} from '@/api/app/pipeline'
 
@@ -70,8 +93,11 @@ export default {
   data() {
     return {
       visible: false,
+      loading: false,
       nodeUuid: '',
+      hostList: [],
       form: {
+        host:'',
         deployScript: '# 解压缩到指定目录中，再执行启动脚本（通常在代码中维护，如示deploy.sh \n\n # tar zxvf /home/admin/app/package.tgz -C /home/admin/app/\n # sh /home/admin/app/deploy.sh restart\n '
       },
       radio: 1,
@@ -92,6 +118,7 @@ export default {
         {value: 'EMAIL', label: '邮件'},
       ],
       rules: {
+        host: [{required: true, message: '主机不能为空', trigger: 'blur'}],
         jdk: [{required: true, message: 'jdk版本不能为空', trigger: 'blur'}],
         mvn: [{required: true, message: 'maven版本不能为空', trigger: 'blur'}],
         deployScript: [{required: true, message: '构建命令不能为空', trigger: 'blur'}],
@@ -104,10 +131,28 @@ export default {
       // TODO: need reset form
       this.nodeUuid = nodeUuid
       nodeInfo(nodeUuid).then(response => {
-        if (response.data) {
-          this.form = JSON.parse(response.data.info)
+        if (response.code === 2000) {
+          if (response.data) {
+            this.form = JSON.parse(response.data.info)
+          }
+        } else {
+          this.msgError(response.msg)
         }
+        this.getHostList();
         this.visible = true
+      })
+    },
+    // 获取主机列表
+    getHostList(name) {
+      console.log(name)
+      this.loading = true
+      searchHostList({'name': name}).then(response => {
+        if (response.code === 2000) {
+          this.hostList = response.data
+        } else {
+          this.msgError(response.msg)
+        }
+        this.loading = false
       })
     },
     submitForm() {
@@ -127,7 +172,7 @@ export default {
               }
             })
           } else {
-            addNodeInfo({'pipelineNodeInfoDTO': info}).then(response => {
+              addNodeInfo({'pipelineNodeInfoDTO': info}).then(response => {
               if (response.code === 2000) {
                 this.msgSuccess('新增成功')
               } else {
@@ -138,7 +183,7 @@ export default {
         }
       })
     },
-    onChange(){
+    onChange() {
 
     }
   }
