@@ -82,7 +82,7 @@ import 'brace/mode/sh';
 import 'brace/theme/monokai';
 import {list as searchHostList} from '@/api/machine/machine'
 
-import {nodeInfo, addNodeInfo, updateNodeInfo} from '@/api/app/pipeline'
+import {nodeInfo, addNodeInfo, updateInfo} from '@/api/app/pipeline'
 
 export default {
   name: "host-deploy",
@@ -164,7 +164,7 @@ export default {
             'info': JSON.stringify(this.form)
           }
           if (this.form.id !== undefined) {
-            updateNodeInfo({'pipelineNodeInfoDTO': info}).then(response => {
+            updateInfo({'pipelineNodeInfoDTO': info}).then(response => {
               if (response.code === 2000) {
                 this.msgSuccess('修改成功')
               } else {

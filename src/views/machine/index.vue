@@ -2,12 +2,8 @@
   <div>
     <el-card class="box-card">
       <el-form ref="queryForm" :model="queryParams" :inline="true" label-position="left" label-width="98px">
-        <el-form-item label="IP/服务器名" prop="name">
-          <el-input v-model="queryParams.machineInfoDTO.name" placeholder="请输入IP或者服务器名称" clearable size="small"
-                    @keyup.enter.native="handleQuery"/>
-        </el-form-item>
-        <el-form-item label="所属分组" prop="group">
-          <el-select v-model="groupUUID" placeholder="请选择">
+        <el-form-item label="所属分组" prop="group" label-width="2">
+          <el-select v-model="groupUUID" size="medium" placeholder="请选择">
             <el-option
               @change="getList"
               v-for="item in groupList"
@@ -16,6 +12,10 @@
               :value="item.uuid">
             </el-option>
           </el-select>
+        </el-form-item>
+        <el-form-item label="IP/服务器名" prop="name" label-width="2">
+          <el-input v-model="queryParams.machineInfoDTO.name" placeholder="请输入IP或者服务器名称" clearable size="small"
+                    @keyup.enter.native="handleQuery"/>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
@@ -91,12 +91,12 @@
         <el-form ref="form" :model="form" :rules="rules" label-width="120px">
           <el-row>
             <el-col :span="12">
-              <el-form-item label="服务器名" prop="applicationName">
+              <el-form-item label="服务器名" prop="name">
                 <el-input v-model="form.name" placeholder="请输入服务器名称"/>
               </el-form-item>
             </el-col>
             <el-col :span="12">
-              <el-form-item label="服务器IP" prop="applicationName">
+              <el-form-item label="服务器IP" prop="ip">
                 <el-input v-model="form.ip" placeholder="请输入服务器IP"/>
               </el-form-item>
             </el-col>
@@ -105,12 +105,6 @@
                 <el-input v-model="form.port" placeholder="请输入访问端口"/>
               </el-form-item>
             </el-col>
-            <el-col :span="24">
-              <el-form-item label="访问用户名" prop="accessUsername">
-                <el-input v-model="form.accessUsername" placeholder="请输入用户名"/>
-              </el-form-item>
-            </el-col>
-
             <el-col :span="12">
               <el-form-item label="访问方式" prop="accessWay">
                 <el-radio-group v-model="form.accessWay">
@@ -118,6 +112,24 @@
                 </el-radio-group>
               </el-form-item>
             </el-col>
+            <el-col :span="24">
+              <el-form-item label="所属分组" prop="host">
+                <el-select v-model="form.groupList" size="100" multiple placeholder="请选择">
+                  <el-option
+                    v-for="item in groupList"
+                    :key="item.uuid"
+                    :label="item.name"
+                    :value="item.uuid">
+                  </el-option>
+                </el-select>
+              </el-form-item>
+            </el-col>
+            <el-col :span="24">
+              <el-form-item label="访问用户名" prop="accessUsername">
+                <el-input v-model="form.accessUsername" placeholder="请输入用户名"/>
+              </el-form-item>
+            </el-col>
+
 
             <el-col v-if="form.accessWay === 'PASSWORD'" :span="24">
               <el-form-item label="访问密码" prop="accessPassword">
@@ -227,6 +239,7 @@ export default {
       form: {},
       // 表单校验
       rules: {
+        name: [{required: true, message: '名词不能为空', trigger: 'blur'}],
         ip: [{required: true, message: 'IP不能为空', trigger: 'blur'}],
         port: [{required: true, message: '端口不能为空', trigger: 'blur'}],
         email: [{required: true, message: '邮箱不能为空', trigger: 'blur'}],

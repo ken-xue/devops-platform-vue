@@ -2,7 +2,7 @@
   <div>
     <el-card class="box-card">
       <el-form ref="queryForm" :model="queryParams" :inline="true" label-position="left" label-width="68px">
-        <el-form-item label="名称" prop="roleName">
+        <el-form-item label="名称" prop="roleName" label-width="2">
           <el-input
             v-model="queryParams.machineGroupDTO.name"
             placeholder="请输入名称"
@@ -14,12 +14,8 @@
         <el-form-item>
           <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
           <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
-          <el-button v-permission="['machine:group:add']" type="primary" icon="el-icon-plus" size="mini"
-                     @click="handleAdd">新增
-          </el-button>
-          <el-button v-permission="['machine:group:delete']" type="danger" icon="el-icon-delete" size="mini"
-                     :disabled="multiple" @click="handleDelete">删除
-          </el-button>
+          <el-button v-permission="['machine:group:add']" type="primary" icon="el-icon-plus" size="mini" @click="handleAdd">新增</el-button>
+          <el-button v-permission="['machine:group:delete']" type="danger" icon="el-icon-delete" size="mini" :disabled="multiple" @click="handleDelete">删除</el-button>
         </el-form-item>
       </el-form>
 
@@ -29,7 +25,7 @@
           label="序号"
           align="center"
           prop="id"
-          width="45"
+          width="55"
           :show-overflow-tooltip="true">
           <template slot-scope="props">
             <p v-text="props.$index+1"/>
@@ -39,6 +35,12 @@
           label="分组名"
           align="center"
           prop="name"
+          :show-overflow-tooltip="true"
+        />
+        <el-table-column
+          label="备注"
+          align="center"
+          prop="remark"
           :show-overflow-tooltip="true"
         />
         <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
@@ -66,7 +68,7 @@
         <el-form ref="form" :model="form" :rules="rules" label-width="80px">
           <el-row>
             <el-col :span="24">
-              <el-form-item label="分组名" prop="groupName">
+              <el-form-item label="分组名" prop="name">
                 <el-input v-model="form.name" placeholder="请输入分组名"/>
               </el-form-item>
             </el-col>
@@ -93,7 +95,7 @@ import {add, del, info, page, update} from '@/api/machine/group'
 import {nestedGetQuery} from "@/utils";
 
 export default {
-  name: 'Role',
+  name: 'group',
   components: {},
   data() {
     return {
@@ -128,7 +130,7 @@ export default {
       form: {},
       // 表单校验
       rules: {
-        groupName: [{required: true, message: '分组名不能为空', trigger: 'blur'}],
+        name: [{required: true, message: '分组名不能为空', trigger: 'blur'}],
       }
     }
   },
@@ -187,6 +189,7 @@ export default {
       info(row.id).then(response => {
         this.form.id = response.data.id
         this.form.name = response.data.name
+        this.form.remark = response.data.remark
         this.open = true
         this.title = '修改'
         this.isEdit = true
