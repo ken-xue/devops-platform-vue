@@ -156,6 +156,7 @@ export default {
     reset() {
       this.form = {
         name: undefined,
+        remark: undefined
       }
       this.resetForm('form')
     },

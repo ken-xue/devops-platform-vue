@@ -3,9 +3,9 @@
     <el-card class="box-card">
       <el-form ref="queryForm" :model="queryParams" :inline="true" label-position="left" label-width="98px">
         <el-form-item label="所属分组" prop="group" label-width="2">
-          <el-select v-model="groupUUID" size="medium" placeholder="请选择">
+          <el-select v-model="queryParams.machineInfoDTO.groupUuid" size="medium" clearable
+                     @change="getList" placeholder="请选择">
             <el-option
-              @change="getList"
               v-for="item in groupList"
               :key="item.uuid"
               :label="item.name"
@@ -232,7 +232,8 @@ export default {
         pageIndex: 1,
         pageSize: 10,
         machineInfoDTO: {
-          name: ''
+          name: '',
+          groupUuid: ''
         }
       },
       // 表单参数

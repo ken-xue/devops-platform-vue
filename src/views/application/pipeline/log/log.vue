@@ -1,8 +1,9 @@
 <template>
   <el-drawer title="日志" size="75%"  :visible.sync="nodeExecuteLogVisible" append-to-body :destroy-on-close="true">
-
     <el-card class="box-card">
-    <div style="overflow: hidden" id="xterm" class="xterm" />
+      <div style="height: calc(100vh - 50px)">
+        <div style="overflow: hidden" id="xterm" class="xterm" />
+      </div>
     </el-card>
   </el-drawer>
 </template>
@@ -40,7 +41,7 @@ export default {
         rows: 45,
         cursorBlink: true,
         windowsMode: true,
-        disableStdin: false
+        disableStdin: true
       });
       const attachAddon = new AttachAddon(this.socket);
       const fitAddon = new FitAddon();
@@ -83,7 +84,7 @@ export default {
 </script>
 
 <style scoped>
-  .box-card {
-    height: 90%;
-  }
+  /*.box-card {*/
+  /*  height: 90%;*/
+  /*}*/
 </style>
