@@ -15,6 +15,7 @@
             <el-table-column label="操作" align="center" class-name="small-padding fixed-width" >
               <template slot-scope="scope">
                 <el-button v-permission="['sys:user:update']" size="mini" type="text" icon="el-icon-data-analysis" @click="handleInfo(scope.row)">详情</el-button>
+                <el-button v-permission="['pipeline:logger:delete']" size="mini" type="text" style="color: red" icon="el-icon-delete" @click="handleDelete(scope.row)">删除</el-button>
                </template>
             </el-table-column>
           </el-table>
@@ -30,7 +31,7 @@ import Vue from 'vue';
 import ComponentTree from '@/views/application/pipeline/menu.vue';
 import FlowChart from '../flowchart';
 import PluginFlowExec from '../pluginflowexec';
-import {add, info, update, page} from "@/views/application/pipeline/record/record";
+import {page,del} from "@/views/application/pipeline/record/record";
 import instance from '../instance';
 import JavaBuild from "@/views/application/pipeline/config/java-build";
 import {nestedGetQuery} from "@/utils";
@@ -142,6 +143,20 @@ export default Vue.extend({
         this.pipelineList = response.data
         this.total = response.totalCount
         this.loading = false
+      })
+    },
+    handleDelete(row) {
+      const Ids = (row.id && [row.id]) || this.ids
+      this.$confirm('是否确认删除编号为"' + Ids + '"的数据项?', '警告', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(function() {
+        return del({ 'ids': Ids })
+      }).then(() => {
+        this.getList()
+        this.msgSuccess('删除成功')
+      }).catch(function() {
       })
     },
     handleInfo(row){
