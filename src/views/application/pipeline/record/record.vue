@@ -8,10 +8,16 @@
                 <p v-text="props.$index+1" />
               </template>
             </el-table-column>
-            <el-table-column label="触发时间" align="center" prop="gmtCreate" max-width="300"  :show-overflow-tooltip="true"/>
+            <el-table-column label="触发时间" align="center" prop="executeStartTime" max-width="300"  :show-overflow-tooltip="true"/>
             <el-table-column label="触发人" align="center" prop="modifier" :show-overflow-tooltip="true" />
             <el-table-column label="结束时间" align="center" prop="gmtModified" :show-overflow-tooltip="true" />
-            <el-table-column label="执行结果" align="center" prop="gmtModified" :show-overflow-tooltip="true" />
+            <el-table-column label="执行结果" align="center" prop="finalStatus" :show-overflow-tooltip="true" >
+              <template slot-scope="scope">
+                <el-tag v-if="scope.row.finalStatus==='成功'" size="small" type="success">{{ scope.row.finalStatus }}</el-tag>
+                <el-tag v-else-if="scope.row.finalStatus==='失败'" size="small" type="danger">{{ scope.row.finalStatus }}</el-tag>
+                <el-tag v-else size="small" type="info">-</el-tag>
+              </template>
+            </el-table-column>
             <el-table-column label="操作" align="center" class-name="small-padding fixed-width" >
               <template slot-scope="scope">
                 <el-button v-permission="['sys:user:update']" size="mini" type="text" icon="el-icon-data-analysis" @click="handleInfo(scope.row)">详情</el-button>
@@ -22,7 +28,7 @@
           <!--页码-->
           <pagination v-show="total>0" style="padding: 0px" :total="total" :page.sync="queryParams.pageIndex" :limit.sync="queryParams.pageSize" @pagination="getList" />
           <!-- 添加或修改对话框 -->
-          <FlowInfo  v-if="addVisible" ref="flowinfo" @refreshDataList="getList"></FlowInfo>
+          <FlowInfo  v-if="addVisible" ref="FlowInfo" @refreshDataList="getList"></FlowInfo>
       </div>
   </el-drawer>
 </template>
@@ -162,7 +168,7 @@ export default Vue.extend({
     handleInfo(row){
       this.addVisible = true
       this.$nextTick(() => {
-        this.$refs.flowinfo.init(row.uuid)
+        this.$refs.FlowInfo.init(row.id)
       })
     },
     closeDialog() {

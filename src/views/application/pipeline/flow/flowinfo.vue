@@ -130,6 +130,7 @@ import {add, info, execute,deploy} from "@/api/app/pipeline";
 import instance from '@/views/application/pipeline/instance';
 import {getFlowChartData} from "@/views/application/pipeline/mock";
 import JavaBuild from "@/views/application/pipeline/config/java-build";
+import {info as loggerInfo} from '@/views/application/pipeline/record/record.js'
 
 FlowChart.use(PluginFlowExec);
 
@@ -203,7 +204,7 @@ export default Vue.extend({
   methods: {
     init(id) {
       this.open = true
-      info(69).then(response => {
+      loggerInfo(id).then(response => {
         if (response.code === 2000) {
           console.log(response.data)
           this.pipelineName = response.data.pipelineName
@@ -239,7 +240,7 @@ export default Vue.extend({
                 this.isShowNodeConfig = false
             }
           });
-          FlowChart.loadData(JSON.parse(response.data.pipelineContext))
+          FlowChart.loadData(JSON.parse(response.data.graphContent))
         } else {
           this.msgError(response.msg)
         }

@@ -334,6 +334,8 @@ export default Vue.extend({
     },
     execute() {
       this.isExecDisable = true
+      const pipeline = FlowChart.getModelData()
+      pipeline.nodes.forEach(node=>FlowChart.changeNodeStatus(node.id,''))
       execute({'id': this.pipelineId}).then(response => {
         if (response.code === 2000) {
           const data = response.data

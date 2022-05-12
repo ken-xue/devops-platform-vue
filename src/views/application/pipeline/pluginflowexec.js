@@ -63,10 +63,11 @@ export default function flowExec({ instance }) {
   //     }, 5000));
   // };
   this.execModel = (data)=> {
-    // console.log('--------节点执行状态接收数据------')
-    // console.log(data)
-    // console.log('--------节点执行状态接收数据------')
     changeStateByNodeId(data.nodes.id,data.nodes.data.nodeState)
     blingConnectors(data.edges)
+  };
+
+  this.changeNodeStatus = (nodeId,nodeStatus)=> {
+    changeStateByNodeId(nodeId,nodeStatus)
   };
 }
