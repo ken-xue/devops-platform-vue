@@ -41,7 +41,7 @@ import {page,del} from "@/views/application/pipeline/record/record";
 import instance from '../instance';
 import JavaBuild from "@/views/application/pipeline/config/java-build";
 import {nestedGetQuery} from "@/utils";
-import FlowInfo from "@/views/application/pipeline/flow/flowinfo";
+import FlowInfo from "@/views/application/pipeline/flow/flowinfo.vue";
 
 FlowChart.use(PluginFlowExec);
 

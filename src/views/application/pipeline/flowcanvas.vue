@@ -141,10 +141,11 @@ import FlowChart from './flowchart';
 import PluginFlowExec from './pluginflowexec';
 import {add, info, update, execute, deploy} from "@/api/app/pipeline";
 import instance from './instance';
-import {getFlowChartData} from "@/views/application/pipeline/mock";
 import JavaBuild from "@/views/application/pipeline/config/java-build";
 import HostDeploy from '@/views/application/pipeline/config/host-deploy'
 import Log from "@/views/application/pipeline/log/log";
+import {initPipelineTemplate} from "@/views/application/pipeline/const";
+import editor from "@/views/application/pipeline/editor";
 
 FlowChart.use(PluginFlowExec);
 
@@ -186,47 +187,8 @@ export default Vue.extend({
         {value: 'code', label: '提交代码'},
         {value: 'hand', label: '手动触发'},
       ],
-      gridData: [
-        {
-          date: '2016-05-02',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄',
-        }, {
-          date: '2016-05-04',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄',
-        }, {
-          date: '2016-05-01',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄',
-        }, {
-          date: '2016-05-03',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄',
-        }],
       dialogTableVisible: false,
-      nodeExecuteLogVisible: false,
-      messagesList: [
-        {
-          time: '2019/6/5 下午3:17:29',
-          message: '当前实验中没有可回滚的节点',
-        }, {
-          time: '2019/6/5 下午3:00:25',
-          message: '模型不存在,请生成模型后重试',
-        }, {
-          time: '2019/6/5 下午3:00:17',
-          message: '实验目录不存在',
-        }, {
-          time: '2019/6/5 下午3:00:09',
-          message: '模型不存在,请生成模型后重试',
-        }, {
-          time: '2019/6/5 下午3:00:09',
-          message: '模型不存在,请生成模型后重试',
-        }, {
-          time: '2019/6/5 下午3:00:09',
-          message: '模型不存在,请生成模型后重试',
-        }
-      ],
+      nodeExecuteLogVisible: false
     };
   },
   methods: {
@@ -310,8 +272,12 @@ export default Vue.extend({
       FlowChart.undo();
     },
     resetFlow() {
-      instance.reset()
-      FlowChart.loadData(getFlowChartData)
+      // instance.reset()
+      FlowChart.getModelData().nodes.forEach(node=>editor.removeNode(node.id))
+      // instance.reset()
+      const data = JSON.parse(JSON.stringify(initPipelineTemplate));
+      FlowChart.loadData(data)
+      console.log(initPipelineTemplate)
     },
     hideOrShowTree() {
       this.nodeTreeVisible = !this.nodeTreeVisible

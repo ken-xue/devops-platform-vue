@@ -30,11 +30,8 @@
 </template>
 
 <script>
-import Vue, {CreateElement} from 'vue';
-import {getMenuData} from './mock';
+import Vue from 'vue';
 import {list} from '@/api/app/node'
-import {pageAppInfo} from "@/api/app/app";
-import {nestedGetQuery} from "@/utils";
 
 export default Vue.extend({
   data() {
