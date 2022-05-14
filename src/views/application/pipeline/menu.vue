@@ -1,13 +1,16 @@
 <template>
-  <el-aside width="240px"
-            class="left">
+  <div>
+    <div>
+    </div>
+  <el-aside width="240px" class="left">
     <div class="search">
-      <el-input placeholder="搜索节点"
-                size="small"
-                v-model="filterText">
-        <i slot="prefix"
-           class="el-input__icon el-icon-search"></i>
-      </el-input>
+      <div class="title">节点列表</div>
+<!--      <el-input placeholder="搜索节点"-->
+<!--                size="small"-->
+<!--                v-model="filterText">-->
+<!--        <i slot="prefix"-->
+<!--           class="el-input__icon el-icon-search"></i>-->
+<!--      </el-input>-->
     </div>
 <!--    <el-tree :data="nodeData"-->
 <!--             node-key="id"-->
@@ -17,16 +20,19 @@
 <!--             :filter-node-method="filterNode"-->
 <!--             ref="tree2"-->
 <!--             :props="defaultProps"></el-tree>-->
-    <el-tree :data="nodeData"
-             :accordion="true"
-             node-key="id"
-             :default-expanded-keys="[10]"
-             icon-class="el-icon-arrow-right"
-             :render-content="renderContentFunction"
-             :filter-node-method="filterNode"
-             ref="tree2"
-             :props="defaultProps"></el-tree>
+    <div class="node-tree">
+      <el-tree :data="nodeData"
+               :accordion="true"
+               node-key="id"
+               :default-expanded-keys="[10]"
+               icon-class="el-icon-arrow-right"
+               :render-content="renderContentFunction"
+               :filter-node-method="filterNode"
+               ref="tree2"
+               :props="defaultProps"></el-tree>
+    </div>
   </el-aside>
+  </div>
 </template>
 
 <script>
@@ -135,3 +141,98 @@ export default Vue.extend({
   },
 });
 </script>
+
+<style lang="scss">
+.el-tree-node__content{
+  padding-left: 0px!important;
+}
+
+.node-tree{
+  height: calc(100vh - 120px);
+  overflow-y: auto
+}
+.title {
+  -webkit-text-size-adjust: 100%;
+  text-rendering: optimizeLegibility;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+  color: #2c3e50;
+  -webkit-font-smoothing: antialiased;
+  -webkit-box-direction: normal;
+  box-sizing: inherit;
+  height: 40px;
+  font-size: 12px;
+  line-height: 40px;
+  text-align: center;
+}
+.left{
+    border-right: 1px solid #e5e5e5;
+    height: 100%;
+
+    //.el-tree {
+    //  height: 100%;
+      //overflow-y: auto;
+    //}
+}
+.el-aside {
+  background: #f8f8f8;
+  padding: 0px 0px;
+
+  .search {
+    height: 41px;
+    background-color: #f3f3f3;
+    //padding: 8px 12px;
+    box-sizing: border-box;
+    border-bottom: 1px solid #e5e5e5;
+    border-top: 1px solid #e5e5e5;
+
+    .el-input {
+      height: 24px;
+
+      .el-input__inner {
+        height: 42px;
+      }
+    }
+
+    .el-input__prefix {
+      top: 5px;
+    }
+
+    .el-input--small .el-input__icon {
+      line-height: 24px;
+    }
+  }
+
+  .el-tree {
+    background: transparent;
+    margin-left: 2px;
+  }
+}
+.el-tree-node__content,
+.el-tree-node {
+  min-height: 38px !important;
+}
+
+.node{
+  width: 100%!important;
+}
+.leafNode {
+  .node::before {
+    content: "";
+    position: absolute;
+    top: 2px;
+    left: 3px;
+    border-radius: 2px;
+    padding: 13px 2px;
+    background: transparent;
+  }
+
+  &:hover span.node {
+    border: 1px solid #1c9bec !important;
+    background: #fff;
+
+    &::before {
+      background: #1c9bec;
+    }
+  }
+}
+</style>

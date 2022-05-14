@@ -68,6 +68,47 @@
             </el-select>
           </el-form-item>
         </el-col>
+<!--        -->
+        <el-col :span="24">
+          <el-form-item label="通知" prop="notice">
+            <el-select v-model="form.notice" placeholder="请选择通知方式" clearable :style="{width: '100%'}">
+              <el-option v-for="(item, index) in noticeWays" :key="index" :label="item.label" :value="item.value"
+                         :disabled="item.disabled"></el-option>
+            </el-select>
+          </el-form-item>
+        </el-col>
+        <el-col :span="24">
+          <el-form-item label="通知" prop="notice">
+            <el-select v-model="form.notice" placeholder="请选择通知方式" clearable :style="{width: '100%'}">
+              <el-option v-for="(item, index) in noticeWays" :key="index" :label="item.label" :value="item.value"
+                         :disabled="item.disabled"></el-option>
+            </el-select>
+          </el-form-item>
+        </el-col>
+        <el-col :span="24">
+          <el-form-item label="通知" prop="notice">
+            <el-select v-model="form.notice" placeholder="请选择通知方式" clearable :style="{width: '100%'}">
+              <el-option v-for="(item, index) in noticeWays" :key="index" :label="item.label" :value="item.value"
+                         :disabled="item.disabled"></el-option>
+            </el-select>
+          </el-form-item>
+        </el-col>
+        <el-col :span="24">
+          <el-form-item label="通知" prop="notice">
+            <el-select v-model="form.notice" placeholder="请选择通知方式" clearable :style="{width: '100%'}">
+              <el-option v-for="(item, index) in noticeWays" :key="index" :label="item.label" :value="item.value"
+                         :disabled="item.disabled"></el-option>
+            </el-select>
+          </el-form-item>
+        </el-col>
+        <el-col :span="24">
+          <el-form-item label="通知" prop="notice">
+            <el-select v-model="form.notice" placeholder="请选择通知方式" clearable :style="{width: '100%'}">
+              <el-option v-for="(item, index) in noticeWays" :key="index" :label="item.label" :value="item.value"
+                         :disabled="item.disabled"></el-option>
+            </el-select>
+          </el-form-item>
+        </el-col>
       </el-row>
     </el-form>
     <div slot="footer" class="dialog-footer">

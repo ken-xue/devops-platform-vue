@@ -93,7 +93,7 @@
                         <!--                            <span class="value">{{ currentNodeId }}</span>-->
                         <!--                          </p>-->
                         <!--                        </div>-->
-                        <div class="model-attr">
+                        <div class="model-attr node-config">
                           <java-build ref="JavaBuild" v-if="javaBuildVisible"></java-build>
                           <host-deploy ref="HostDeploy" v-if="hostDeployVisible"></host-deploy>
                         </div>
@@ -406,19 +406,10 @@ export default Vue.extend({
 ;
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .flowChartWrap {
-  height: 650px;
-
-  .left {
-    border-right: 1px solid #e5e5e5;
-    height: 100%;
-
-    .el-tree {
-      height: calc(100% - 40px);
-      overflow-y: auto;
-    }
-  }
+  height: calc(100vh - 77px);
+  overflow: hidden;
 
   .right {
     border-left: 1px solid #e5e5e5;
@@ -571,40 +562,6 @@ export default Vue.extend({
     }
   }
 
-  .el-aside {
-    background: #f8f8f8;
-    padding: 0px 0px;
-
-    .search {
-      height: 42px;
-      background-color: #f3f3f3;
-      //padding: 8px 12px;
-      box-sizing: border-box;
-      border-bottom: 1px solid #e5e5e5;
-
-      .el-input {
-        height: 24px;
-
-        .el-input__inner {
-          height: 42px;
-        }
-      }
-
-      .el-input__prefix {
-        top: 5px;
-      }
-
-      .el-input--small .el-input__icon {
-        line-height: 24px;
-      }
-    }
-
-    .el-tree {
-      background: transparent;
-      //margin-left: 2px;
-    }
-  }
-
   .el-container {
     height: 100%;
   }
@@ -629,31 +586,9 @@ export default Vue.extend({
       box-shadow: none !important;
     }
   }
-
-  .el-tree-node__content,
-  .el-tree-node {
-    min-height: 38px !important;
-  }
-
-  .leafNode {
-    .node::before {
-      content: "";
-      position: absolute;
-      top: 2px;
-      left: 3px;
-      border-radius: 2px;
-      padding: 13px 2px;
-      background: transparent;
-    }
-
-    &:hover span.node {
-      border: 1px solid #1c9bec !important;
-      background: #fff;
-
-      &::before {
-        background: #1c9bec;
-      }
-    }
+  .node-config {
+    height: calc(100vh - 120px);
+    overflow-y: auto
   }
 }
 </style>
