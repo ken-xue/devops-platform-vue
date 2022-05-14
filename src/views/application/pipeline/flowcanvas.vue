@@ -312,7 +312,7 @@ export default Vue.extend({
       })
     },
     initSocket(uuid) {
-      this.socket = new WebSocket('ws://127.0.0.1:8088/pipeline?' + uuid);
+      this.socket = new WebSocket(process.env.VUE_APP_SOCKET_API + '/pipeline?' + uuid);
       this.socketOnOpen();
       this.socketOnMessage()
       this.socketOnClose();

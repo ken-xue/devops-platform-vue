@@ -214,6 +214,7 @@ export default Vue.extend({
 
 .node{
   width: 100%!important;
+  min-width: 150px!important;
 }
 .leafNode {
   .node::before {
