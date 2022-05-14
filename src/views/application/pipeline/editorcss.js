@@ -1,6 +1,9 @@
 /* eslint-disable no-unused-expressions */
 import { addCssRules } from './utils';
 
+/**
+ * 画布节点样式
+ */
 addCssRules`
 #mainContainer .tooltip{
 
@@ -47,7 +50,7 @@ addCssRules`
 .fy_node{
     position:absolute;
     border:1px solid #289de9;
-    width:170px;
+    width:auto;
     height:34px;
     line-height:32px;
     border-radius:4px;
@@ -113,7 +116,7 @@ addCssRules`
 }
 .fy_node .content span{
     display:inline-block;
-    width:80px;
+    width:auto;
     overflow: hidden;
     text-overflow:ellipsis;
     white-space: nowrap;
