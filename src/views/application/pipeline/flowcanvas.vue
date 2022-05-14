@@ -272,9 +272,7 @@ export default Vue.extend({
       FlowChart.undo();
     },
     resetFlow() {
-      // instance.reset()
       FlowChart.getModelData().nodes.forEach(node=>editor.removeNode(node.id))
-      // instance.reset()
       const data = JSON.parse(JSON.stringify(initPipelineTemplate));
       FlowChart.loadData(data)
       console.log(initPipelineTemplate)
