@@ -85,22 +85,22 @@
           <el-row>
             <el-col :span="24">
               <el-form-item label="集群名称" prop="name">
-                <el-input v-model="name" placeholder="请输入集群名称"/>
+                <el-input v-model="form.name" placeholder="请输入集群名称"/>
               </el-form-item>
             </el-col>
             <el-col :span="24">
               <el-form-item label="版本" prop="version">
-                <el-input v-model="version" placeholder="请输入版本"/>
+                <el-input v-model="form.version" placeholder="请输入版本"/>
               </el-form-item>
             </el-col>
             <el-col :span="24">
               <el-form-item label="秘钥" prop="secretKey">
-                <el-input v-model="secretKey" placeholder="请输入秘钥"/>
+                <el-input v-model="form.secretKey" placeholder="请输入秘钥"/>
               </el-form-item>
             </el-col>
             <el-col :span="24">
               <el-form-item label="集群配置文件" prop="config">
-                <el-input v-model="config" placeholder="请输入集群配置文件"/>
+                <el-input v-model="form.config" placeholder="请输入集群配置文件"/>
               </el-form-item>
             </el-col>
           </el-row>
@@ -157,8 +157,7 @@ export default {
         name: [{required: true, message: '集群名称不能为空', trigger: 'blur'}],
         version: [{required: true, message: '版本不能为空', trigger: 'blur'}],
         secretKey: [{required: true, message: '秘钥不能为空', trigger: 'blur'}],
-        config: [{required: true, message: '集群配置文件不能为空', trigger: 'blur'}],
-        graphContent: [{required: true, message: '流水线快照不能为空', trigger: 'blur'}],
+        config: [{required: true, message: '集群配置文件不能为空', trigger: 'blur'}]
       }
     }
   },
@@ -231,7 +230,7 @@ export default {
     },
     /** 提交按钮 */
     submitForm: function () {
-      this.refs['form'].validate(valid => {
+      this.$refs['form'].validate(valid => {
         if (valid) {
           if (this.form.id !== undefined) {
             update({"clusterDTO": this.form}).then(response => {

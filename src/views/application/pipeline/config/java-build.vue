@@ -70,9 +70,9 @@
         </el-col>
       </el-row>
     </el-form>
-    <div slot="footer" class="dialog-footer">
-      <el-button type="primary" @click="submitForm">保 存</el-button>
-    </div>
+<!--    <div slot="footer" class="dialog-footer">-->
+<!--      <el-button type="primary" @click="submitForm">保 存</el-button>-->
+<!--    </div>-->
   </div>
 </template>
 
@@ -133,6 +133,10 @@ export default {
         }
         this.visible = true
       })
+    },
+    //获取当前节点的配置文件（改之前的每个配置节点提交为统一流水线一起提交到后台）
+    getNodeConfig(){
+        return this.form
     },
     submitForm() {
       this.$refs['form'].validate(valid => {
