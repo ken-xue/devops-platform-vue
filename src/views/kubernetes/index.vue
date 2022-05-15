@@ -14,12 +14,9 @@
         <el-form-item>
           <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
           <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
-          <el-button v-permission="['kubernetes:cluster:add']" type="primary" icon="el-icon-plus" size="mini"
-                     @click="handleAdd">新增
-          </el-button>
-          <el-button v-permission="['kubernetes:cluster:delete']" type="danger" icon="el-icon-delete" size="mini"
-                     :disabled="multiple" @click="handleDelete">删除
-          </el-button>
+          <el-button v-permission="['kubernetes:cluster:add']" type="primary" icon="el-icon-plus" size="mini" @click="handleAdd">新增</el-button>
+          <el-button v-permission="['kubernetes:cluster:delete']" type="danger" icon="el-icon-delete" size="mini" :disabled="multiple" @click="handleDelete">删除</el-button>
+          <el-button v-permission="['kubernetes:cluster:add']" type="primary" icon="el-icon-orange" size="mini" @click="handleAdd">创建集群</el-button>
         </el-form-item>
       </el-form>
 
@@ -44,6 +41,7 @@
         <el-table-column
           label="版本"
           align="center"
+          width="50"
           prop="version"
           :show-overflow-tooltip="true"
         />
@@ -52,7 +50,11 @@
           align="center"
           prop="secretKey"
           :show-overflow-tooltip="true"
-        />
+          >
+          <template slot-scope="scope">
+              {{scope.row.secretKey}}
+          </template>
+        </el-table-column>
         <el-table-column
           label="集群配置文件"
           align="center"
@@ -63,6 +65,9 @@
           <template slot-scope="scope">
             <el-button v-permission="['kubernetes:cluster:update']" size="mini" type="text" icon="el-icon-edit"
                        @click="handleUpdate(scope.row)">修改
+            </el-button>
+            <el-button v-permission="['kubernetes:cluster:delete']" size="mini" type="text" style="color: green"
+                       icon="el-icon-set-up" @click="handleDelete(scope.row)">控制面板
             </el-button>
             <el-button v-permission="['kubernetes:cluster:delete']" size="mini" type="text" style="color: red"
                        icon="el-icon-delete" @click="handleDelete(scope.row)">删除

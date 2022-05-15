@@ -34,17 +34,8 @@
               <div class="mainContainer" @drop="dropHandle" @dragover="dragoverHandle">
                 <div id="mainContainer" @click="clickBgHandle"></div>
               </div>
-              <el-dialog title="数据探查-（仅显示前100条）" :visible.sync="dialogTableVisible" append-to-body>
-                <el-table :data="gridData">
-                  <el-table-column property="date" label="日期" width="150"></el-table-column>
-                  <el-table-column property="name" label="姓名" width="200"></el-table-column>
-                  <el-table-column property="address" label="地址"></el-table-column>
-                </el-table>
-                <div slot="footer" class="dialog-footer">
-                  <el-button type="primary" @click="dialogTableVisible = false">复 制</el-button>
-                  <el-button @click="dialogTableVisible = false">取 消</el-button>
-                </div>
-              </el-dialog>
+              <!--节点执行日志-->
+              <log v-if="nodeExecuteLogVisible" ref="Log"></log>
             </el-main>
             <!-- 2.2.2 组件属性设置 -->
 <!--            <el-aside width="300px" class="right">-->
@@ -130,13 +121,14 @@ import {add, info, execute,deploy} from "@/api/app/pipeline";
 import instance from '@/views/application/pipeline/instance';
 import {getFlowChartData} from "@/views/application/pipeline/mock";
 import JavaBuild from "@/views/application/pipeline/config/java-build";
-import {info as loggerInfo} from '@/views/application/pipeline/record/record.js'
+import {info as loggerInfo} from '@/views/application/pipeline/record/record.js';
+import Log from "@/views/application/pipeline/log/log";
 
 FlowChart.use(PluginFlowExec);
 
 export default Vue.extend({
   name: 'FlowInfo',
-  components: {JavaBuild, ComponentTree},
+  components: {JavaBuild, ComponentTree,Log},
   props: {
     sidebarComponentName: String,
   },
@@ -148,6 +140,7 @@ export default Vue.extend({
       infoVisible: false,
       nodeTreeVisible: true,
       javaBuildVisible: false,
+      nodeExecuteLogVisible: false,
       pipelineId: '',
       pipelineName: '',
       currentNodeId: '',
@@ -155,50 +148,12 @@ export default Vue.extend({
       isExecDisable: false,
       applicationUuid: '',
       applicationName: '',
+      executeLoggerUuid: '',
       activeName: 'first',
       toolBarShow: 'component',
       modelName: '你你您',
       description: '描述',
-      gridData: [
-        {
-          date: '2016-05-02',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄',
-        }, {
-          date: '2016-05-04',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄',
-        }, {
-          date: '2016-05-01',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄',
-        }, {
-          date: '2016-05-03',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄',
-        }],
-      dialogTableVisible: false,
-      messagesList: [
-        {
-          time: '2019/6/5 下午3:17:29',
-          message: '当前实验中没有可回滚的节点',
-        }, {
-          time: '2019/6/5 下午3:00:25',
-          message: '模型不存在,请生成模型后重试',
-        }, {
-          time: '2019/6/5 下午3:00:17',
-          message: '实验目录不存在',
-        }, {
-          time: '2019/6/5 下午3:00:09',
-          message: '模型不存在,请生成模型后重试',
-        }, {
-          time: '2019/6/5 下午3:00:09',
-          message: '模型不存在,请生成模型后重试',
-        }, {
-          time: '2019/6/5 下午3:00:09',
-          message: '模型不存在,请生成模型后重试',
-        }
-      ],
+      dialogTableVisible: false
     };
   },
   methods: {
@@ -206,15 +161,16 @@ export default Vue.extend({
       this.open = true
       loggerInfo(id).then(response => {
         if (response.code === 2000) {
-          console.log(response.data)
+          const data = response.data
+          this.executeLoggerUuid = data.uuid;
           this.pipelineName = response.data.pipelineName
           instance.reset()
           FlowChart.setContainer('mainContainer');
           FlowChart.on('commandListEmpty', () => {
             this.isUndoDisable = true;
           });
-          FlowChart.on('showNodeData', () => {
-            this.dialogTableVisible = true;
+          FlowChart.on('showNodeData', (nodeId) => {
+            this.nodeExecuteLog(nodeId)
           });
           FlowChart.on('addCommand', () => {
             this.isUndoDisable = false;
@@ -284,35 +240,16 @@ export default Vue.extend({
         }
       })
     },
-    execute () {
-      execute({'id': this.pipelineId}).then(response => {
-        if (response.code === 2000) {
-          this.msgSuccess('操作成功')
-        } else {
-          this.msgError(response.msg)
-        }
-      })
-    },
-    saveData() {
-      const modelData = FlowChart.getModelData();
-      add({
-        'applicationPipelineDTO': {
-          'pipelineName': this.pipelineName,
-          'description' : this.description,
-          'applicationUuid': this.applicationUuid,
-          'graph': modelData
-        }
-      }).then(response => {
-        if (response.code === 2000) {
-          this.msgSuccess('操作成功')
-        } else {
-          this.msgError(response.msg)
-        }
-      })
-    },
     closeDialog() {
       this.$emit('refreshDataList')
-    }
+    },
+    //查看当前节点的执行日志
+    nodeExecuteLog(nodeId) {
+      this.nodeExecuteLogVisible = true
+      this.$nextTick(() => {
+        this.$refs.Log.init(nodeId,this.executeLoggerUuid)
+      })
+    },
   },
 });
 </script>

@@ -10,7 +10,7 @@
             <!-- 2.2.1 flow面板 -->
             <el-main class="main">
               <!-- 2.2.1.1操作按钮 -->
-              <div id="mainMenu" v-if="!infoVisible">
+              <div id="mainMenu" v-if="!infoVisible" style="overflow: hidden">
                 <div class="tool-left">
                   <el-button :icon="hideOrShowIcon" @click="hideOrShowTree" size="small">{{ hideOrShowText }}
                   </el-button>

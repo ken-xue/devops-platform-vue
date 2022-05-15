@@ -312,7 +312,9 @@ function addNodeByDrag(position, elId) {
  */
 function addNodeByCopy(position, nodeId) {
   const nodeData = model.getNodeDataByNodeId(nodeId);
-  const { icon, value,nodeName } = nodeData.data;
+  const { icon, value } = nodeData.data;
+  let nodeName  = nodeData.name
+  debugger
   return addNodeByAction('copy', position, icon, value,nodeName);
 }
 
