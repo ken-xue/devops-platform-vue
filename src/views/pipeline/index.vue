@@ -3,7 +3,7 @@
     <el-card class="box-card">
       <el-form ref="queryForm" :model="queryParams" :inline="true" label-position="left" label-width="90px">
         <el-form-item  label="应用名称">
-          <el-select v-model="queryParams.applicationUuid" filterable placeholder="请选择" @change="handleQuery">
+          <el-select size="small" v-model="queryParams.applicationUuid" filterable placeholder="请选择" @change="handleQuery">
             <el-option
               v-for="item in appList"
               :key="item.uuid"

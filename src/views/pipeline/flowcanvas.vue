@@ -70,11 +70,11 @@
                           </p>
                           <p>
                             <span class="item">流水线名称</span>
-                            <el-input size="small" v-model="pipelineName"></el-input>
+                            <el-input size="mini" v-model="pipelineName"></el-input>
                           </p>
                           <p>
                             <span class="item">触发条件</span>
-                            <el-select v-model="triggerWay" placeholder="请选择触发条件" clearable :style="{width: '100%'}">
+                            <el-select size="mini" v-model="triggerWay" placeholder="请选择触发条件" clearable :style="{width: '100%'}">
                               <el-option v-for="(item, index) in triggerList" :key="index" :label="item.label"
                                          :value="item.value"
                                          :disabled="item.disabled"></el-option>
