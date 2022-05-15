@@ -22,6 +22,7 @@
           <el-form-item label="构建命令" prop="buildScript">
             <div style="width: 100%;overflow-x: scroll">
               <AceEditor
+                v-model="form.buildScript"
                 width="100%"
                 height="150px"
                 :fontSize="14"
@@ -31,7 +32,6 @@
                 mode="sh"
                 theme="monokai"
                 :onChange="onChange"
-                v-model="form.buildScript"
                 name="editor"
                 :editorProps="{$blockScrolling: true}"
               />
@@ -101,12 +101,6 @@ export default {
         {value: 'DING_DING', label: '钉钉'},
         {value: 'EMAIL', label: '邮件'},
       ],
-      dynamicValidateForm: {
-        domains: [{
-          value: ''
-        }],
-        email: ''
-      },
       rules: {
         jdk: [{required: true, message: 'jdk版本不能为空', trigger: 'blur'}],
         mvn: [{required: true, message: 'maven版本不能为空', trigger: 'blur'}],
@@ -163,19 +157,12 @@ export default {
         }
       })
     },
-    onChange(){
-
-    },
-    addDomain() {
-      this.dynamicValidateForm.domains.push({
-        value: '',
-        key: Date.now()
-      });
+    onChange(data){
+      this.form.buildScript = data
     }
   }
 }
 </script>
 
 <style scoped>
-font-size: 12px;
 </style>

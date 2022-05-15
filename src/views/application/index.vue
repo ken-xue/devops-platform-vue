@@ -84,8 +84,8 @@
               </el-form-item>
             </el-col>
             <el-col :span="24">
-              <el-form-item label="应用仓库" prop="repository">
-                <el-input v-model="form.repository" placeholder="请输入应用仓库" />
+              <el-form-item label="代码仓库" prop="repository">
+                <el-input v-model="form.repository" placeholder="请输入代码仓库" />
               </el-form-item>
             </el-col>
             <el-col :span="12">
