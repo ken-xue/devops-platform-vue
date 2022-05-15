@@ -171,10 +171,10 @@ export default Vue.extend({
             this.isUndoDisable = true;
           });
           FlowChart.on('showNodeLogger', (nodeId) => {
-            this.nodeExecuteLog(nodeId)
+            this.showNodeExecuteLog(nodeId)
           });
           FlowChart.on('showNodeData', (nodeId) => {
-            this.showNodeView(nodeId)
+            this.showNodeExecuteView(nodeId)
           });
           FlowChart.on('addCommand', () => {
             this.isUndoDisable = false;
@@ -229,13 +229,13 @@ export default Vue.extend({
       this.$emit('refreshDataList')
     },
     //查看当前节点的执行日志
-    nodeExecuteLog(nodeId) {
+    showNodeExecuteLog(nodeId) {
       this.nodeExecuteLogVisible = true
       this.$nextTick(() => {
         this.$refs.Log.init(nodeId,this.executeLoggerUuid)
       })
     },
-    showNodeView(nodeId){
+    showNodeExecuteView(nodeId){
       this.nodeViewVisible = true
       this.$nextTick(() => {
         this.$refs.View.init(nodeId,this.executeLoggerUuid)
