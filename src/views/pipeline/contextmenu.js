@@ -5,7 +5,7 @@ import exec, {
   RenameNodeCommand, PasteNodeCommand, RemoveNodeCommand, RemoveConnectorCommand,
 } from './command';
 import editor from './editor';
-import model from "@/views/application/pipeline/model";
+import model from "@/views/pipeline/model";
 
 class MenuItem {
   constructor(opt) {
@@ -107,6 +107,7 @@ function generateNodeMenu() {
   //   },
   // });
   const node = model.getNodeDataByNodeId(currentComponent);
+  debugger
   //start和end节点不支持复制删除
   if('START' !== node.name && 'END' !== node.name) {
     generateMenuItem({
@@ -133,16 +134,30 @@ function generateNodeMenu() {
     generateMenuDivideLine();
   }
   generateMenuItem({
-    text: '查看日志',
+    text: '执行日志',
     icon: 'el-icon-view',
     role: 'view',
     clickHandle: () => {
       Contextmenu.hide()
       // const nodeEl = document.getElementById(currentComponent);
       // const cComp = nodeEl.vNode.$children[0];
-      editor.emitShowNodeData(currentComponent);
+      editor.emitShowNodeLogger(currentComponent);
     },
   });
+  debugger
+  if (node.data.view === 'true'||node.data.view === true) {
+    generateMenuItem({
+      text: '结果数据',
+      icon: 'el-icon-data-analysis',
+      role: 'view',
+      clickHandle: () => {
+        Contextmenu.hide()
+        // const nodeEl = document.getElementById(currentComponent);
+        // const cComp = nodeEl.vNode.$children[0];
+        editor.emitShowNodeData(currentComponent);
+      },
+    });
+  }
 }
 
 /**

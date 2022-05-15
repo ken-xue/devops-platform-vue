@@ -33,6 +33,10 @@ function emitShowNodeData(nodeId) {
   FlowChart.emit('showNodeData', nodeId);
 }
 
+function emitShowNodeLogger(nodeId){
+  FlowChart.emit('showNodeLogger', nodeId);
+}
+
 /**
  * @description 移除当前选中节点的className：fy_node_selected
  */
@@ -173,7 +177,7 @@ function getConnectorByUuids(uuids) {
  * @param {string} html
  * @returns {Element} 返回生成的节点
  */
-function generateNode(left, top, id, iconCLassName, contentText,nodeName, nodeState) {
+function generateNode(left, top, id, iconCLassName, contentText,nodeName,view, nodeState) {
   // 节点最外层div
   const newNode = document.createElement('div');
   newNode.classList.add('fy_node');
@@ -182,6 +186,7 @@ function generateNode(left, top, id, iconCLassName, contentText,nodeName, nodeSt
 
   newNode.id = id;
   newNode.name = nodeName
+  newNode.view = view
   container.appendChild(newNode);
 
   // 右键菜单
@@ -214,6 +219,7 @@ function generateNode(left, top, id, iconCLassName, contentText,nodeName, nodeSt
           contentText,
           nodeState,
           nodeName,
+          view
         },
       });
     },
@@ -231,7 +237,7 @@ function generateNode(left, top, id, iconCLassName, contentText,nodeName, nodeSt
  * @param {*} value
  * @returns
  */
-function addNodeByAction(action, position, icon, value,nodeName) {
+function addNodeByAction(action, position, icon, value,view,nodeName) {
   const containerRect = container.getBoundingClientRect();
   const scale = getScale();
   const id = `node-${createUuid()}`;
@@ -257,7 +263,7 @@ function addNodeByAction(action, position, icon, value,nodeName) {
     targetEndpoints.push({ id: `target-${createUuid()}`, data: { value: '输入' } })
   }
 
-  generateNode(left, top, id, icon, value,nodeName,'');
+  generateNode(left, top, id, icon, value,nodeName,view,'');
   addTargetEndpoints(id, targetEndpoints);
   addSourceEndpoints(id, sourceEndpoints);
   model.addNode({
@@ -272,13 +278,15 @@ function addNodeByAction(action, position, icon, value,nodeName) {
     name: nodeName,
     data: {
       icon,
-      value
+      value,
+      view,
     },
   });
   [...targetEndpoints].concat([...sourceEndpoints]).forEach((point) => {
     model.addEndpoint(point);
   });
 
+  const n = model.getNodeDataByNodeId(id)
   return id;
 }
 
@@ -302,7 +310,8 @@ function addNodeByDrag(position, elId) {
   const contentText = copeNode.lastElementChild.innerHTML;
   const icon = copeNode.firstElementChild.className;
   const nodeName = copeNode.getAttribute('name');
-  return addNodeByAction('drag', position, icon, contentText,nodeName);
+  const view = copeNode.getAttribute('view');
+  return addNodeByAction('drag', position, icon, contentText,view,nodeName);
 }
 
 /**
@@ -312,10 +321,10 @@ function addNodeByDrag(position, elId) {
  */
 function addNodeByCopy(position, nodeId) {
   const nodeData = model.getNodeDataByNodeId(nodeId);
-  const { icon, value } = nodeData.data;
+  const { icon, value,view } = nodeData.data;
   let nodeName  = nodeData.name
   debugger
-  return addNodeByAction('copy', position, icon, value,nodeName);
+  return addNodeByAction('copy', position, icon, value,view,nodeName);
 }
 
 /**
@@ -325,7 +334,7 @@ function addNodeByCopy(position, nodeId) {
 function addNodeByData(nodeData) {
   const { endpoints } = model.getData();
   const {id, nodeName,position, points, data} = nodeData;
-  generateNode(position.left, position.top, id, data.icon, data.value,nodeName, data.nodeState);
+  generateNode(position.left, position.top, id, data.icon, data.value,data.view,nodeName, data.nodeState);
   const { targets, sources } = points;
   const targetsData = endpoints.filter(item => targets.indexOf(item.id) > -1);
   const sourcesData = endpoints.filter(item => sources.indexOf(item.id) > -1);
@@ -436,7 +445,6 @@ function render() {
  * @param {array} uuids [sourceUuid,targetId]
  */
 function execAddConnectorCommand(uuids) {
-  console.error("执行增加连接线命令"+uuids)
   exec(AddConnectorCommand, uuids);
   model.addEdge(uuids.join(CONNECTORSEPARATESYMBOL));
 }
@@ -514,6 +522,7 @@ const editor = {
   emitCommandListEmpty,
   emitAddCommand,
   emitShowNodeData,
+  emitShowNodeLogger,
   addNodeByDrag,
   addNodeByCopy,
   addNodeByExtraData,

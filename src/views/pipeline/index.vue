@@ -56,8 +56,8 @@
 import { del, page,add } from '@/api/app/pipeline'
 import {listAppInfo} from '@/api/app/app'
 import {nestedGetQuery} from "@/utils";
-import flowcanvas from "@/views/application/pipeline/flowcanvas";
-import record from "@/views/application/pipeline/record/record.vue";
+import flowcanvas from "@/views/pipeline/flowcanvas";
+import record from "@/views/pipeline/record/record.vue";
 
 export default {
   name: 'Pipeline',

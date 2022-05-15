@@ -298,7 +298,7 @@ export default {
     pipeline(row) {
       this.$router.push(
         {
-          path: '/application/app',
+          path: '/application',
           query: {
             uuid: row.uuid
           }

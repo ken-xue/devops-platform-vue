@@ -114,15 +114,13 @@
 </template>
 <script>
 import Vue from 'vue';
-import ComponentTree from '@/views/application/pipeline/menu.vue';
-import FlowChart from '@/views/application/pipeline/flowchart';
-import PluginFlowExec from '@/views/application/pipeline/pluginflowexec';
-import {add, info, execute,deploy} from "@/api/app/pipeline";
-import instance from '@/views/application/pipeline/instance';
-import {getFlowChartData} from "@/views/application/pipeline/mock";
-import JavaBuild from "@/views/application/pipeline/config/java-build";
-import {info as loggerInfo} from '@/views/application/pipeline/record/record.js';
-import Log from "@/views/application/pipeline/log/log";
+import ComponentTree from '@/views/pipeline/menu.vue';
+import FlowChart from '@/views/pipeline/flowchart';
+import PluginFlowExec from '@/views/pipeline/pluginflowexec';
+import instance from '@/views/pipeline/instance';
+import JavaBuild from "@/views/pipeline/config/java-build";
+import {info as loggerInfo} from '@/views/pipeline/record/record.js';
+import Log from "@/views/pipeline/log/log";
 
 FlowChart.use(PluginFlowExec);
 
@@ -220,25 +218,6 @@ export default Vue.extend({
     },
     undo() {
       FlowChart.undo();
-    },
-    execModel() {
-      this.isExecDisable = true;
-      FlowChart.execModel().then(() => {
-        this.isExecDisable = false;
-      });
-    },
-    resetFlow() {
-      instance.reset()
-      FlowChart.loadData(getFlowChartData)
-    },
-    deploy () {
-      deploy({'id': this.pipelineId}).then(response => {
-        if (response.code === 2000) {
-          this.msgSuccess('操作成功')
-        } else {
-          this.msgError(response.msg)
-        }
-      })
     },
     closeDialog() {
       this.$emit('refreshDataList')

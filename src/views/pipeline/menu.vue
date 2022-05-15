@@ -60,21 +60,14 @@ export default Vue.extend({
       this.nodeData = response.data
     })
   },
-  mounted() {
-    // list({}).then(response=> {
-    //   this.nodeData = response.data
-    // })
-    // this.nodeData = getMenuData
-    // API.getMenuData().then((data) => {
-    //   this.nodeData = data.data;
-    // });
-  },
   methods: {
     renderContentFunction(h, {node, data, store}) {
       const className = node.expanded ? 'el-icon-folder-opened' : 'el-icon-folder';
       const classNameChild = (!data.children && data.icon) ? data.icon : '';
       return h('div', {
-        class: {leafNode: !data.children},
+        class: {
+          leafNode: !data.children
+        },
         style: {
           height: '38px',
           lineHeight: '38px',
@@ -93,7 +86,8 @@ export default Vue.extend({
             attrs: {
               draggable: !data.children,
               id: data.id,
-              name:data.name,
+              name: data.name,
+              'view': data.view
             },
             on: {
               dragstart: this.dragHandle,

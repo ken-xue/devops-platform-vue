@@ -138,7 +138,7 @@ addCssRules`
 .fy_contextMenu{
     margin: 0;
     padding: 5px 0;
-    min-width: 170px;
+    min-width: 100px;
     position: absolute;
     list-style: none;
     background-color: hsla(0,0%,100%,.98);

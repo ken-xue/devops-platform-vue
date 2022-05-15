@@ -49,6 +49,7 @@
               </div>
               <!--节点执行日志-->
               <log v-if="nodeExecuteLogVisible" ref="Log"></log>
+              <NodeView v-if="nodeViewVisible" ref="View"></NodeView>
             </el-main>
             <!-- 2.2.2 组件属性设置 -->
             <el-aside v-show="nodeConfigVisible" width="300px" class="right">
@@ -136,22 +137,23 @@
 </template>
 <script>
 import Vue from 'vue';
-import ComponentTree from '@/views/application/pipeline/menu.vue';
+import ComponentTree from '@/views/pipeline/menu.vue';
 import FlowChart from './flowchart';
 import PluginFlowExec from './pluginflowexec';
 import {add, info, update, execute, deploy} from "@/api/app/pipeline";
 import instance from './instance';
-import JavaBuild from "@/views/application/pipeline/config/java-build";
-import HostDeploy from '@/views/application/pipeline/config/host-deploy'
-import Log from "@/views/application/pipeline/log/log";
-import {initPipelineTemplate} from "@/views/application/pipeline/const";
-import editor from "@/views/application/pipeline/editor";
+import JavaBuild from "@/views/pipeline/config/java-build";
+import HostDeploy from '@/views/pipeline/config/host-deploy'
+import Log from "@/views/pipeline/log/log";
+import {initPipelineTemplate} from "@/views/pipeline/const";
+import editor from "@/views/pipeline/editor";
+import NodeView from "@/views/pipeline/node/nodeview";
 
 FlowChart.use(PluginFlowExec);
 
 export default Vue.extend({
   name: 'FlowCanvas',
-  components: {JavaBuild, HostDeploy, ComponentTree, Log},
+  components: {NodeView, JavaBuild, HostDeploy, ComponentTree, Log},
   props: {
     sidebarComponentName: String,
   },
@@ -187,6 +189,7 @@ export default Vue.extend({
         {value: 'code', label: '提交代码'},
         {value: 'hand', label: '手动触发'},
       ],
+      nodeViewVisible: false,
       dialogTableVisible: false,
       nodeExecuteLogVisible: false
     };
@@ -208,8 +211,11 @@ export default Vue.extend({
           FlowChart.on('commandListEmpty', () => {
             this.isUndoDisable = true;
           });
-          FlowChart.on('showNodeData', (nodeId) => {
+          FlowChart.on('showNodeLogger', (nodeId) => {
             this.nodeExecuteLog(nodeId)
+          });
+          FlowChart.on('showNodeData', (nodeId) => {
+            this.showNodeView(nodeId)
           });
           FlowChart.on('addCommand', () => {
             this.isUndoDisable = false;
@@ -321,8 +327,8 @@ export default Vue.extend({
     socketOnMessage() {
       this.socket.onmessage = e => {
         const data = JSON.parse(e.data)
-        console.log('接收到数据 = ' + data.nodes.name + ' status = ' + data.nodes.data.nodeState)
-        console.log(data)
+        //console.log('接收到数据 = ' + data.nodes.name + ' status = ' + data.nodes.data.nodeState)
+        //console.log(data)
         this.execModel(data)
       }
     },
@@ -401,6 +407,16 @@ export default Vue.extend({
         this.$refs.Log.init(nodeId,this.executeLoggerUuid)
       })
     },
+    showNodeView(nodeId){
+      this.nodeViewVisible = true
+      if (this.executeLoggerUuid==null||this.executeLoggerUuid===0){
+        this.msgError('当前流水线未执行')
+        return
+      }
+      this.$nextTick(() => {
+        this.$refs.View.init(nodeId,this.executeLoggerUuid)
+      })
+    }
   },
 })
 ;

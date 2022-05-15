@@ -34,14 +34,14 @@
 </template>
 <script>
 import Vue from 'vue';
-import ComponentTree from '@/views/application/pipeline/menu.vue';
+import ComponentTree from '@/views/pipeline/menu.vue';
 import FlowChart from '../flowchart';
 import PluginFlowExec from '../pluginflowexec';
-import {page,del} from "@/views/application/pipeline/record/record";
+import {page,del} from "@/views/pipeline/record/record";
 import instance from '../instance';
-import JavaBuild from "@/views/application/pipeline/config/java-build";
+import JavaBuild from "@/views/pipeline/config/java-build";
 import {nestedGetQuery} from "@/utils";
-import FlowInfo from "@/views/application/pipeline/flow/flowinfo.vue";
+import FlowInfo from "@/views/pipeline/flow/flowinfo.vue";
 
 FlowChart.use(PluginFlowExec);
 
