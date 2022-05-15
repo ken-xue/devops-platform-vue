@@ -107,7 +107,6 @@ function generateNodeMenu() {
   //   },
   // });
   const node = model.getNodeDataByNodeId(currentComponent);
-  debugger
   //start和end节点不支持复制删除
   if('START' !== node.name && 'END' !== node.name) {
     generateMenuItem({
@@ -144,7 +143,6 @@ function generateNodeMenu() {
       editor.emitShowNodeLogger(currentComponent);
     },
   });
-  debugger
   if (node.data.view === 'true'||node.data.view === true) {
     generateMenuItem({
       text: '结果数据',

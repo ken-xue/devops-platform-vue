@@ -36,6 +36,7 @@
               </div>
               <!--节点执行日志-->
               <log v-if="nodeExecuteLogVisible" ref="Log"></log>
+              <NodeView v-if="nodeViewVisible" ref="View"></NodeView>
             </el-main>
             <!-- 2.2.2 组件属性设置 -->
 <!--            <el-aside width="300px" class="right">-->
@@ -121,12 +122,13 @@ import instance from '@/views/pipeline/instance';
 import JavaBuild from "@/views/pipeline/config/java-build";
 import {info as loggerInfo} from '@/views/pipeline/record/record.js';
 import Log from "@/views/pipeline/log/log";
+import NodeView from "@/views/pipeline/node/nodeview";
 
 FlowChart.use(PluginFlowExec);
 
 export default Vue.extend({
   name: 'FlowInfo',
-  components: {JavaBuild, ComponentTree,Log},
+  components: {JavaBuild, ComponentTree,Log,NodeView},
   props: {
     sidebarComponentName: String,
   },
@@ -138,6 +140,7 @@ export default Vue.extend({
       infoVisible: false,
       nodeTreeVisible: true,
       javaBuildVisible: false,
+      nodeViewVisible: false,
       nodeExecuteLogVisible: false,
       pipelineId: '',
       pipelineName: '',
@@ -167,8 +170,11 @@ export default Vue.extend({
           FlowChart.on('commandListEmpty', () => {
             this.isUndoDisable = true;
           });
-          FlowChart.on('showNodeData', (nodeId) => {
+          FlowChart.on('showNodeLogger', (nodeId) => {
             this.nodeExecuteLog(nodeId)
+          });
+          FlowChart.on('showNodeData', (nodeId) => {
+            this.showNodeView(nodeId)
           });
           FlowChart.on('addCommand', () => {
             this.isUndoDisable = false;
@@ -229,6 +235,12 @@ export default Vue.extend({
         this.$refs.Log.init(nodeId,this.executeLoggerUuid)
       })
     },
+    showNodeView(nodeId){
+      this.nodeViewVisible = true
+      this.$nextTick(() => {
+        this.$refs.View.init(nodeId,this.executeLoggerUuid)
+      })
+    }
   },
 });
 </script>

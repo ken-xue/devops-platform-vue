@@ -323,7 +323,6 @@ function addNodeByCopy(position, nodeId) {
   const nodeData = model.getNodeDataByNodeId(nodeId);
   const { icon, value,view } = nodeData.data;
   let nodeName  = nodeData.name
-  debugger
   return addNodeByAction('copy', position, icon, value,view,nodeName);
 }
 
