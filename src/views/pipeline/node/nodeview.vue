@@ -16,7 +16,7 @@
 import { get as Info} from '@/views/pipeline/node/nodeview.js'
 
 export default {
-  name: "node-view",
+  name: "NodeView",
   data(){
     return{
       nodeViewVisible: false,

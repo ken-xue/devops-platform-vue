@@ -23,6 +23,10 @@
         <el-switch v-model="sidebarLogo" class="drawer-switch" />
       </div>
 
+<!--      <div class="drawer-item">-->
+<!--        <span>隐藏设置</span>-->
+<!--        <el-switch v-model="sidebarLogo" class="drawer-switch" />-->
+<!--      </div>-->
     </div>
   </div>
 </template>

@@ -39,14 +39,6 @@
           </el-form-item>
         </el-col>
         <el-col :span="24">
-          <el-form-item label="存储方式">
-            <el-radio-group v-model="radio">
-              <el-radio :label="1">公共储存库</el-radio>
-              <el-radio :label="2">自定义存储</el-radio>
-            </el-radio-group>
-          </el-form-item>
-        </el-col>
-        <el-col :span="24">
           <el-form-item label="打包路径" prop="packagePath">
                 <span slot="label">
                   打包路径
@@ -57,22 +49,14 @@
                     <i class="el-icon-question"/>
                   </el-tooltip>
                 </span>
-            <el-input v-model="form.packagePath" placeholder="请输入打包路径"/>
-          </el-form-item>
-        </el-col>
-        <el-col :span="24">
-          <el-form-item label="通知" prop="notice">
-            <el-select v-model="form.notice" placeholder="请选择通知方式" clearable :style="{width: '100%'}">
-              <el-option v-for="(item, index) in noticeWays" :key="index" :label="item.label" :value="item.value"
-                         :disabled="item.disabled"></el-option>
-            </el-select>
+              <el-input v-model="form.packagePath" placeholder="请输入打包路径"/>
           </el-form-item>
         </el-col>
       </el-row>
     </el-form>
-<!--    <div slot="footer" class="dialog-footer">-->
-<!--      <el-button type="primary" @click="submitForm">保 存</el-button>-->
-<!--    </div>-->
+    <div slot="footer" class="dialog-footer">
+      <el-button size="mini" style="width: 100%" type="primary" @click="submitForm">保 存</el-button>
+    </div>
   </div>
 </template>
 
@@ -93,10 +77,12 @@ export default {
   },
   data() {
     return {
+      id:0,
       visible: false,
       nodeUuid: '',
+      initBuildScript: '# maven build default command\nmvn -B clean package -Dmaven.test.skip=true -Dautoconfig.skip\n# gradle build default command\n# ./gradlew build\n\n# ant build default command\n# ant \n',
       form: {
-        buildScript: '# maven build default command\nmvn -B clean package -Dmaven.test.skip=true -Dautoconfig.skip\n# gradle build default command\n# ./gradlew build\n\n# ant build default command\n# ant \n',
+        buildScript: this.initBuildScript
       },
       radio: 1,
       JDKVersions: [
@@ -115,6 +101,12 @@ export default {
         {value: 'DING_DING', label: '钉钉'},
         {value: 'EMAIL', label: '邮件'},
       ],
+      dynamicValidateForm: {
+        domains: [{
+          value: ''
+        }],
+        email: ''
+      },
       rules: {
         jdk: [{required: true, message: 'jdk版本不能为空', trigger: 'blur'}],
         mvn: [{required: true, message: 'maven版本不能为空', trigger: 'blur'}],
@@ -125,11 +117,15 @@ export default {
   },
   methods: {
     init(nodeUuid) {
-      // TODO: need reset form
+      this.form = {
+        buildScript: this.initBuildScript
+      }
       this.nodeUuid = nodeUuid
       nodeInfo(nodeUuid).then(response => {
-        if (response.data) {
-          this.form = JSON.parse(response.data.info)
+        const data = response.data
+        if (data) {
+          this.form = JSON.parse(data.info)
+          this.id = data.id
         }
         this.visible = true
       })
@@ -143,10 +139,11 @@ export default {
         if (valid) {
           // 构建数据json
           let info = {
+            'id':this.id,
             'nodeUuid': this.nodeUuid,
             'info': JSON.stringify(this.form)
           }
-          if (this.form.id !== undefined) {
+          if (this.id !== 0) {
             updateInfo({'pipelineNodeInfoDTO': info}).then(response => {
               if (response.code === 2000) {
                 this.msgSuccess('修改成功')
@@ -168,11 +165,17 @@ export default {
     },
     onChange(){
 
+    },
+    addDomain() {
+      this.dynamicValidateForm.domains.push({
+        value: '',
+        key: Date.now()
+      });
     }
   }
 }
 </script>
 
 <style scoped>
-
+font-size: 12px;
 </style>

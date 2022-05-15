@@ -74,7 +74,7 @@
                           </p>
                           <p>
                             <span class="item">触发条件</span>
-                            <el-select v-model="trigger" placeholder="请选择触发条件" clearable :style="{width: '100%'}">
+                            <el-select v-model="triggerWay" placeholder="请选择触发条件" clearable :style="{width: '100%'}">
                               <el-option v-for="(item, index) in triggerList" :key="index" :label="item.label"
                                          :value="item.value"
                                          :disabled="item.disabled"></el-option>
@@ -176,7 +176,7 @@ export default Vue.extend({
       pipelineId: '',
       pipelineName: '',
       currentNodeId: '',
-      trigger: '',
+      triggerWay: '',
       isUndoDisable: true,
       isExecDisable: false,
       applicationUuid: '',
@@ -188,6 +188,7 @@ export default Vue.extend({
       triggerList: [
         {value: 'code', label: '提交代码'},
         {value: 'hand', label: '手动触发'},
+        {value: 'webhook', label: 'WebHook'}
       ],
       nodeViewVisible: false,
       dialogTableVisible: false,
@@ -206,6 +207,7 @@ export default Vue.extend({
       info(this.id).then(response => {
         if (response.code === 2000) {
           this.pipelineName = response.data.pipelineName
+          this.triggerWay = response.data.triggerWay
           instance.reset()
           FlowChart.setContainer('mainContainer');
           FlowChart.on('commandListEmpty', () => {
@@ -278,7 +280,7 @@ export default Vue.extend({
       FlowChart.undo();
     },
     resetFlow() {
-      FlowChart.getModelData().nodes.forEach(node=>editor.removeNode(node.id))
+      FlowChart.getModelData().nodes.forEach(node => editor.removeNode(node.id))
       const data = JSON.parse(JSON.stringify(initPipelineTemplate));
       FlowChart.loadData(data)
       console.log(initPipelineTemplate)
@@ -305,7 +307,7 @@ export default Vue.extend({
     execute() {
       this.isExecDisable = true
       const pipeline = FlowChart.getModelData()
-      pipeline.nodes.forEach(node=>FlowChart.changeNodeStatus(node.id,''))
+      pipeline.nodes.forEach(node => FlowChart.changeNodeStatus(node.id, ''))
       execute({'id': this.pipelineId}).then(response => {
         if (response.code === 2000) {
           const data = response.data
@@ -367,7 +369,7 @@ export default Vue.extend({
         'pipelineDTO': {
           'id': this.id == 0 ? null : this.id,
           'pipelineName': this.pipelineName,
-          'trigger': this.trigger,
+          'triggerWay': this.triggerWay,
           'description': this.description,
           'applicationUuid': this.applicationUuid,
           'graph': graph
@@ -399,22 +401,22 @@ export default Vue.extend({
     //查看当前节点的执行日志
     nodeExecuteLog(nodeId) {
       this.nodeExecuteLogVisible = true
-      if (this.executeLoggerUuid==null||this.executeLoggerUuid===0){
+      if (this.executeLoggerUuid == null || this.executeLoggerUuid === 0) {
         this.msgError('当前流水线未执行')
         return
       }
       this.$nextTick(() => {
-        this.$refs.Log.init(nodeId,this.executeLoggerUuid)
+        this.$refs.Log.init(nodeId, this.executeLoggerUuid)
       })
     },
-    showNodeView(nodeId){
+    showNodeView(nodeId) {
       this.nodeViewVisible = true
-      if (this.executeLoggerUuid==null||this.executeLoggerUuid===0){
+      if (this.executeLoggerUuid == null || this.executeLoggerUuid === 0) {
         this.msgError('当前流水线未执行')
         return
       }
       this.$nextTick(() => {
-        this.$refs.View.init(nodeId,this.executeLoggerUuid)
+        this.$refs.View.init(nodeId, this.executeLoggerUuid)
       })
     }
   },
@@ -602,6 +604,7 @@ export default Vue.extend({
       box-shadow: none !important;
     }
   }
+
   .node-config {
     height: calc(100vh - 120px);
     overflow-y: auto

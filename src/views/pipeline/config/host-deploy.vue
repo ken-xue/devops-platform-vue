@@ -69,7 +69,7 @@
       </el-row>
     </el-form>
     <div slot="footer" class="dialog-footer">
-      <el-button type="primary" @click="submitForm">保 存</el-button>
+      <el-button size="mini" style="width: 100%" type="primary" @click="submitForm">保 存</el-button>
     </div>
   </div>
 </template>
@@ -92,27 +92,17 @@ export default {
   },
   data() {
     return {
+      id:0,
       visible: false,
       loading: false,
       nodeUuid: '',
       hostList: [],
+      initDeployScript: '# 解压缩到指定目录中，再执行启动脚本（通常在代码中维护，如示deploy.sh \n\n # tar zxvf /home/admin/app/package.tgz -C /home/admin/app/\n # sh /home/admin/app/deploy.sh restart\n ',
       form: {
         host:'',
-        deployScript: '# 解压缩到指定目录中，再执行启动脚本（通常在代码中维护，如示deploy.sh \n\n # tar zxvf /home/admin/app/package.tgz -C /home/admin/app/\n # sh /home/admin/app/deploy.sh restart\n '
+        deployScript: this.initDeployScript
       },
       radio: 1,
-      JDKVersions: [
-        {value: 'JDK 1.7', label: 'JDK 1.7'},
-        {value: 'JDK 1.8', label: 'JDK 1.8'},
-        {value: 'JDK 1.9', label: 'JDK 1.9'},
-        {value: 'OPENJDK 10', label: 'OPENJDK 10'},
-        {value: 'OPENJDK 11', label: 'OPENJDK 11'},
-        {value: 'JDK 17', label: 'JDK 17'},
-      ],
-      mavenVersions: [
-        {value: 'MAVEN 3.6', label: 'MAVEN 3.6'},
-        {value: 'MAVEN 3.7', label: 'MAVEN 3.7'},
-      ],
       noticeWays: [
         {value: 'DING_DING', label: '钉钉'},
         {value: 'EMAIL', label: '邮件'},
@@ -128,12 +118,16 @@ export default {
   },
   methods: {
     init(nodeUuid) {
-      // TODO: need reset form
+      this.form = {
+        deployScript: this.initDeployScript
+      }
       this.nodeUuid = nodeUuid
       nodeInfo(nodeUuid).then(response => {
         if (response.code === 2000) {
-          if (response.data) {
-            this.form = JSON.parse(response.data.info)
+          const data = response.data
+          if (data) {
+            this.form = JSON.parse(data.info)
+            this.id = data.id
           }
         } else {
           this.msgError(response.msg)
@@ -160,10 +154,11 @@ export default {
         if (valid) {
           // 构建数据json
           let info = {
+            'id': this.id,
             'nodeUuid': this.nodeUuid,
             'info': JSON.stringify(this.form)
           }
-          if (this.form.id !== undefined) {
+          if (this.id !== 0) {
             updateInfo({'pipelineNodeInfoDTO': info}).then(response => {
               if (response.code === 2000) {
                 this.msgSuccess('修改成功')
