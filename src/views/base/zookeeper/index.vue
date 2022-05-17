@@ -23,7 +23,8 @@
         </el-form-item>
       </el-form>
 
-      <el-table v-loading="loading" :data="dataList" @selection-change="handleSelectionChange">
+      <el-table v-loading="loading" :element-loading-text="loadingContent"
+                element-loading-spinner="el-icon-loading" :data="dataList" @selection-change="handleSelectionChange">
         <el-table-column type="selection" width="55" align="center"/>
         <el-table-column
           label="序号"
@@ -130,7 +131,7 @@
       </div>
     </el-dialog>
 
-    <el-dialog title="数据详情" :visible.sync="dataViewVisible" width="900px" append-to-body>
+    <el-drawer title="数据详情" :visible.sync="dataViewVisible" size="70%">
       <el-row :gutter="20">
         <el-col span="16">
           <el-divider content-position="center">可视化树</el-divider>
@@ -167,7 +168,7 @@
           <el-button
             type="text"
             size="mini"
-            @click="() => deleteNode(node , data)">
+            @click="() => deleteNode(data)">
             <i class="el-icon-minus"></i>删除
           </el-button>
         </span>
@@ -183,7 +184,7 @@
           </el-card>
         </el-col>
       </el-row>
-    </el-dialog>
+    </el-drawer>
 
     <!--添加子节点弹框-->
     <el-dialog
@@ -281,7 +282,7 @@ export default {
         uuid: '',
       },
       nodeDataInfo: '',
-
+      loadingContent:'',
     }
   },
   created() {
@@ -289,12 +290,15 @@ export default {
   },
   methods: {
     connect(row) {
+      this.loading = true
+      this.loadingContent = "拼命连接中"
       testConnect({"zookeeperDTO": row}).then(response => {
         if (response.code === 2000) {
           this.msgSuccess("zookeeper连接成功")
+          this.loading = false
         }
       }).catch(err => {
-
+        this.loading = false
       })
     },
 
@@ -302,8 +306,7 @@ export default {
       console.log("data  " + JSON.stringify(this.addZkNodeData))
       let data = this.zkNodeForm;
       data.uuid = this.form.uuid;
-      data.name = this.addZkNodeData.parentId + "/" + this.zkNodeForm.name
-      // data.name = this.addZkNodeData.children.length !== 0 ? "/" + this.zkNodeForm.name : this.addZkNodeData.parentId + "/" + this.zkNodeForm.name
+      data.name = this.addZkNodeData.parentId === null ? "/"+data.name : this.addZkNodeData.parentId + this.addZkNodeData.id + "/" + data.name
       addZkNode({"zookeeperAddNodeDTO": data}).then(res => {
         if (res.code === 2000) {
           this.$message.success("添加成功")
@@ -317,13 +320,13 @@ export default {
 
     //添加节点
     append(data) {
+      console.log("data  "+JSON.stringify(data))
       this.addZkNodeData = data
       this.addChildNodeDialog = true
     },
 
-    deleteNode(node, data) {
-      console.log("data  " + JSON.stringify(data))
-      console.log("node " + JSON.stringify(node))
+    deleteNode(node) {
+      //console.log("data  " + JSON.stringify(data))
       let name = node.parentId === "/" ? node.id : node.parentId
       deleteZkNode({"name": name, uuid: this.form.uuid}).then(response => {
         if (response.code === 2000) {
