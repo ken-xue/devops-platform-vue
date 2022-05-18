@@ -133,9 +133,8 @@
 
     <el-drawer title="数据详情" :visible.sync="dataViewVisible" size="70%">
       <el-row :gutter="20">
-        <el-col span="16">
+        <el-col :span="16">
           <el-divider content-position="center">可视化树</el-divider>
-          <br>
           <el-card shadow="hover" class="custom-tree-container" style="height: 550px;overflow: auto;">
             <el-tree
               :data="tree"
@@ -162,7 +161,7 @@
           <el-button
             type="text"
             size="mini"
-            @click="() => update(node, data)">
+            @click="() => updateNode(data)">
             <i class="el-icon-edit"></i>修改
           </el-button>
           <el-button
@@ -176,9 +175,8 @@
             </el-tree>
           </el-card>
         </el-col>
-        <el-col span="8">
+        <el-col :span="8">
           <el-divider content-position="center">节点数据</el-divider>
-          <br>
           <el-card>
             {{ nodeDataInfo }}
           </el-card>
@@ -188,26 +186,33 @@
 
     <!--添加子节点弹框-->
     <el-dialog
-      title="添加节点"
+      :title="nodeTitle"
       :visible.sync="addChildNodeDialog"
-      width="25%"
+      width="35%"
       center>
-      <el-form :model="zkNodeForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
-        <el-form-item label="上级节点" prop="name">
-          <el-tag>{{ addZkNodeData.parentId }}</el-tag>
+      <el-form ref="zkNodeForm" :model="zkNodeForm" :rules="zkNodeFormRules" label-width="100px" class="demo-ruleForm">
+        <el-form-item label="上级节点">
+          {{ addZkNodeData.parentId }}
         </el-form-item>
         <el-form-item label="节点名称" prop="name">
-          <el-input v-model="zkNodeForm.name"></el-input>
+          <el-input :disabled="nodeNameDisabled" v-model="zkNodeForm.name"></el-input>
         </el-form-item>
-        <el-form-item label="节点数据" prop="name">
-          <el-input v-model="zkNodeForm.data"></el-input>
+        <el-form-item label="节点数据" prop="data">
+          <el-input type="textarea" :rows="4" v-model="zkNodeForm.data"></el-input>
         </el-form-item>
-        <el-form-item label="节点类型" prop="name">
-          <el-input v-model="zkNodeForm.type"></el-input>
+        <el-form-item label="节点类型" prop="type">
+          <el-select v-model="zkNodeForm.type" placeholder="请选择" :disabled="nodeTypeDisabled">
+            <el-option
+              v-for="item in zkTypes"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button size="mini" @click="centerDialogVisible = false">取 消</el-button>
+        <el-button size="mini" @click="addChildNodeDialog = false">取 消</el-button>
         <el-button size="mini" type="primary" @click="addZkNode">确 定</el-button>
       </span>
     </el-dialog>
@@ -248,6 +253,7 @@ export default {
       total: 0,
       // 弹出层标题
       title: '',
+      nodeTitle:'',
       // 是否显示弹出层
       open: false,
       isEdit: false,
@@ -272,23 +278,56 @@ export default {
         remark: [{required: true, message: '备注不能为空', trigger: 'blur'}],
         sessionTimeout: [{required: true, message: '会话超时时间不能为空', trigger: 'blur'}],
       },
+      zkNodeFormRules: {
+        name: [{required: true, message: '节点名称名称不能为空', trigger: 'blur'}],
+        //type: [{required: true, message: '连接地址串不能为空', trigger: 'blur'}],
+      },
+      zkTypes: [
+        {
+          value: 1,
+          label: '持久化节点(默认)'
+        }, {
+          value: 2,
+          label: '持久化顺序节点'
+        }, {
+          value: 3,
+          label: '临时节点'
+        }, {
+          value: 2,
+          label: '临时顺序节点'
+        },
+      ],
       tree: [],
       addZkNodeData: {},
       addChildNodeDialog: false,
       zkNodeForm: {
-        name: '',
-        data: '',
+        name: null,
+        data: null,
         type: 1,
         uuid: '',
       },
       nodeDataInfo: '',
-      loadingContent:'',
+      loadingContent: '',
+      filterText: '',
+      nodeOps: null,
+      nodeNameDisabled: false,
+      nodeTypeDisabled: false
     }
   },
   created() {
     this.getList()
+    this.notice();
   },
   methods: {
+    notice() {
+      this.$notify({
+        title: '版本提示',
+        message: 'zookeeper3.4.x已被彻底弃用，因此请确保你的zookeeper版本大于3.4.x',
+        showClose: false,
+        type: 'warning'
+      });
+    },
+
     connect(row) {
       this.loading = true
       this.loadingContent = "拼命连接中"
@@ -302,54 +341,94 @@ export default {
       })
     },
 
-    addZkNode() {
-      console.log("data  " + JSON.stringify(this.addZkNodeData))
-      let data = this.zkNodeForm;
-      data.uuid = this.form.uuid;
-      data.name = this.addZkNodeData.parentId === null ? "/"+data.name : this.addZkNodeData.parentId + this.addZkNodeData.id + "/" + data.name
-      addZkNode({"zookeeperAddNodeDTO": data}).then(res => {
-        if (res.code === 2000) {
-          this.$message.success("添加成功")
-          this.addChildNodeDialog = false
-          this.zkNodeForm = {}
-        }
-      }).catch(err => {
+    updateZkNode(){
 
+    },
+
+    //修改节点
+    updateNode(data) {
+      console.log("data  "+JSON.stringify(data))
+      this.nodeTitle = '修改节点'
+      this.resetAddZkForm();
+      this.addZkNodeData = data
+      this.zkNodeForm.name = data.id
+      this.zkNodeForm.data = this.nodeDataInfo
+      this.nodeTypeDisabled = true
+      this.nodeNameDisabled = true
+      this.addChildNodeDialog = true
+    },
+
+    addZkNode() {
+      this.$refs['zkNodeForm'].validate(valid => {
+        if (valid) {
+          let data = this.zkNodeForm;
+          data.uuid = this.form.uuid;
+          let addData = this.addZkNodeData;
+          if (addData.parentId === null) { //添加一级目录
+            data.name = "/" + data.name;
+          } else if (addData.parentId === "/") { //添加二级以上目录
+            data.name = addData.id + "/" + data.name;
+          } else {
+            data.name = addData.parentId + "/" + data.name
+          }
+          addZkNode({"zookeeperAddNodeDTO": data}).then(res => {
+            if (res.code === 2000) {
+              this.$message.success("添加成功")
+              this.addChildNodeDialog = false
+              this.zkNodeForm = {}
+              this.dataView(this.form)
+            }
+          }).catch(err => {
+
+          })
+        }
       })
+    },
+
+    resetAddZkForm(){
+      this.zkNodeForm = {
+        name: null,
+        data: null,
+        type: 1,
+      }
     },
 
     //添加节点
     append(data) {
-      console.log("data  "+JSON.stringify(data))
+      this.nodeTitle = '添加节点';
+      this.resetAddZkForm();
       this.addZkNodeData = data
+      this.nodeTypeDisabled = false
+      this.nodeNameDisabled = false
       this.addChildNodeDialog = true
     },
 
     deleteNode(node) {
-      //console.log("data  " + JSON.stringify(data))
+      this.nodeOps = 3
       let name = node.parentId === "/" ? node.id : node.parentId
       deleteZkNode({"name": name, uuid: this.form.uuid}).then(response => {
         if (response.code === 2000) {
-          this.msgSuccess("delete node success");
+          this.msgSuccess("删除节点成功");
+          this.dataView(this.form)
+          this.nodeOps = null
         }
       }).catch(err => {
-        this.msgError("delete node fail");
+        this.nodeOps = null
       })
+
     },
 
     //懒加载子节点
     lazyLeaf(nodeInfo) {
-      if (nodeInfo.parentId === "/") {
+      if (this.nodeOps === 3) return 1;
+      if (nodeInfo.parentId === "/") { //二级目录
         this.clickPath = nodeInfo.id
       } else if (nodeInfo.parentId === null) {
         this.clickPath = "/"
-      } else {
+      } else { //三级后的目录
         this.clickPath = nodeInfo.parentId
       }
-      let node = {
-        id: this.clickPath,
-        uuid: this.form.uuid
-      }
+      let node = {id: this.clickPath, uuid: this.form.uuid}
       //懒加载数据
       lazyLeaf({"zookeeperLazyLeafDTO": node}).then(res => {
         let nodeArr = res.data;
@@ -361,10 +440,7 @@ export default {
 
       })
       //节点数据
-      let nodeData = {
-        name: this.clickPath,
-        uuid: this.form.uuid
-      }
+      let nodeData = {name: this.clickPath, uuid: this.form.uuid}
       loadNodeDataInfo(nodeData).then(response => {
         if (response.code === 2000) {
           this.nodeDataInfo = response.data.data
@@ -372,6 +448,7 @@ export default {
       }).catch(err => {
 
       })
+      this.nodeOps = {}
     },
 
     //递归节点并判断
@@ -395,7 +472,6 @@ export default {
         if (response.code === 2000) {
           this.tree = [response.data];
           this.dataViewVisible = true
-          this.msgSuccess("data loading success");
         }
       })
     },
@@ -479,31 +555,31 @@ export default {
     },
     /** 提交按钮 */
     submitForm: function () {
-      //  this.refs['form'].validate(valid => {
-      //   if (valid) {
-      if (this.form.id !== undefined) {
-        update({"zookeeperDTO": this.form}).then(response => {
-          if (response.code === 2000) {
-            this.msgSuccess('修改成功')
-            this.open = false
-            this.getList()
+      this.$refs['form'].validate(valid => {
+        if (valid) {
+          if (this.form.id !== undefined) {
+            update({"zookeeperDTO": this.form}).then(response => {
+              if (response.code === 2000) {
+                this.msgSuccess('修改成功')
+                this.open = false
+                this.getList()
+              } else {
+                this.msgError(response.msg)
+              }
+            })
           } else {
-            this.msgError(response.msg)
+            add({"zookeeperDTO": this.form}).then(response => {
+              if (response.code === 2000) {
+                this.msgSuccess('新增成功')
+                this.open = false
+                this.getList()
+              } else {
+                this.msgError(response.msg)
+              }
+            })
           }
-        })
-      } else {
-        add({"zookeeperDTO": this.form}).then(response => {
-          if (response.code === 2000) {
-            this.msgSuccess('新增成功')
-            this.open = false
-            this.getList()
-          } else {
-            this.msgError(response.msg)
-          }
-        })
-      }
-      //   }
-      // })
+        }
+      })
     },
     /** 删除按钮操作 */
     handleDelete(row) {
