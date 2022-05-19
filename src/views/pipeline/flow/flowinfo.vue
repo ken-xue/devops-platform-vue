@@ -36,7 +36,7 @@
               </div>
               <!--节点执行日志-->
               <log v-if="nodeExecuteLogVisible" ref="Log"></log>
-              <NodeView v-if="nodeViewVisible" ref="View"></NodeView>
+              <NodeView v-if="nodeViewVisible" ref="NodeView"></NodeView>
             </el-main>
             <!-- 2.2.2 组件属性设置 -->
 <!--            <el-aside width="300px" class="right">-->
@@ -122,7 +122,7 @@ import instance from '@/views/pipeline/instance';
 import JavaBuild from "@/views/pipeline/config/java-build";
 import {info as loggerInfo} from '@/views/pipeline/record/record.js';
 import Log from "@/views/pipeline/log/log";
-import NodeView from "@/views/pipeline/node/nodeview";
+import NodeView from "@/views/pipeline/node/nodeview.vue";
 
 FlowChart.use(PluginFlowExec);
 
@@ -238,7 +238,7 @@ export default Vue.extend({
     showNodeExecuteView(nodeId){
       this.nodeViewVisible = true
       this.$nextTick(() => {
-        this.$refs.View.init(nodeId,this.executeLoggerUuid)
+        this.$refs.NodeView.init(nodeId,this.executeLoggerUuid)
       })
     }
   },

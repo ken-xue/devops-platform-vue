@@ -30,6 +30,13 @@ export function add(data) {
         data: data
     })
 }
+export function create(data) {
+  return request({
+    url: 'kubernetes/cluster/create',
+    method: 'post',
+    data: data
+  })
+}
 // 修改
 export function update(data) {
     return request({
