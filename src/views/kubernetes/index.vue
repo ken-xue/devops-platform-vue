@@ -16,7 +16,7 @@
           <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
           <el-button v-permission="['kubernetes:cluster:add']" type="primary" icon="el-icon-plus" size="mini" @click="handleAdd">导入</el-button>
           <el-button v-permission="['kubernetes:cluster:delete']" type="danger" icon="el-icon-delete" size="mini" :disabled="multiple" @click="handleDelete">删除</el-button>
-          <el-button v-permission="['kubernetes:cluster:add']" type="primary" icon="el-icon-orange" size="mini" @click="handleCreate">创建集群</el-button>
+          <el-button v-permission="['kubernetes:cluster:add']" type="success" icon="el-icon-orange" size="mini" @click="handleCreate">创建集群</el-button>
         </el-form-item>
       </el-form>
 
@@ -124,7 +124,7 @@
 </template>
 
 <script>
-import {add, del, info, page, update} from '@/views/kubernetes/Cluster'
+import {add, del, info, page, update} from '@/views/kubernetes/cluster'
 import {nestedGetQuery} from "@/utils";
 import Create from "@/views/kubernetes/create";
 

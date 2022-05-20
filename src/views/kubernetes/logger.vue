@@ -1,6 +1,13 @@
 <template>
-  <div style="overflow: hidden" id="xterm" class="xterm" />
+  <el-drawer title="日志" size="75%"  :visible.sync="nodeExecuteLogVisible" append-to-body :destroy-on-close="true">
+    <el-card class="box-card">
+      <div style="height: calc(100vh - 50px)">
+        <div style="overflow: hidden" id="xterm" class="xterm" />
+      </div>
+    </el-card>
+  </el-drawer>
 </template>
+
 <script>
 import 'xterm/css/xterm.css'
 import { Terminal } from 'xterm'
@@ -8,12 +15,17 @@ import { FitAddon } from 'xterm-addon-fit'
 import { AttachAddon } from 'xterm-addon-attach'
 
 export default {
-  name: 'xterm',
+  name: 'logger',
   props: {
     socketURI: {
       type: String,
-      default: 'ws://127.0.0.1:8088/ws/terminal?f1944396bf43402aaa501b5856f67379'
+      default: 'ws://127.0.0.1:8088/terminal?f1944396bf43402aaa501b5856f67379'
     },
+  },
+  data(){
+    return{
+      nodeExecuteLogVisible: false
+    }
   },
   mounted() {
     // this.initSocket()
@@ -23,13 +35,13 @@ export default {
     this.term.dispose()
   },
   methods: {
-    initTerm() {
+    initSocket() {
       const term = new Terminal({
         fontSize: 14,
-        rows: 33,
+        rows: 45,
         cursorBlink: true,
         windowsMode: true,
-        disableStdin: false
+        disableStdin: true
       });
       const attachAddon = new AttachAddon(this.socket);
       const fitAddon = new FitAddon();
@@ -40,9 +52,9 @@ export default {
       term.focus();
       this.term = term
     },
-    initSocket(uuid) {
-      // this.socket = new WebSocket(this.socketURI);
-      this.socket = new WebSocket('ws://127.0.0.1:8088/ws/terminal?'+uuid);
+    init(data) {
+      this.nodeExecuteLogVisible = true
+      this.socket = new WebSocket(process.env.VUE_APP_SOCKET_API + '/logger?nodeUUID=123&executeLoggerUUID=123');
       this.socketOnClose();
       this.socketOnOpen();
       this.socketOnError();
@@ -50,17 +62,18 @@ export default {
     socketOnOpen() {
       this.socket.onopen = () => {
         // 链接成功后
-        this.initTerm()
+        this.initSocket()
+        this.socket.send()
       }
     },
     socketOnClose() {
       this.socket.onclose = () => {
-        // console.log('close socket')
+        console.log('close socket')
       }
     },
     socketOnError() {
       this.socket.onerror = () => {
-        // console.log('socket 链接失败')
+        console.log('socket 链接失败')
       }
     },
     beforeDestroy() {
@@ -70,3 +83,9 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+  /*.box-card {*/
+  /*  height: 90%;*/
+  /*}*/
+</style>

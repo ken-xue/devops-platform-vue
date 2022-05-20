@@ -1,90 +1,91 @@
 <template>
   <el-dialog title="创建集群" :visible.sync="open" width="700px" append-to-body @close="cancel">
-        <el-form ref="form" :model="form" :rules="rules" label-width="120px">
-          <el-row>
-            <el-col :span="24">
-              <el-form-item label="集群名称" prop="name">
-                <el-input v-model="form.name" placeholder="请输入集群名称"/>
-              </el-form-item>
-            </el-col>
-            <el-col :span="24">
-              <el-form-item label="版本" prop="version">
-                <el-select v-model="form.version" placeholder="请选择版本">
-                  <el-option
-                    v-for="item in kubernetesVersions"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value">
-                  </el-option>
-                </el-select>
-              </el-form-item>
-            </el-col>
-            <el-col :span="24">
-              <el-form-item label="Master节点" prop="masterHostList">
-                <el-select
-                  style="width: 100%"
-                  v-model="form.masterHostList"
-                  multiple
-                  filterable
-                  remote
-                  reserve-keyword
-                  placeholder="请输入关键词"
-                  :remote-method="getHostList"
-                  :loading="searchLoading">
-                  <el-option
-                    v-for="item in hostList"
-                    :key="item.uuid"
-                    :label="item.name"
-                    :value="item.uuid"
-                    :disabled="disableMaster(item)"
-                  >
-                    <span style="float: left">{{ item.name }}</span>
-                    <span style="float: right; color: #8492a6; font-size: 8px;padding-right: 20px">{{ item.ip }}</span>
-                  </el-option>
-                </el-select>
-              </el-form-item>
-            </el-col>
-            <el-col :span="24">
-              <el-form-item label="Slave节点" prop="slaveHostList">
-                <el-select
-                  style="width: 100%"
-                  v-model="form.slaveHostList"
-                  multiple
-                  filterable
-                  remote
-                  reserve-keyword
-                  placeholder="请输入关键词"
-                  :remote-method="getSlaveHostList"
-                  :loading="searchLoading">
-                  <el-option
-                    v-for="item in slaveHostList"
-                    :key="item.uuid"
-                    :label="item.name"
-                    :value="item.uuid"
-                    :disabled="disableSlave(item)"
-                  >
-                    <span style="float: left">{{ item.name }}</span>
-                    <span style="float: right; color: #8492a6; font-size: 8px;padding-right: 20px">{{ item.ip }}</span>
-                  </el-option>
-                </el-select>
-              </el-form-item>
-            </el-col>
-          </el-row>
-        </el-form>
-        <div slot="footer" class="dialog-footer">
-          <el-button type="primary" :loading="submitLoading" @click="submitForm">确 定</el-button>
-          <el-button @click="cancel">取 消</el-button>
-        </div>
+    <el-form ref="form" :model="form" :rules="rules" label-width="120px">
+      <el-row>
+        <el-col :span="24">
+          <el-form-item label="集群名称" prop="name">
+            <el-input v-model="form.name" placeholder="请输入集群名称"/>
+          </el-form-item>
+        </el-col>
+        <el-col :span="24">
+          <el-form-item label="版本" prop="version">
+            <el-select v-model="form.version" placeholder="请选择版本">
+              <el-option
+                v-for="item in kubernetesVersions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
+              </el-option>
+            </el-select>
+          </el-form-item>
+        </el-col>
+        <el-col :span="24">
+          <el-form-item label="Master节点" prop="masterHostList">
+            <el-select
+              style="width: 100%"
+              v-model="form.masterHostList"
+              multiple
+              filterable
+              remote
+              reserve-keyword
+              placeholder="请输入关键词"
+              :remote-method="getHostList"
+              :loading="searchLoading">
+              <el-option
+                v-for="item in hostList"
+                :key="item.uuid"
+                :label="item.name"
+                :value="item.uuid"
+                :disabled="disableMaster(item)"
+              >
+                <span style="float: left">{{ item.name }}</span>
+                <span style="float: right; color: #8492a6; font-size: 8px;padding-right: 20px">{{ item.ip }}</span>
+              </el-option>
+            </el-select>
+          </el-form-item>
+        </el-col>
+        <el-col :span="24">
+          <el-form-item label="Slave节点" prop="slaveHostList">
+            <el-select
+              style="width: 100%"
+              v-model="form.slaveHostList"
+              multiple
+              filterable
+              remote
+              reserve-keyword
+              placeholder="请输入关键词"
+              :remote-method="getSlaveHostList"
+              :loading="searchLoading">
+              <el-option
+                v-for="item in slaveHostList"
+                :key="item.uuid"
+                :label="item.name"
+                :value="item.uuid"
+                :disabled="disableSlave(item)"
+              >
+                <span style="float: left">{{ item.name }}</span>
+                <span style="float: right; color: #8492a6; font-size: 8px;padding-right: 20px">{{ item.ip }}</span>
+              </el-option>
+            </el-select>
+          </el-form-item>
+        </el-col>
+      </el-row>
+    </el-form>
+    <div slot="footer" class="dialog-footer">
+      <el-button type="primary" :loading="submitLoading" @click="submitForm">确 定</el-button>
+      <el-button @click="cancel">取 消</el-button>
+    </div>
+    <logger v-if="loggerVisible" ref="logger"></logger>
   </el-dialog>
 </template>
 
 <script>
-import {create} from '@/views/kubernetes/Cluster'
 import {list as searchHostList} from "@/api/machine/machine";
+import logger from "@/views/kubernetes/logger";
 
 export default {
   name: 'Create',
-  components: {},
+  components: {logger},
   data() {
     return {
       // 遮罩层
@@ -93,6 +94,7 @@ export default {
       isEdit: false,
       searchLoading: false,
       submitLoading: false,
+      loggerVisible: false,
       // 类型数据字典
       typeOptions: [],
       dataList: [],
@@ -101,7 +103,7 @@ export default {
       masterHostList: [],
       // 表单参数
       form: {},
-      kubernetesVersions:[
+      kubernetesVersions: [
         {value: '1.24', label: '1.24'},
       ],
       // 表单校验
@@ -117,18 +119,18 @@ export default {
     // this.getList()
   },
   methods: {
-    init(){
+    init() {
       this.open = true
     },
-    disableMaster(item){
+    disableMaster(item) {
       for (let i = 0; i < this.form.slaveHostList.length; i++) {
-        if (item.uuid === this.form.slaveHostList[i])return true;
+        if (item.uuid === this.form.slaveHostList[i]) return true;
       }
       return false
     },
-    disableSlave(item){
+    disableSlave(item) {
       for (let i = 0; i < this.form.masterHostList.length; i++) {
-        if (item.uuid === this.form.masterHostList[i])return true;
+        if (item.uuid === this.form.masterHostList[i]) return true;
       }
       return false
     },
@@ -174,16 +176,9 @@ export default {
       this.$refs['form'].validate(valid => {
         if (valid) {
           this.submitLoading = true
-          create(this.form).then(response => {
-            if (response.code === 2000) {
-              this.submitLoading = false
-              this.msgSuccess('创建成功')
-              this.open = false
-              this.getList()
-            } else {
-              this.submitLoading = false
-              this.msgError(response.msg)
-            }
+          this.loggerVisible = true
+          this.$nextTick(() => {
+            this.$refs.logger.init(this.form)
           })
         }
       })

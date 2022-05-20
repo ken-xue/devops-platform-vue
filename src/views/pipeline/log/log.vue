@@ -54,7 +54,7 @@ export default {
     },
     init(nodeUUID,executeLoggerUUID) {
       this.nodeExecuteLogVisible = true
-      this.socket = new WebSocket(process.env.VUE_APP_SOCKET_API + '/logger?nodeUUID='+nodeUUID+'&executeLoggerUUID='+executeLoggerUUID);
+      this.socket = new WebSocket(process.env.VUE_APP_SOCKET_API + '/ws/logger?nodeUUID='+nodeUUID+'&executeLoggerUUID='+executeLoggerUUID);
       this.socketOnClose();
       this.socketOnOpen();
       this.socketOnError();

@@ -147,7 +147,7 @@ import HostDeploy from '@/views/pipeline/config/host-deploy'
 import Log from "@/views/pipeline/log/log";
 import {initPipelineTemplate} from "@/views/pipeline/const";
 import editor from "@/views/pipeline/editor";
-import NodeView from "@/views/pipeline/node/nodeview";
+import NodeView from "@/views/pipeline/node/nodeview.vue";
 
 FlowChart.use(PluginFlowExec);
 
@@ -320,7 +320,7 @@ export default Vue.extend({
       })
     },
     initSocket(uuid) {
-      this.socket = new WebSocket(process.env.VUE_APP_SOCKET_API + '/pipeline?' + uuid);
+      this.socket = new WebSocket(process.env.VUE_APP_SOCKET_API + '/ws/pipeline?' + uuid);
       this.socketOnOpen();
       this.socketOnMessage()
       this.socketOnClose();
