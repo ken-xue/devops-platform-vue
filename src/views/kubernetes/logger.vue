@@ -24,7 +24,8 @@ export default {
   },
   data(){
     return{
-      nodeExecuteLogVisible: false
+      nodeExecuteLogVisible: false,
+      clusterCreateDTO: {}
     }
   },
   mounted() {
@@ -53,17 +54,19 @@ export default {
       this.term = term
     },
     init(data) {
+      this.clusterCreateDTO = data;
       this.nodeExecuteLogVisible = true
-      this.socket = new WebSocket(process.env.VUE_APP_SOCKET_API + '/logger?nodeUUID=123&executeLoggerUUID=123');
+      this.socket = new WebSocket(process.env.VUE_APP_SOCKET_API + '/ws/create');
       this.socketOnClose();
       this.socketOnOpen();
       this.socketOnError();
     },
     socketOnOpen() {
       this.socket.onopen = () => {
-        // 链接成功后
+        // 连接成功后
         this.initSocket()
-        this.socket.send()
+        // 发送创建集群必要信息
+        this.socket.send(JSON.stringify(this.clusterCreateDTO))
       }
     },
     socketOnClose() {
