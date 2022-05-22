@@ -1,5 +1,5 @@
 <template>
-  <el-dialog title="创建集群" :visible.sync="open" width="700px" append-to-body @close="cancel">
+  <el-dialog title="控制面板" :visible.sync="open" width="700px" append-to-body @close="cancel">
     <el-form ref="form" :model="form" :rules="rules" label-width="120px">
       <el-row>
         <el-col :span="24">
@@ -96,7 +96,7 @@ import {list as searchHostList} from "@/api/machine/machine";
 import logger from "@/views/kubernetes/logger";
 
 export default {
-  name: 'Create',
+  name: 'control-panel',
   components: {logger},
   data() {
     return {
@@ -137,7 +137,7 @@ export default {
     // this.getList()
   },
   methods: {
-    init() {
+    init(row) {
       this.open = true
     },
     disableMaster(item) {

@@ -14,9 +14,15 @@
         <el-form-item>
           <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
           <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
-          <el-button v-permission="['kubernetes:cluster:add']" type="primary" icon="el-icon-plus" size="mini" @click="handleAdd">导入</el-button>
-          <el-button v-permission="['kubernetes:cluster:delete']" type="danger" icon="el-icon-delete" size="mini" :disabled="multiple" @click="handleDelete">删除</el-button>
-          <el-button v-permission="['kubernetes:cluster:add']" type="success" icon="el-icon-orange" size="mini" @click="handleCreate">创建集群</el-button>
+          <el-button v-permission="['kubernetes:cluster:add']" type="primary" icon="el-icon-plus" size="mini"
+                     @click="handleAdd">导入
+          </el-button>
+          <el-button v-permission="['kubernetes:cluster:delete']" type="danger" icon="el-icon-delete" size="mini"
+                     :disabled="multiple" @click="handleDelete">删除
+          </el-button>
+          <el-button v-permission="['kubernetes:cluster:add']" type="success" icon="el-icon-orange" size="mini"
+                     @click="handleCreate">创建集群
+          </el-button>
         </el-form-item>
       </el-form>
 
@@ -50,9 +56,9 @@
           align="center"
           prop="secretKey"
           :show-overflow-tooltip="true"
-          >
+        >
           <template slot-scope="scope">
-              {{scope.row.secretKey}}
+            {{ scope.row.secretKey }}
           </template>
         </el-table-column>
         <el-table-column
@@ -61,19 +67,19 @@
           prop="config"
           :show-overflow-tooltip="true"
         />
-        <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+        <el-table-column label="操作" min-width="120" align="center" class-name="small-padding fixed-width">
           <template slot-scope="scope">
             <el-button v-permission="['kubernetes:cluster:update']" size="mini" type="text" icon="el-icon-edit"
                        @click="handleUpdate(scope.row)">修改
             </el-button>
             <el-button v-permission="['kubernetes:cluster:delete']" size="mini" type="text" style="color: green"
-                       icon="el-icon-set-up" @click="handleDelete(scope.row)">控制面板
+                       icon="el-icon-set-up" @click="controlPanel(scope.row)">控制面板
             </el-button>
             <el-button v-permission="['kubernetes:cluster:update']" size="mini" type="text" icon="el-icon-s-platform"
-                       @click="handleUpdate(scope.row)">Terminal
+                       @click="terminalHandler(scope.row)">终端
             </el-button>
             <el-button v-permission="['kubernetes:cluster:delete']" size="mini" type="text" style="color: red"
-                       icon="el-icon-delete" @click="handleDelete(scope.row)">删除
+                       icon="el-icon-delete" @click="handleDelete(scope.row)">释放
             </el-button>
           </template>
         </el-table-column>
@@ -120,17 +126,21 @@
       </el-dialog>
     </el-card>
     <Create ref="Create" v-if="createClusterVisible" @refreshDataList="getList"></Create>
+    <ControlPanel ref="ControlPanel" v-if="controlPanelVisible"></ControlPanel>
+    <terminal ref="Terminal" v-if="terminalVisible"></terminal>
   </div>
 </template>
 
 <script>
-import {add, del, info, page, update} from '@/views/kubernetes/cluster'
+import {add, del, info, page, update} from '@/api/kubernetes/cluster'
 import {nestedGetQuery} from "@/utils";
 import Create from "@/views/kubernetes/create";
+import ControlPanel from "@/views/kubernetes/control-panel";
+import Terminal from "@/views/kubernetes/terminal";
 
 export default {
   name: 'Kubernetes',
-  components: {Create},
+  components: {Terminal, ControlPanel, Create},
   data() {
     return {
       // 遮罩层
@@ -150,6 +160,8 @@ export default {
       open: false,
       isEdit: false,
       createClusterVisible: false,
+      controlPanelVisible: false,
+      terminalVisible: false,
       // 类型数据字典
       typeOptions: [],
       dataList: [],
@@ -223,6 +235,30 @@ export default {
       this.createClusterVisible = true
       this.$nextTick(() => {
         this.$refs.Create.init(row)
+      })
+    },
+    controlPanel(row) {
+      this.controlPanelVisible = true
+      this.$nextTick(() => {
+        this.$refs.ControlPanel.init(row)
+      })
+    },
+    terminalHandler(row) {
+      this.terminalVisible = true
+      info(row.id).then(response => {
+        if (response.code === 2000) {
+          const data = response.data
+          debugger
+          if (data.masterNodeList.length > 0) {
+            this.$nextTick(() => {
+              this.$refs.Terminal.init(data.masterNodeList.pop().machineUuid)
+            })
+          } else {
+            this.msgError('Master节点为空')
+          }
+        } else {
+          this.msgError(response.msg)
+        }
       })
     },
     // 多选框选中数据
