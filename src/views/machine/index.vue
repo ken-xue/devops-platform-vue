@@ -23,6 +23,9 @@
           <el-button v-permission="['sys:user:add']" type="primary" icon="el-icon-plus" size="mini" @click="handleAdd">
             新增
           </el-button>
+          <el-button v-permission="['sys:user:add']" type="success" icon="el-icon-upload2" size="mini" @click="handleImport">
+            导入
+          </el-button>
           <el-button v-permission="['sys:user:delete']" type="danger" icon="el-icon-delete" size="mini"
                      :disabled="multiple" @click="handleDelete">删除
           </el-button>
@@ -323,6 +326,9 @@ export default {
       this.form.accessWay = 'PASSWORD'
       this.form.port = 22
       this.isEdit = false
+    },
+    handleImport(){
+      this.msgError('该功能未实现')
     },
     // 多选框选中数据
     handleSelectionChange(selection) {

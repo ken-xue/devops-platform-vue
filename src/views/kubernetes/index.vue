@@ -312,7 +312,7 @@ export default {
     /** 删除按钮操作 */
     handleDelete(row) {
       const Ids = (row.id && [row.id]) || this.ids
-      this.$confirm('是否确认删除"' + row.id + '"的数据项?', '警告', {
+      this.$confirm('是否确认释放"' + row.name + '"的集群?', '警告', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
