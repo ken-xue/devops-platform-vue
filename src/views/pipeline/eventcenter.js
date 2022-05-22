@@ -9,7 +9,8 @@ Event.prototype = {
     if (!this.clientList[key]) {
       this.clientList[key] = [];
     }
-    this.clientList[key].push(fn);
+    // this.clientList[key].push(fn);
+    this.clientList[key]=fn;
   },
 
   emit(...args) {
@@ -19,9 +20,11 @@ Event.prototype = {
       return false;
     }
 
-    fns.forEach((fn) => {
-      fn.apply(this, args);
-    });
+    fns.apply(this, args);
+
+    // fns.forEach((fn) => {
+    //   fn.apply(this, args);
+    // });
     return false;
   },
 

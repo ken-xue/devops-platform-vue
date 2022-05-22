@@ -9,6 +9,11 @@
               </template>
             </el-table-column>
             <el-table-column label="触发时间" align="center" prop="executeStartTime" max-width="300"  :show-overflow-tooltip="true"/>
+            <el-table-column label="触发方式" align="center" prop="modifier" :show-overflow-tooltip="true" >
+              <template slot-scope="scope">
+                <el-tag size="small" type="success">{{scope.row.targetWay}}</el-tag>
+              </template>
+            </el-table-column>
             <el-table-column label="触发人" align="center" prop="modifier" :show-overflow-tooltip="true" />
             <el-table-column label="结束时间" align="center" prop="gmtModified" :show-overflow-tooltip="true" />
             <el-table-column label="执行结果" align="center" prop="finalStatus" :show-overflow-tooltip="true" >
@@ -34,11 +39,9 @@
 </template>
 <script>
 import Vue from 'vue';
-import ComponentTree from '@/views/pipeline/menu.vue';
 import FlowChart from '../flowchart';
 import PluginFlowExec from '../pluginflowexec';
 import {page,del} from "@/views/pipeline/record/record";
-import instance from '../instance';
 import JavaBuild from "@/views/pipeline/config/java-build";
 import {nestedGetQuery} from "@/utils";
 import FlowInfo from "@/views/pipeline/flow/flowinfo.vue";
@@ -47,7 +50,7 @@ FlowChart.use(PluginFlowExec);
 
 export default Vue.extend({
   name: 'Record',
-  components: {JavaBuild, ComponentTree,FlowInfo},
+  components: {JavaBuild,FlowInfo},
   props: {
     sidebarComponentName: String,
   },
@@ -68,48 +71,7 @@ export default Vue.extend({
       applicationName: '',
       activeName: 'first',
       toolBarShow: 'component',
-      modelName: '你你您',
-      description: '描述',
-      gridData: [
-        {
-          date: '2016-05-02',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄',
-        }, {
-          date: '2016-05-04',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄',
-        }, {
-          date: '2016-05-01',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄',
-        }, {
-          date: '2016-05-03',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄',
-        }],
       dialogTableVisible: false,
-      messagesList: [
-        {
-          time: '2019/6/5 下午3:17:29',
-          message: '当前实验中没有可回滚的节点',
-        }, {
-          time: '2019/6/5 下午3:00:25',
-          message: '模型不存在,请生成模型后重试',
-        }, {
-          time: '2019/6/5 下午3:00:17',
-          message: '实验目录不存在',
-        }, {
-          time: '2019/6/5 下午3:00:09',
-          message: '模型不存在,请生成模型后重试',
-        }, {
-          time: '2019/6/5 下午3:00:09',
-          message: '模型不存在,请生成模型后重试',
-        }, {
-          time: '2019/6/5 下午3:00:09',
-          message: '模型不存在,请生成模型后重试',
-        }
-      ],
       loading: true,
       id: 0,
       /////////////////////

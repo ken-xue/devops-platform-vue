@@ -43,7 +43,7 @@
                   </el-tooltip>
                 </div>
               </div>
-              <!-- 2.2.1.2 画布容器 -->
+              <!-- 画布容器 -->
               <div class="mainContainer" @drop="dropHandle" @dragover="dragoverHandle">
                 <div id="mainContainer" @click="clickBgHandle"></div>
               </div>
@@ -226,6 +226,10 @@ export default Vue.extend({
             this.currentNodeId = data;
             this.showNodeConfig(data)
           });
+          FlowChart.on('restartNode', (data) => {
+            let currentNodeId = data;
+            this.restartNode(currentNodeId)
+          });
           FlowChart.loadData(JSON.parse(response.data.pipelineContext))
         } else {
           this.msgError(response.msg)
@@ -267,6 +271,7 @@ export default Vue.extend({
       FlowChart.addNode({pageX: ev.pageX, pageY: ev.pageY}, ev.dataTransfer.getData('target'));
     },
     clickBgHandle() {
+      FlowChart.hideMenu()
       this.isShowNode = true
       this.isShowNodeConfig = false
     },
@@ -397,6 +402,7 @@ export default Vue.extend({
     },
     closeDialog() {
       this.$emit('refreshDataList')
+      FlowChart.hideMenu()
     },
     //查看当前节点的执行日志
     nodeExecuteLog(nodeId) {
@@ -418,6 +424,10 @@ export default Vue.extend({
       this.$nextTick(() => {
         this.$refs.View.init(nodeId, this.executeLoggerUuid)
       })
+    },
+    restartNode(){
+      // TODO:
+      this.msgError('重启节点功能正在努力开发中')
     }
   },
 })

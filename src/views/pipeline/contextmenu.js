@@ -88,7 +88,7 @@ function generateMenuItem(opt) {
 /**
  * @description 生成节点的右键菜单
  */
-function generateNodeMenu() {
+function generateNodeMenu(logger) {
   // generateMenuItem({
   //   text: '重命名',
   //   icon: 'el-icon-edit',
@@ -108,7 +108,7 @@ function generateNodeMenu() {
   // });
   const node = model.getNodeDataByNodeId(currentComponent);
   //start和end节点不支持复制删除
-  if('START' !== node.name && 'END' !== node.name) {
+  if('START' !== node.name && 'END' !== node.name && logger === undefined) {
     generateMenuItem({
       text: '复制节点',
       icon: 'el-icon-copy-document',
@@ -131,6 +131,15 @@ function generateNodeMenu() {
       },
     });
     generateMenuDivideLine();
+    generateMenuItem({
+      text: '重启节点',
+      icon: 'el-icon-refresh',
+      role: 'view',
+      clickHandle: () => {
+        Contextmenu.hide()
+        editor.emitRestartNode(currentComponent);
+      },
+    });
   }
   generateMenuItem({
     text: '执行日志',
@@ -161,52 +170,61 @@ function generateNodeMenu() {
 /**
  * @description 生成连接线的右键菜单
  */
-function generateConnectorMenu() {
-  generateMenuItem({
-    text: '删除',
-    icon: 'el-icon-delete',
-    role: 'delete',
-    clickHandle: () => {
-      Contextmenu.hide()
-      deleteHandle(currentComponent);
-    },
-  });
+function generateConnectorMenu(logger) {
+  //如果是历史日志模式下查看无需展示
+  if (logger === undefined) {
+    generateMenuItem({
+      text: '删除',
+      icon: 'el-icon-delete',
+      role: 'delete',
+      clickHandle: () => {
+        Contextmenu.hide()
+        deleteHandle(currentComponent);
+      },
+    });
+  }else {
+    hide()
+  }
 }
 
 /**
  * @description 生成背景的菜单
  */
-function generateBgMenu() {
-  generateMenuItem({
-    text: '粘贴节点',
-    icon: 'el-icon-download',
-    role: 'paste',
-    clickHandle: () => {
-      Contextmenu.hide()
-      if (copiedNodeId) {
-        exec(
-          PasteNodeCommand,
-          { pageX: contextMenuPos.left, pageY: contextMenuPos.top },
-          copiedNodeId,
-        );
-      } else {
-        Message({
-          type: 'warning',
-          message: '请复制节点后再粘贴。',
-        });
-      }
-    },
-  });
+function generateBgMenu(loggerView) {
+  if (loggerView===undefined) {
+    generateMenuItem({
+      text: '粘贴节点',
+      icon: 'el-icon-download',
+      role: 'paste',
+      clickHandle: () => {
+        Contextmenu.hide()
+        if (copiedNodeId) {
+          exec(
+            PasteNodeCommand,
+            {pageX: contextMenuPos.left, pageY: contextMenuPos.top},
+            copiedNodeId,
+          );
+        } else {
+          Message({
+            type: 'warning',
+            message: '请复制节点后再粘贴。',
+          });
+        }
+      },
+    });
+  }else {
+    hide()
+  }
 }
 
 /**
  * @description 生成菜单项
  */
-function generateMenuItemsBycurrentComponent() {
+function generateMenuItemsBycurrentComponent(logger) {
   ul.innerHTML = '';
-  if (currentComponent && typeof currentComponent === 'string')generateNodeMenu();
-  if (currentComponent && typeof currentComponent === 'object') generateConnectorMenu();
-  if (typeof currentComponent === 'undefined') generateBgMenu();
+  if (currentComponent && typeof currentComponent === 'string')generateNodeMenu(logger);
+  if (currentComponent && typeof currentComponent === 'object') generateConnectorMenu(logger);
+  if (typeof currentComponent === 'undefined') generateBgMenu(logger);
 }
 
 /**
@@ -223,20 +241,22 @@ function generateMenuContainer() {
  * @description 显示右键菜单
  * @param {object} position {left:0,top:0}
  * @param {*} component 组件，传入当前组件，用于在点击菜单按钮时，绑定操作对象
+ * @param {*} loggerView 是否是日志视图，如果是部分菜单不显示
  */
-function show(position, component) {
+function show(position, component,loggerView) {
   ul.style.top = `${position.top}px`;
   ul.style.left = `${position.left}px`;
   ul.style.display = 'block';
   contextMenuPos = position;
   currentComponent = component;
-  generateMenuItemsBycurrentComponent();
+  generateMenuItemsBycurrentComponent(loggerView);
 }
 
 /**
  * @description 初始化右键菜单
  */
 function init() {
+
   generateMenuContainer();
 
   hide();

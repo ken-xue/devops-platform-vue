@@ -7,15 +7,16 @@ import contentMenu from './contextmenu';
 import editor from './editor';
 import model from './model';
 import exec, { undo, AddNodeCommand } from './command';
+import Contextmenu from "./contextmenu";
 
 const FlowChart = {
   /**
    * @description 设置插件容器
    * @param {string} id 容器id
    */
-  setContainer(id) {
+  setContainer(id,loggerView) {
     instance.setContainer(id);
-    this.init();
+    this.init(loggerView);
   },
 
   /**
@@ -37,8 +38,8 @@ const FlowChart = {
   /**
    * @description 初始化
    */
-  init() {
-    editor.init();
+  init(loggerView) {
+    editor.init(loggerView);
     panZoom.init();
     contentMenu.init();
   },
@@ -64,9 +65,9 @@ const FlowChart = {
   /**
    * @description 加载数据
    */
-  loadData(data) {
+  loadData(data,loggerView) {
     model.setData(data);
-    editor.render();
+    editor.render(loggerView);
   },
 
   /**
@@ -92,6 +93,10 @@ const FlowChart = {
 
   getNodeDataByNodeId(nodeId) {
     return model.getNodeDataByNodeId(nodeId);
+  },
+
+  hideMenu(){
+    Contextmenu.hide()
   }
 };
 

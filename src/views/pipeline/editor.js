@@ -33,6 +33,10 @@ function emitShowNodeData(nodeId) {
   FlowChart.emit('showNodeData', nodeId);
 }
 
+function emitRestartNode(nodeId) {
+  FlowChart.emit('restartNode', nodeId);
+}
+
 function emitShowNodeLogger(nodeId){
   FlowChart.emit('showNodeLogger', nodeId);
 }
@@ -177,7 +181,7 @@ function getConnectorByUuids(uuids) {
  * @param {string} html
  * @returns {Element} 返回生成的节点
  */
-function generateNode(left, top, id, iconCLassName, contentText,nodeName,view, nodeState) {
+function generateNode(left, top, id, iconCLassName, contentText,nodeName,view, nodeState,loggerView) {
   // 节点最外层div
   const newNode = document.createElement('div');
   newNode.classList.add('fy_node');
@@ -195,8 +199,7 @@ function generateNode(left, top, id, iconCLassName, contentText,nodeName,view, n
     contextMenu.show({
       left: ev.pageX,
       top: ev.pageY,
-    }, id);
-
+    }, id,loggerView);
     ev.stopPropagation();
   };
 
@@ -330,10 +333,10 @@ function addNodeByCopy(position, nodeId) {
  * @description 根据节点数据渲染节点 ，此时的动作只有一个：根据数据生成节点
  *  @param {*} nodeData
  */
-function addNodeByData(nodeData) {
+function addNodeByData(nodeData,loggerView) {
   const { endpoints } = model.getData();
   const {id, nodeName,position, points, data} = nodeData;
-  generateNode(position.left, position.top, id, data.icon, data.value,data.view,nodeName, data.nodeState);
+  generateNode(position.left, position.top, id, data.icon, data.value,data.view,nodeName, data.nodeState,loggerView);
   const { targets, sources } = points;
   const targetsData = endpoints.filter(item => targets.indexOf(item.id) > -1);
   const sourcesData = endpoints.filter(item => sources.indexOf(item.id) > -1);
@@ -360,10 +363,10 @@ function addNodeByExtraData(nodeData, nodeEdgesData, nodeEndpointsData) {
 /**
  * @description 根据给定的node数据生成node节点
  */
-function addNodesByData() {
+function addNodesByData(loggerView) {
   const { nodes } = model.getData();
   nodes.forEach((n) => {
-    addNodeByData(n);
+    addNodeByData(n,loggerView);
   });
 }
 
@@ -434,8 +437,8 @@ function renameNode(nodeId, value) {
 /**
  * @description 根据model里的数据  渲染流程图
  */
-function render() {
-  addNodesByData();
+function render(loggerView) {
+  addNodesByData(loggerView);
   addConnectorsByData();
 }
 
@@ -451,7 +454,7 @@ function execAddConnectorCommand(uuids) {
 /**
  * @description 绑定事件（节点的右键菜单事件在 generateNode 函数中绑定）
  */
-function bindEvent() {
+function bindEvent(loggerView) {
   // 右键菜单事件
   instance.bind('contextmenu', (component, originalEvent) => {
     originalEvent.preventDefault();
@@ -460,14 +463,14 @@ function bindEvent() {
     contextMenu.show({
       left: originalEvent.pageX,
       top: originalEvent.pageY,
-    }, component);
+    }, component,loggerView);
   });
   instance.getContainer().parentElement.addEventListener('contextmenu', (ev) => {
     ev.preventDefault();
     contextMenu.show({
       left: ev.pageX,
       top: ev.pageY,
-    });
+    },undefined,loggerView);
   });
 
   // 手动拖动创建连接事件
@@ -512,14 +515,15 @@ function bindEvent() {
 /**
  * @description 初始化
  */
-function init() {
+function init(loggerView) {
   container = instance.getContainer();
-  bindEvent();
+  bindEvent(loggerView);
 }
 
 const editor = {
   emitCommandListEmpty,
   emitAddCommand,
+  emitRestartNode,
   emitShowNodeData,
   emitShowNodeLogger,
   addNodeByDrag,

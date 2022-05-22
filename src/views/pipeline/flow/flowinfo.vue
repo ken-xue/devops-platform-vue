@@ -31,7 +31,8 @@
                 </div>
               </div>
               <!-- 2.2.1.2 画布容器 -->
-              <div class="mainContainer" @drop="dropHandle" @dragover="dragoverHandle">
+<!--              <div class="mainContainer" @drop="dropHandle" @dragover="dragoverHandle">-->
+              <div class="mainContainer">
                 <div id="mainContainer" @click="clickBgHandle"></div>
               </div>
               <!--节点执行日志-->
@@ -166,7 +167,7 @@ export default Vue.extend({
           this.executeLoggerUuid = data.uuid;
           this.pipelineName = response.data.pipelineName
           instance.reset()
-          FlowChart.setContainer('mainContainer');
+          FlowChart.setContainer('mainContainer','loggerView');
           FlowChart.on('commandListEmpty', () => {
             this.isUndoDisable = true;
           });
@@ -176,17 +177,12 @@ export default Vue.extend({
           FlowChart.on('showNodeData', (nodeId) => {
             this.showNodeExecuteView(nodeId)
           });
-          FlowChart.on('addCommand', () => {
-            this.isUndoDisable = false;
-          });
           FlowChart.on('selectNode', (data) => {
             this.isShowNode = false
             this.isShowNodeConfig = true
             this.currentNodeId = data;
             let nodeData = FlowChart.getNodeDataByNodeId(data)
-            console.log('data=' + JSON.stringify(nodeData))
             const name = nodeData.name;
-            console.log('click node =' + name)
             switch (name) {
               case 'JAVA_BUILD':
                 this.javaBuildVisible = true
@@ -200,19 +196,15 @@ export default Vue.extend({
                 this.isShowNodeConfig = false
             }
           });
-          FlowChart.loadData(JSON.parse(response.data.graphContent))
+          FlowChart.loadData(JSON.parse(response.data.graphContent),'loggerView')
+          instance.draggable(false)
         } else {
           this.msgError(response.msg)
         }
       });
     },
-    dragoverHandle(ev) {
-      ev.preventDefault();
-    },
-    dropHandle(ev) {
-      FlowChart.addNode({pageX: ev.pageX, pageY: ev.pageY}, ev.dataTransfer.getData('target'));
-    },
     clickBgHandle() {
+      FlowChart.hideMenu()
       this.isShowNode = true
       this.isShowNodeConfig = false
     },
@@ -222,11 +214,9 @@ export default Vue.extend({
     zoomIn() {
       FlowChart.zoomIn();
     },
-    undo() {
-      FlowChart.undo();
-    },
     closeDialog() {
       this.$emit('refreshDataList')
+      FlowChart.hideMenu()
     },
     //查看当前节点的执行日志
     showNodeExecuteLog(nodeId) {
