@@ -25,16 +25,22 @@
       </el-form>
       <el-table v-loading="loading" :data="pipelineList" @selection-change="handleSelectionChange">
         <el-table-column type="selection" width="55" align="center" />
-        <el-table-column label="序号" align="center" prop="jobId" width="55" :show-overflow-tooltip="true">
+        <el-table-column label="序号" align="center" prop="jobId" width="50" :show-overflow-tooltip="true">
           <template slot-scope="props">
             <p v-text="props.$index+1" />
           </template>
         </el-table-column>
-        <el-table-column label="名称" align="center" prop="pipelineName" :show-overflow-tooltip="true" />
+        <el-table-column label="流水线名称" align="center" prop="pipelineName" min-width="100" :show-overflow-tooltip="true" />
         <el-table-column label="创建人" align="center" prop="creator" width="100"  :show-overflow-tooltip="true"/>
         <el-table-column label="创建时间" align="center" prop="gmtCreate" max-width="300"  :show-overflow-tooltip="true"/>
         <el-table-column label="修改人" align="center" prop="modifier" :show-overflow-tooltip="true" />
         <el-table-column label="修改时间" align="center" prop="gmtModified" :show-overflow-tooltip="true" />
+        <el-table-column label="触发方式" align="center" prop="triggerWay" :show-overflow-tooltip="true" >
+          <template slot-scope="scope">
+            <el-tag type="success" v-text="scope.row.triggerWay"></el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column label="最新触发时间" align="center" prop="latestTriggerTime" :show-overflow-tooltip="true" />
         <el-table-column label="操作" align="center" class-name="small-padding fixed-width"  width="300" >
           <template slot-scope="scope">
             <el-button v-permission="['sys:user:update']" size="mini" type="text" icon="el-icon-setting" @click="handleUpdate(scope.row)">编排</el-button>

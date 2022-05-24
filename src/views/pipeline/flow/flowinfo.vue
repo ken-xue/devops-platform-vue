@@ -10,9 +10,6 @@
               <!-- 2.2.1.1操作按钮 -->
               <div id="mainMenu" v-if="!infoVisible">
                 <div class="tool-left">
-                  <el-button size="small" v-text="pipelineName"></el-button>
-                </div>
-                <div class="tool-right">
                   <el-tooltip content="放大">
                     <el-button icon="el-icon-zoom-in" @click="zoomOut" circle></el-button>
                   </el-tooltip>
@@ -28,6 +25,9 @@
                   <el-tooltip content="全屏">
                     <el-button icon="el-icon-full-screen" circle></el-button>
                   </el-tooltip>
+                  <el-button size="small" v-text="pipelineName"></el-button>
+                </div>
+                <div class="tool-right">
                 </div>
               </div>
               <!-- 2.2.1.2 画布容器 -->
@@ -40,74 +40,74 @@
               <NodeView v-if="nodeViewVisible" ref="NodeView"></NodeView>
             </el-main>
             <!-- 2.2.2 组件属性设置 -->
-<!--            <el-aside width="300px" class="right">-->
-<!--              <el-container id="mainNodeInfo">-->
-<!--                <el-main>-->
-<!--                  <div>-->
-<!--                    <div v-show="toolBarShow==='component'">-->
-<!--                      <div v-show="isShowNode">-->
-<!--                        <div class="title">基本信息</div>-->
-<!--                        <div class="model-attr">-->
-<!--                          <p>-->
-<!--                            <span class="item">所属应用</span>-->
-<!--                            <span class="value" v-text="applicationName">Test</span>-->
-<!--                          </p>-->
-<!--                          <p v-if="pipelineId">-->
-<!--                            <span class="item">创建日期</span>-->
-<!--                            <span class="value" v-text="">2019-04-19 12:14:39</span>-->
-<!--                          </p>-->
-<!--                          <p>-->
-<!--                            <span class="item">流水线名称</span>-->
-<!--                            <el-input size="small" v-model="pipelineName"></el-input>-->
-<!--                          </p>-->
-<!--                          <p>-->
-<!--                            <span class="item">描述</span>-->
-<!--                            <el-input type="textarea" :rows="10" size="small" v-model="description"></el-input>-->
-<!--                          </p>-->
-<!--                        </div>-->
-<!--                      </div>-->
-<!--                      <div v-show="isShowNodeConfig">-->
-<!--                        <div class="title">节点配置</div>-->
-<!--                        &lt;!&ndash;                        <div class="node-attr">&ndash;&gt;-->
-<!--                        &lt;!&ndash;                          <p>&ndash;&gt;-->
-<!--                        &lt;!&ndash;                            <span class="item">节点ID</span>&ndash;&gt;-->
-<!--                        &lt;!&ndash;                            <span class="value">{{ currentNodeId }}</span>&ndash;&gt;-->
-<!--                        &lt;!&ndash;                          </p>&ndash;&gt;-->
-<!--                        &lt;!&ndash;                        </div>&ndash;&gt;-->
-<!--                        <div class="model-attr">-->
-<!--                          <java-build ref="JavaBuild" v-if="javaBuildVisible"></java-build>-->
-<!--                        </div>-->
-<!--                      </div>-->
-<!--                    </div>-->
-<!--                    &lt;!&ndash;                    <div v-show="toolBarShow==='message'">&ndash;&gt;-->
-<!--                    &lt;!&ndash;                      <div class="title">执行记录</div>&ndash;&gt;-->
-<!--                    &lt;!&ndash;                      <div>&ndash;&gt;-->
-<!--                    &lt;!&ndash;                        <el-card class="messageInfo" v-for="(m,idx) in messagesList" :key="idx">&ndash;&gt;-->
-<!--                    &lt;!&ndash;                          <p>{{ m.time }}</p>&ndash;&gt;-->
-<!--                    &lt;!&ndash;                          <div>&ndash;&gt;-->
-<!--                    &lt;!&ndash;                            <i class="el-icon-circle-close" style="color:red;font-size:26px;position:relative;top:5px;"></i>&ndash;&gt;-->
-<!--                    &lt;!&ndash;                            {{ m.message }}&ndash;&gt;-->
-<!--                    &lt;!&ndash;                          </div>&ndash;&gt;-->
-<!--                    &lt;!&ndash;                        </el-card>&ndash;&gt;-->
-<!--                    &lt;!&ndash;                      </div>&ndash;&gt;-->
-<!--                    &lt;!&ndash;                    </div>&ndash;&gt;-->
-<!--                  </div>-->
-<!--                </el-main>-->
-<!--                &lt;!&ndash;                <el-aside width="32px"&ndash;&gt;-->
-<!--                &lt;!&ndash;                          class="nodeInfoToolBar">&ndash;&gt;-->
-<!--                &lt;!&ndash;                  <div :class="{'tool':true, 'component':true, 'acitve': toolBarShow==='component'}"&ndash;&gt;-->
-<!--                &lt;!&ndash;                       @click="toolBarShow='component'">&ndash;&gt;-->
-<!--                &lt;!&ndash;                    <i class="el-icon-tickets"></i>&ndash;&gt;-->
-<!--                &lt;!&ndash;                    <span> 组件参数</span>&ndash;&gt;-->
-<!--                &lt;!&ndash;                  </div>&ndash;&gt;-->
-<!--                &lt;!&ndash;                  <div :class="{'tool':true, 'message':true, 'acitve': toolBarShow==='message'}"&ndash;&gt;-->
-<!--                &lt;!&ndash;                       @click="toolBarShow='message'">&ndash;&gt;-->
-<!--                &lt;!&ndash;                    <i class="el-icon-chat-dot-round"></i>&ndash;&gt;-->
-<!--                &lt;!&ndash;                    <span> 执行记录</span>&ndash;&gt;-->
-<!--                &lt;!&ndash;                  </div>&ndash;&gt;-->
-<!--                &lt;!&ndash;                </el-aside>&ndash;&gt;-->
-<!--              </el-container>-->
-<!--            </el-aside>-->
+            <el-aside width="300px" class="right">
+              <el-container id="mainNodeInfo">
+                <el-main>
+                  <div>
+                    <div v-show="toolBarShow==='component'">
+                      <div v-show="isShowNode">
+                        <div class="title">基本信息</div>
+                        <div class="model-attr">
+                          <p>
+                            <span class="item">所属应用</span>
+                            <span class="value" v-text="applicationName">Test</span>
+                          </p>
+                          <p v-if="pipelineId">
+                            <span class="item">创建日期</span>
+                            <span class="value" v-text="">2019-04-19 12:14:39</span>
+                          </p>
+                          <p>
+                            <span class="item">流水线名称</span>
+                            <el-input size="small" v-model="pipelineName"></el-input>
+                          </p>
+                          <p>
+                            <span class="item">描述</span>
+                            <el-input type="textarea" :rows="10" size="small" v-model="description"></el-input>
+                          </p>
+                        </div>
+                      </div>
+                      <div v-show="isShowNodeConfig">
+                        <div class="title">节点配置</div>
+                        <!--                        <div class="node-attr">-->
+                        <!--                          <p>-->
+                        <!--                            <span class="item">节点ID</span>-->
+                        <!--                            <span class="value">{{ currentNodeId }}</span>-->
+                        <!--                          </p>-->
+                        <!--                        </div>-->
+                        <div class="model-attr">
+                          <java-build ref="JavaBuild" v-if="javaBuildVisible"></java-build>
+                        </div>
+                      </div>
+                    </div>
+                    <!--                    <div v-show="toolBarShow==='message'">-->
+                    <!--                      <div class="title">执行记录</div>-->
+                    <!--                      <div>-->
+                    <!--                        <el-card class="messageInfo" v-for="(m,idx) in messagesList" :key="idx">-->
+                    <!--                          <p>{{ m.time }}</p>-->
+                    <!--                          <div>-->
+                    <!--                            <i class="el-icon-circle-close" style="color:red;font-size:26px;position:relative;top:5px;"></i>-->
+                    <!--                            {{ m.message }}-->
+                    <!--                          </div>-->
+                    <!--                        </el-card>-->
+                    <!--                      </div>-->
+                    <!--                    </div>-->
+                  </div>
+                </el-main>
+                <!--                <el-aside width="32px"-->
+                <!--                          class="nodeInfoToolBar">-->
+                <!--                  <div :class="{'tool':true, 'component':true, 'acitve': toolBarShow==='component'}"-->
+                <!--                       @click="toolBarShow='component'">-->
+                <!--                    <i class="el-icon-tickets"></i>-->
+                <!--                    <span> 组件参数</span>-->
+                <!--                  </div>-->
+                <!--                  <div :class="{'tool':true, 'message':true, 'acitve': toolBarShow==='message'}"-->
+                <!--                       @click="toolBarShow='message'">-->
+                <!--                    <i class="el-icon-chat-dot-round"></i>-->
+                <!--                    <span> 执行记录</span>-->
+                <!--                  </div>-->
+                <!--                </el-aside>-->
+              </el-container>
+            </el-aside>
           </el-container>
         </el-container>
       </el-main>
@@ -237,7 +237,8 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .flowChartWrap {
-  height: 650px;
+  //height: 650px;
+  height: calc(100vh - 77px);
 
   .left {
     border-right: 1px solid #e5e5e5;
@@ -267,14 +268,14 @@ export default Vue.extend({
 
       .tool-left {
         float: left;
-
+        height: 100%;
         .el-button {
           &:first-child {
             margin-left: 10px;
           }
 
           border: none;
-          margin-top: 4px;
+          margin-top: 7px;
         }
         span {
           margin-left: 10px;
@@ -285,7 +286,6 @@ export default Vue.extend({
 
       .tool-right {
         float: right;
-
         .el-button {
           position: relative;
           border: none;

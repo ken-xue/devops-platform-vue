@@ -81,6 +81,13 @@
                             </el-select>
                           </p>
                           <p>
+                            <span class="item">触发分支</span>
+                            <el-select size="mini" v-model="branch" placeholder="请选择触发分支" clearable :style="{width: '100%'}">
+                              <el-option v-for="(item, index) in branchList" :key="index" :label="item.label"
+                                         :value="item.value"></el-option>
+                            </el-select>
+                          </p>
+                          <p>
                             <span class="item">描述</span>
                             <el-input type="textarea" :rows="10" size="small" v-model="description"></el-input>
                           </p>
@@ -177,6 +184,7 @@ export default Vue.extend({
       pipelineName: '',
       currentNodeId: '',
       triggerWay: '',
+      branch: '',
       isUndoDisable: true,
       isExecDisable: false,
       applicationUuid: '',
@@ -188,7 +196,11 @@ export default Vue.extend({
       triggerList: [
         {value: 'code', label: '提交代码'},
         {value: 'hand', label: '手动触发'},
-        {value: 'webhook', label: 'WebHook'}
+        {value: 'webhook', label: 'WebHook'},
+        {value: 'timing', label: '定时触发'}
+      ],
+      branchList: [
+        {value: 'master', label: 'master'}
       ],
       nodeViewVisible: false,
       dialogTableVisible: false,
@@ -471,6 +483,7 @@ export default Vue.extend({
       }
 
       .tool-right {
+        margin-top: 5px;
         float: right;
 
         .el-button {
