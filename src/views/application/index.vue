@@ -42,11 +42,8 @@
           </template>
         </el-table-column>
         <el-table-column label="创建时间" align="center" prop="gmtCreate" :show-overflow-tooltip="true" />
-        <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+        <el-table-column label="操作" align="center" min-width="100">
           <template slot-scope="scope">
-<!--            <router-link :to="'/application/pipeline'">-->
-<!--              <el-button v-permission="['sys:user:update']" size="mini" type="text" icon="el-icon-s-promotion">流水线</el-button>-->
-<!--            </router-link>-->
             <el-button v-permission="['sys:user:update']" size="mini" type="text" icon="el-icon-s-promotion" @click="pipeline(scope.row)">流水线</el-button>
             <el-button v-permission="['sys:user:update']" size="mini" type="text" icon="el-icon-setting" @click="handleUpdate(scope.row)">配置</el-button>
             <el-button v-permission="['sys:user:update']" size="mini" type="text" icon="el-icon-user-solid" @click="handleUpdate(scope.row)">用户</el-button>

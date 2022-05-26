@@ -10,7 +10,7 @@
               </div>
               <div class="login-border"></div>
               <div class="desc">
-                <h4 class="title">一站式持续交付平台</h4>
+                <h4 class="title">一站式全效能平台</h4>
               </div>
               <el-form-item prop="username">
                 <span class="svg-container">

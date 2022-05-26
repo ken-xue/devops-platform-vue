@@ -15,7 +15,7 @@ import { FitAddon } from 'xterm-addon-fit'
 import { AttachAddon } from 'xterm-addon-attach'
 
 export default {
-  name: 'logger',
+  name: 'MinioCreateLogger',
   props: {
     socketURI: {
       type: String,
@@ -56,7 +56,7 @@ export default {
     init(data) {
       this.clusterCreateDTO = data;
       this.nodeExecuteLogVisible = true
-      this.socket = new WebSocket(process.env.VUE_APP_SOCKET_API + '/ws/create/kubernetes');
+      this.socket = new WebSocket(process.env.VUE_APP_SOCKET_API + '/ws/create/minio');
       this.socketOnClose();
       this.socketOnOpen();
       this.socketOnError();
