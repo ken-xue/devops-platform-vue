@@ -29,7 +29,7 @@ for (let i = 0; i < count; i++) {
 
 module.exports = [
   {
-    url: '/cicd-platform-vue/article/list',
+    url: '/devops-platform-vue/article/list',
     type: 'get',
     response: config => {
       const { importance, type, title, page = 1, limit = 20, sort } = config.query
@@ -58,7 +58,7 @@ module.exports = [
   },
 
   {
-    url: '/cicd-platform-vue/article/detail',
+    url: '/devops-platform-vue/article/detail',
     type: 'get',
     response: config => {
       const { id } = config.query
@@ -74,7 +74,7 @@ module.exports = [
   },
 
   {
-    url: '/cicd-platform-vue/article/pv',
+    url: '/devops-platform-vue/article/pv',
     type: 'get',
     response: _ => {
       return {
@@ -92,7 +92,7 @@ module.exports = [
   },
 
   {
-    url: '/cicd-platform-vue/article/create',
+    url: '/devops-platform-vue/article/create',
     type: 'post',
     response: _ => {
       return {
@@ -103,7 +103,7 @@ module.exports = [
   },
 
   {
-    url: '/cicd-platform-vue/article/update',
+    url: '/devops-platform-vue/article/update',
     type: 'post',
     response: _ => {
       return {

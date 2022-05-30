@@ -26,7 +26,7 @@ const users = {
 module.exports = [
   // user login
   {
-    url: '/cicd-platform-vue/user/login',
+    url: '/devops-platform-vue/user/login',
     type: 'post',
     response: config => {
       const { username } = config.body
@@ -49,7 +49,7 @@ module.exports = [
 
   // get user info
   {
-    url: '/cicd-platform-vue/user/info\.*',
+    url: '/devops-platform-vue/user/info\.*',
     type: 'get',
     response: config => {
       const { token } = config.query
@@ -72,7 +72,7 @@ module.exports = [
 
   // user logout
   {
-    url: '/cicd-platform-vue/user/logout',
+    url: '/devops-platform-vue/user/logout',
     type: 'post',
     response: _ => {
       return {

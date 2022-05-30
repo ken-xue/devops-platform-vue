@@ -13,7 +13,7 @@ NameList.push({ name: 'mock-Pan' })
 module.exports = [
   // username search
   {
-    url: '/cicd-platform-vue/search/user',
+    url: '/devops-platform-vue/search/user',
     type: 'get',
     response: config => {
       const { name } = config.query
@@ -30,7 +30,7 @@ module.exports = [
 
   // transaction list
   {
-    url: '/cicd-platform-vue/transaction/list',
+    url: '/devops-platform-vue/transaction/list',
     type: 'get',
     response: _ => {
       return {

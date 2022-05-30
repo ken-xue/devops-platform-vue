@@ -1,5 +1,5 @@
 {
-  "name": "cicd-platform-vue",
+  "name": "devops-platform-vue",
   "version": "1.0.0",
   "description": "One stop continuous delivery platform",
   "author": "kenxue-team <kenxueteam@gmail.com>",
@@ -88,7 +88,7 @@
     "last 2 versions"
   ],
   "bugs": {
-    "url": "https://github.com/kenxue/cicd-platform-vue/issues"
+    "url": "https://github.com/kenxue/devops-platform-vue/issues"
   },
   "engines": {
     "node": ">=8.9",

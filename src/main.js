@@ -35,15 +35,30 @@ Vue.prototype.selectDictLabel = selectDictLabel
 Vue.prototype.selectItemsLabel = selectItemsLabel
 
 Vue.prototype.msgSuccess = function(msg) {
-  this.$message({ showClose: true, message: msg, type: 'success' })
+  this.$notify({
+    title: '成功',
+    message: msg,
+    type: 'success'
+  })
+  // this.$message({ showClose: true, message: msg, type: 'success' })
 }
 
 Vue.prototype.msgError = function(msg) {
-  this.$message({ showClose: true, message: msg, type: 'error' })
+  this.$notify({
+    title: '错误',
+    message: msg,
+    type: 'error'
+  })
+  // this.$message({ showClose: true, message: msg, type: 'error' })
 }
 
 Vue.prototype.msgInfo = function(msg) {
-  this.$message.info(msg)
+  this.$notify({
+    title: '信息',
+    message: msg,
+    type: 'info'
+  })
+  // this.$message.info(msg)
 }
 /**
  * If you don't want to use mock-server

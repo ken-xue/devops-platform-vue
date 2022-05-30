@@ -1,11 +1,11 @@
 module.exports = {
-  title: 'cicd-platform',
+  title: 'devops-platform',
 
   /**
    * @type {boolean} true | false
    * @description Whether show the settings right-panel
    */
-  showSettings: false,
+  showSettings: true,
 
   /**
    * @type {boolean} true | false

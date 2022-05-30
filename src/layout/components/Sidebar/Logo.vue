@@ -24,7 +24,7 @@ export default {
   },
   data() {
     return {
-      title: 'cicd-platform',
+      title: 'devops-platform',
       logo: '/favicon.ico'
     }
   }
@@ -67,7 +67,7 @@ export default {
       color: #fff;
       font-weight: 600;
       line-height: 50px;
-      font-size: 30px;
+      font-size: 25px;
       font-family: Avenir, Helvetica Neue, Arial, Helvetica, sans-serif;
       vertical-align: middle;
     }

@@ -32,10 +32,17 @@
         <el-table-column label="创建时间" align="center" prop="gmtCreate" :show-overflow-tooltip="true"/>
         <el-table-column label="操作" align="center" min-width="100">
           <template slot-scope="scope">
-            <el-button v-permission="['sys:user:update']" size="mini" type="text" icon="el-icon-menu" @click="application(scope.row)">应用</el-button>
-            <el-button v-permission="['sys:user:update']" size="mini" type="text" icon="el-icon-s-data" @click="projectView(scope.row)">数据</el-button>
-            <el-button v-permission="['sys:user:update']" size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)">修改</el-button>
-            <el-button v-permission="['sys:user:delete']" size="mini" type="text" style="color: red" icon="el-icon-delete" @click="handleDelete(scope.row)">删除
+            <el-button v-permission="['sys:user:update']" size="mini" type="text" icon="el-icon-menu"
+                       @click="application(scope.row)">应用
+            </el-button>
+            <el-button v-permission="['sys:user:update']" size="mini" type="text" icon="el-icon-s-data"
+                       @click="projectView(scope.row)">数据
+            </el-button>
+            <el-button v-permission="['sys:user:update']" size="mini" type="text" icon="el-icon-edit"
+                       @click="handleUpdate(scope.row)">修改
+            </el-button>
+            <el-button v-permission="['sys:user:delete']" size="mini" type="text" style="color: red"
+                       icon="el-icon-delete" @click="handleDelete(scope.row)">删除
             </el-button>
           </template>
         </el-table-column>
@@ -64,7 +71,7 @@
                   :loading="searchLoading">
                   <el-option
                     v-for="item in userList"
-                    :key="item.value"
+                    :key="item.uuid"
                     :label="item.userName"
                     :value="item.uuid">
                   </el-option>
@@ -86,7 +93,7 @@
                   :loading="memberSearchLoading">
                   <el-option
                     v-for="item in membersList"
-                    :key="item.value"
+                    :key="item.uuid"
                     :label="item.userName"
                     :value="item.uuid">
                   </el-option>
@@ -194,7 +201,7 @@ export default {
         concurrent: 1,
         userType: 1,
         status: 0,
-        userMembers:[]
+        userMembers: []
       }
       this.roleIdList = []
       this.resetForm('form')
@@ -235,18 +242,21 @@ export default {
     handleUpdate(row) {
       this.reset()
       const id = row.id || this.id
-      listRole({}).then(response => {
-        this.roleList = response.data
-      }).then(() => {
-        info(id).then(response => {
-          this.form = response.data
-          this.form.confirmPassword = response.data.userPassword
-          this.roleIdList = response.data.roleIdList
-          this.form.status = String(this.form.status)
-          this.open = true
-          this.title = '修改应用'
-          this.isEdit = true
-        })
+      listUser({}).then(response => {
+        if (response.code === 2000) {
+          this.userList = response.data
+          this.membersList = response.data
+          info(id).then(response => {
+            this.form = response.data
+            this.open = true
+            this.title = '修改应用'
+            this.isEdit = true
+          })
+        } else {
+          this.msgError(response.msg)
+          this.userList = []
+        }
+        this.searchLoading = false;
       })
     },
     /** 提交按钮 */
@@ -305,7 +315,7 @@ export default {
         }
       )
     },
-    projectView(){
+    projectView() {
       this.msgError('功能开发中')
     },
     remoteMethod(query) {

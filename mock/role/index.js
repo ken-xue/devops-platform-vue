@@ -38,7 +38,7 @@ const roles = [
 module.exports = [
   // mock get all routes form server
   {
-    url: '/cicd-platform-vue/routes',
+    url: '/devops-platform-vue/routes',
     type: 'get',
     response: _ => {
       return {
@@ -50,7 +50,7 @@ module.exports = [
 
   // mock get all roles form server
   {
-    url: '/cicd-platform-vue/roles',
+    url: '/devops-platform-vue/roles',
     type: 'get',
     response: _ => {
       return {
@@ -62,7 +62,7 @@ module.exports = [
 
   // add role
   {
-    url: '/cicd-platform-vue/role',
+    url: '/devops-platform-vue/role',
     type: 'post',
     response: {
       code: 20000,
@@ -74,7 +74,7 @@ module.exports = [
 
   // update role
   {
-    url: '/cicd-platform-vue/role/[A-Za-z0-9]',
+    url: '/devops-platform-vue/role/[A-Za-z0-9]',
     type: 'put',
     response: {
       code: 20000,
@@ -86,7 +86,7 @@ module.exports = [
 
   // delete role
   {
-    url: '/cicd-platform-vue/role/[A-Za-z0-9]',
+    url: '/devops-platform-vue/role/[A-Za-z0-9]',
     type: 'delete',
     response: {
       code: 20000,

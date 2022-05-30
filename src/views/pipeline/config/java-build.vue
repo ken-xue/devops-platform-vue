@@ -44,7 +44,7 @@
                   打包路径
                   <el-tooltip placement="top">
                     <div slot="content">
-                      打包路径示例：target/cicd-platform 多个路径使用;分号分隔
+                      打包路径示例：target/devops-platform 多个路径使用;分号分隔
                     </div>
                     <i class="el-icon-question"/>
                   </el-tooltip>

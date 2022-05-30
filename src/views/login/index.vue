@@ -6,7 +6,7 @@
           <div class="grid-content bg-purple">
             <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" autocomplete="on" label-position="left" @keyup.enter.native="handleLogin">
               <div class="title-container">
-                <h3 class="title">cicd-platform</h3>
+                <h3 class="title">devops-platform</h3>
               </div>
               <div class="login-border"></div>
               <div class="desc">

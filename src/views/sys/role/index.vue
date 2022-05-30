@@ -276,6 +276,7 @@ export default {
               }
             })
           }
+          this.$router.go(0)
         }
       })
     },

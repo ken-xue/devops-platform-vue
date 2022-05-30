@@ -1,6 +1,6 @@
 import Cookies from 'js-cookie'
 
-const tokenKey = 'cicd-platform-authorization'
+const tokenKey = 'devops-platform-authorization'
 
 export function getToken() {
   return Cookies.get(tokenKey)

@@ -29,7 +29,7 @@ export default {
   data() {
     return {
       activeName: 'directly',
-      inputData: 'https://github.com/PanJiaChen/cicd-platform-vue'
+      inputData: 'https://github.com/PanJiaChen/devops-platform-vue'
     }
   },
   methods: {

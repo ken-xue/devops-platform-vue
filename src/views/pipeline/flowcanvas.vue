@@ -220,6 +220,7 @@ export default Vue.extend({
         if (response.code === 2000) {
           this.pipelineName = response.data.pipelineName
           this.triggerWay = response.data.triggerWay
+          this.branch = response.data.branch
           instance.reset()
           FlowChart.setContainer('mainContainer');
           FlowChart.on('commandListEmpty', () => {
@@ -389,6 +390,7 @@ export default Vue.extend({
           'triggerWay': this.triggerWay,
           'description': this.description,
           'applicationUuid': this.applicationUuid,
+          'branch': this.branch,
           'graph': graph
         }
       }

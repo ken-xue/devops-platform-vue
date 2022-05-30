@@ -2,7 +2,7 @@
   <el-dialog center top="10vh" title="创建集群" :visible.sync="open" width="700px" append-to-body @close="cancel">
     <el-form ref="form" :model="form" :rules="rules" label-width="70px">
       <el-tabs type="card" v-model="form.type">
-        <el-tab-pane label="Linux" style="margin-top: 20px">
+        <el-tab-pane name="Linux" label="Linux" style="margin-top: 20px">
           <el-row>
             <el-col :span="24">
               <el-form-item label="别名" prop="name">
@@ -84,8 +84,8 @@
             </el-col>
           </el-row>
         </el-tab-pane>
-        <el-tab-pane label="Kubernetes">Kubernetes</el-tab-pane>
-        <el-tab-pane label="Docker">Docker</el-tab-pane>
+        <el-tab-pane name="Kubernetes" label="Kubernetes">Kubernetes</el-tab-pane>
+        <el-tab-pane name="Docker" label="Docker">Docker</el-tab-pane>
       </el-tabs>
     </el-form>
     <div slot="footer" class="dialog-footer">
@@ -118,6 +118,7 @@ export default {
       hostList: [],
       // 表单参数
       form: {
+        type: 'Linux',
         nodeList: [{
           value: '',
           path: '',

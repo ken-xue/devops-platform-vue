@@ -397,7 +397,7 @@ export const devRoutes = [
     menuOrder: 14,
     children: [
       {
-        path: 'https://github.com/kenxue/cicd-platform-vue',
+        path: 'https://github.com/kenxue/devops-platform-vue',
         meta: { title: '外部链接', icon: 'link' }
       }
     ]

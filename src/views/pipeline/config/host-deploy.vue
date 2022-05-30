@@ -31,7 +31,7 @@
                   下载路径
                   <el-tooltip placement="top">
                     <div slot="content">
-                      下载路径示例：/home/admin/cicd_platform
+                      下载路径示例：/home/admin/devops_platform
                     </div>
                     <i class="el-icon-question"/>
                   </el-tooltip>
