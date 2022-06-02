@@ -315,8 +315,15 @@ export default {
         }
       )
     },
-    projectView() {
-      this.msgError('功能开发中')
+    projectView(row) {
+      this.$router.push(
+        {
+          path: '/project/view',
+          query: {
+            uuid: row.uuid
+          }
+        }
+      )
     },
     remoteMethod(query) {
       if (query !== '') {
