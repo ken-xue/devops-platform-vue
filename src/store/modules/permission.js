@@ -87,19 +87,19 @@ const actions = {
         let menus = data.filter(menu => menu.menuType == 0 || menu.menuType == 1)
         let tree = treeDataTranslate(menus, 'uuid')
         //开发环境展示
-        // if (process.env.NODE_ENV === "development") {
-        //   let accessedRoutes = [].concat(devRoutes)
-        //   generaMenu(accessedRoutes, tree)
-        //   accessedRoutes.sort(function (a, b) {return a.menuOrder - b.menuOrder})
-        //   commit('SET_ROUTES', accessedRoutes)
-        //   resolve(accessedRoutes)
-        // } else {
+        if (process.env.NODE_ENV === "development") {
+          let accessedRoutes = [].concat(devRoutes)
+          generaMenu(accessedRoutes, tree)
+          accessedRoutes.sort(function (a, b) {return a.menuOrder - b.menuOrder})
+          commit('SET_ROUTES', accessedRoutes)
+          resolve(accessedRoutes)
+        } else {
           let accessedRoutes = [].concat(asyncRoutes)
           generaMenu(accessedRoutes, tree)
           accessedRoutes.sort(function (a, b) {return a.menuOrder - b.menuOrder})
           commit('SET_ROUTES', accessedRoutes)
           resolve(accessedRoutes)
-        // }
+        }
       }).catch(error => {
         console.error(error)
       })
