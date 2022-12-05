@@ -30,6 +30,15 @@ export function add(data) {
         data: data
     })
 }
+// 新增
+export function importing(data) {
+    return request({
+        url: 'kubernetes/cluster/import',
+        method: 'post',
+        headers: { "Content-Type": "multipart/form-data" },
+        data: data
+    })
+}
 // 修改
 export function update(data) {
     return request({

@@ -1,6 +1,8 @@
 <template>
-  <el-dialog title="控制面板" :visible.sync="open" width="700px" append-to-body @close="cancel">
+  <el-dialog title="控制面板" :visible.sync="open" width="90%" append-to-body @close="cancel">
     <h1>控制面板</h1>
+    <h1>命名空间</h1>
+    <h1>Pod列表</h1>
   </el-dialog>
 </template>
 

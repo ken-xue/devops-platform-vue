@@ -52,22 +52,26 @@
           :show-overflow-tooltip="true"
         />
         <el-table-column
-          label="秘钥"
+          label="访问方式"
           align="center"
-          prop="secretKey"
+          prop="accessWay"
           :show-overflow-tooltip="true"
         >
           <template slot-scope="scope">
-            {{ scope.row.secretKey }}
+            <el-tag v-if="scope.row.accessWay=='TOKEN'">TOKEN</el-tag>
+            <el-tag v-if="scope.row.accessWay=='CONFIG_FILE'" type="success">配置文件</el-tag>
+            <el-tag v-if="scope.row.accessWay=='UPWD'" type="info">用户名密码</el-tag>
+<!--            <el-tag type="warning">标签四</el-tag>-->
+<!--            <el-tag type="danger">标签五</el-tag>-->
           </template>
         </el-table-column>
-        <el-table-column
-          label="集群配置文件"
-          align="center"
-          prop="config"
-          :show-overflow-tooltip="true"
-        />
-        <el-table-column label="操作" min-width="120" align="center" class-name="small-padding fixed-width">
+<!--        <el-table-column-->
+<!--          label="集群配置文件"-->
+<!--          align="center"-->
+<!--          prop="config"-->
+<!--          :show-overflow-tooltip="true"-->
+<!--        />-->
+        <el-table-column label="操作" min-width="100" align="center" class-name="small-padding fixed-width">
           <template slot-scope="scope">
             <el-button v-permission="['kubernetes:cluster:update']" size="mini" type="text" icon="el-icon-edit"
                        @click="handleUpdate(scope.row)">修改
@@ -75,6 +79,11 @@
             <el-button v-permission="['kubernetes:cluster:delete']" size="mini" type="text" style="color: green"
                        icon="el-icon-set-up" @click="controlPanel(scope.row)">控制面板
             </el-button>
+
+            <a  target="_blank" :href="scope.row.dashboard" >
+              <el-button v-permission="['kubernetes:cluster:dashboard']" size="mini" type="text" icon="el-icon-s-promotion">dashboard</el-button>
+            </a>
+
             <el-button v-permission="['kubernetes:cluster:update']" size="mini" type="text" icon="el-icon-s-platform"
                        @click="terminalHandler(scope.row)">终端
             </el-button>
@@ -104,19 +113,67 @@
             </el-col>
             <el-col :span="24">
               <el-form-item label="版本" prop="version">
-                <el-input v-model="form.version" placeholder="请输入版本"/>
+                <el-select v-model="form.version" size="100" placeholder="请选择">
+                  <el-option
+                    v-for="item in kubeVersions"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value">
+                  </el-option>
+                </el-select>
               </el-form-item>
             </el-col>
             <el-col :span="24">
+              <el-form-item label="访问方式" prop="accessWay">
+                <el-select v-model="form.accessWay" size="100" placeholder="请选择">
+                  <el-option
+                    v-for="item in accessWays"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value">
+                  </el-option>
+                </el-select>
+              </el-form-item>
+            </el-col>
+            <el-col :span="24" v-if="form.accessWay == 'TOKEN'">
               <el-form-item label="秘钥" prop="secretKey">
-                <el-input v-model="form.secretKey" placeholder="请输入秘钥"/>
+                <el-input type="textarea"
+                          :rows="5" v-model="form.secretKey" placeholder="请输入秘钥"/>
               </el-form-item>
             </el-col>
-            <el-col :span="24">
-              <el-form-item label="集群配置文件" prop="config">
-                <el-input v-model="form.config" placeholder="请输入集群配置文件"/>
+            <el-col :span="24" v-if="form.accessWay == 'TOKEN'||form.accessWay == 'UPWD'">
+              <el-form-item label="访问地址" prop="accessUrl">
+                <el-input v-model="form.accessUrl" placeholder="请输入访问链接"/>
               </el-form-item>
             </el-col>
+            <el-col :span="24" v-if="form.accessWay == 'CONFIG_FILE'" >
+              <el-form-item label="文件" prop="file">
+                <el-upload
+                  ref="fileRefs"
+                  class="upload-demo"
+                  action="importUrl"
+                  multiple
+                  :on-change="fileChange"
+                  :limit="1"
+                  :file-list="configFileList"
+                  :on-remove="fileRemove"
+                  :auto-upload="false">
+                  <el-button size="small" type="primary">点击上传</el-button>
+                </el-upload>
+              </el-form-item>
+            </el-col>
+            <div v-if="form.accessWay == 'UPWD'">
+              <el-col :span="24">
+                <el-form-item label="用户名" prop="username">
+                  <el-input v-model="form.username" placeholder="请输入集群访问用户名"/>
+                </el-form-item>
+              </el-col>
+              <el-col :span="24">
+                <el-form-item label="密码" prop="password">
+                  <el-input v-model="form.password" placeholder="请输入集群访问密码"/>
+                </el-form-item>
+              </el-col>
+            </div>
           </el-row>
         </el-form>
         <div slot="footer" class="dialog-footer">
@@ -132,7 +189,7 @@
 </template>
 
 <script>
-import {add, del, info, page, update} from '@/api/kubernetes/cluster'
+import {add, del, importing, info, page, update} from '@/api/kubernetes/cluster'
 import {nestedGetQuery} from "@/utils";
 import Create from "@/views/kubernetes/create";
 import ControlPanel from "@/views/kubernetes/control-panel";
@@ -173,14 +230,31 @@ export default {
           name: ''
         }
       },
+      accessWays: [
+        {value: 'TOKEN', label: '秘钥'},
+        {value: 'CONFIG_FILE', label: '配置文件'},
+        {value: 'UPWD', label: '用户名密码'}
+      ],
+      kubeVersions: [
+        {value: '1.21', label: '1.21'},
+        {value: '1.23', label: '1.23'},
+        {value: '1.24', label: '1.24'},
+        {value: '1.25', label: '1.25'}
+      ],
+      configFileList: [],
+      importUrl: '',
       // 表单参数
       form: {},
       // 表单校验
       rules: {
         name: [{required: true, message: '集群名称不能为空', trigger: 'blur'}],
         version: [{required: true, message: '版本不能为空', trigger: 'blur'}],
-        secretKey: [{required: true, message: '秘钥不能为空', trigger: 'blur'}],
-        config: [{required: true, message: '集群配置文件不能为空', trigger: 'blur'}]
+        secretKey: [{required: true, message: '访问秘钥不能为空', trigger: 'blur'}],
+        accessWay: [{required: true, message: '访问方式不能为空', trigger: 'blur'}],
+        username: [{required: true, message: '访问用户名不能为空', trigger: 'blur'}],
+        password: [{required: true, message: '访问密码不能为空', trigger: 'blur'}],
+        accessUrl: [{required: true, message: '访问地址不能为空', trigger: 'blur'}],
+        file: [{required: true, message: '集群配置文件不能为空', trigger: 'change'}]
       }
     }
   },
@@ -205,11 +279,15 @@ export default {
     // 表单重置
     reset() {
       this.form = {
+        file: null,
         name: undefined,
         version: undefined,
+        accessWay: undefined,
+        accessUrl: undefined,
         secretKey: undefined,
-        config: undefined,
-        graphContent: undefined,
+        username: undefined,
+        password: undefined,
+        config: undefined
       }
       this.resetForm('form')
     },
@@ -228,8 +306,20 @@ export default {
     handleAdd() {
       this.reset()
       this.open = true
-      this.title = '添加'
+      this.title = '导入'
       this.isEdit = false
+    },
+    fileChange(uploadFile, files) {
+      this.form.file = uploadFile
+      if (files.length !== 0) {
+        this.$refs.form.validateField('file')
+      }
+    },
+    fileRemove(uploadFile, files) {
+      if (files.length === 0) {
+        this.form.file = null
+        this.$refs.form.validateField('file')
+      }
     },
     handleCreate(row) {
       this.createClusterVisible = true
@@ -285,8 +375,12 @@ export default {
     submitForm: function () {
       this.$refs['form'].validate(valid => {
         if (valid) {
+          const file = this.form.accessWay == 'CONFIG_FILE' ? this.$refs.fileRefs.uploadFiles[0].raw : null
+          const fd = new FormData()
+          fd.append('info', JSON.stringify(this.form))
+          fd.append('file', file)
           if (this.form.id !== undefined) {
-            update({"clusterDTO": this.form}).then(response => {
+            update(fd).then(response => {
               if (response.code === 2000) {
                 this.msgSuccess('修改成功')
                 this.open = false
@@ -296,9 +390,9 @@ export default {
               }
             })
           } else {
-            add({"clusterDTO": this.form}).then(response => {
+            importing(fd).then(response => {
               if (response.code === 2000) {
-                this.msgSuccess('新增成功')
+                this.msgSuccess('导入成功')
                 this.open = false
                 this.getList()
               } else {
