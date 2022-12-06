@@ -1,0 +1,74 @@
+<template>
+  <div>
+  <el-drawer :with-header="false" title="Pod" size="70%" :visible.sync="open" :destroy-on-close="true" append-to-body @close="cancel">
+    <el-card class="box-card">
+      <div style="width: 100%;height: 90%">
+         <AceEditor
+           v-model="describe"
+           width="100%"
+           :fontSize="14"
+           :showPrintMargin="true"
+           :showGutter="true"
+           :highlightActiveLine="true"
+           mode="yaml"
+           theme="monokai"
+           :onChange="onChange"
+           name="editor"
+           :readOnly="true"
+           :maxLines="100"
+           :editorProps="{$blockScrolling: true}"
+         />
+       </div>
+    </el-card>
+  </el-drawer>
+  </div>
+</template>
+
+<script>
+import {namespaceList, podList,describe} from "@/api/kubernetes/cluster";
+
+import {Ace as AceEditor, Split as SplitEditor} from 'vue2-brace-editor';
+
+export default {
+  name: 'Describe',
+  components: {
+    AceEditor,
+    SplitEditor,
+  },
+  data() {
+    return {
+      // 遮罩层
+      loading: true,
+      open: false,
+      isEdit: false,
+      searchLoading: false,
+      submitLoading: false,
+      loggerVisible: false,
+      attachVisible: false,
+      describe: '',
+      clusterId: 0,
+    }
+  },
+  created() {
+    // this.getList()
+  },
+  methods: {
+    init(row) {
+      const data = {
+        'name': row.name,
+        'clusterId': row.clusterId,
+        'namespace': row.namespace,
+      }
+      describe(data).then(response => {
+        if (response.code === 2000) {
+          this.describe = JSON.stringify(response.data,null,4)
+          this.open = true
+        } else {
+          this.msgError(response.msg)
+        }
+        this.searchLoading = false
+      })
+    }
+  }
+}
+</script>

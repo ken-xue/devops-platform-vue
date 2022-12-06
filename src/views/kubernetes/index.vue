@@ -61,31 +61,69 @@
             <el-tag v-if="scope.row.accessWay=='TOKEN'">TOKEN</el-tag>
             <el-tag v-if="scope.row.accessWay=='CONFIG_FILE'" type="success">配置文件</el-tag>
             <el-tag v-if="scope.row.accessWay=='UPWD'" type="info">用户名密码</el-tag>
-<!--            <el-tag type="warning">标签四</el-tag>-->
-<!--            <el-tag type="danger">标签五</el-tag>-->
+            <!--            <el-tag type="warning">标签四</el-tag>-->
+            <!--            <el-tag type="danger">标签五</el-tag>-->
           </template>
         </el-table-column>
-<!--        <el-table-column-->
-<!--          label="集群配置文件"-->
-<!--          align="center"-->
-<!--          prop="config"-->
-<!--          :show-overflow-tooltip="true"-->
-<!--        />-->
+        <!--        <el-table-column-->
+        <!--          label="集群配置文件"-->
+        <!--          align="center"-->
+        <!--          prop="config"-->
+        <!--          :show-overflow-tooltip="true"-->
+        <!--        />-->
         <el-table-column label="操作" min-width="100" align="center" class-name="small-padding fixed-width">
           <template slot-scope="scope">
-            <el-button v-permission="['kubernetes:cluster:update']" size="mini" type="text" icon="el-icon-edit"
-                       @click="handleUpdate(scope.row)">修改
-            </el-button>
-            <el-button v-permission="['kubernetes:cluster:delete']" size="mini" type="text" style="color: green"
-                       icon="el-icon-set-up" @click="controlPanel(scope.row)">控制面板
+            <el-button v-permission="['kubernetes:cluster:delete']" size="mini" type="text" style="color: #000500"
+                       icon="el-icon-set-up" @click="controlPanel(scope.row)">Pod
             </el-button>
 
-            <a  target="_blank" :href="scope.row.dashboard" >
-              <el-button v-permission="['kubernetes:cluster:dashboard']" size="mini" type="text" icon="el-icon-s-promotion">dashboard</el-button>
+            <a target="_blank" :href="scope.row.dashboard">
+              <el-button v-permission="['kubernetes:cluster:dashboard']" size="mini" type="text"
+                         icon="el-icon-s-promotion">dashboard
+              </el-button>
             </a>
 
-            <el-button v-permission="['kubernetes:cluster:update']" size="mini" type="text" icon="el-icon-s-platform"
+            <el-button v-if="scope.row.machineUuid != '' && scope.row.machineUuid != null"
+                       v-permission="['kubernetes:cluster:update']" size="mini" type="text" icon="el-icon-s-platform"
                        @click="terminalHandler(scope.row)">终端
+            </el-button>
+
+              <el-popover v-if="scope.row.machineUuid == '' || scope.row.machineUuid == null" placement="top"
+                width="200"
+                :trigger="click">
+<!--                <el-tooltip content='如果机器不存在则需要先将机器添加进列表'>-->
+<!--                  <i class="el-icon-question">这是一段内容这是一段内容确定删除吗</i>-->
+<!--                </el-tooltip>-->
+                <p>需要先将机器添加进列表</p>
+                  <el-select
+
+                    v-model="machineUuid"
+                    filterable
+                    remote
+                    reserve-keyword
+                    placeholder="请输入关键词"
+                    :remote-method="getHostList"
+                    :loading="searchLoading">
+
+                    <el-option
+                      v-for="item in hostList"
+                      :key="item.uuid"
+                      :label="item.name"
+                      :value="item.uuid"
+                      :disabled="machineUuid==item.uuid"
+                    >
+                      <span style="float: left">{{ item.name }}</span>
+                      <span style="float: left; color: #8492a6; font-size: 8px;margin-left: 25px">{{ item.ip }}</span>
+                    </el-option>
+                  </el-select>
+                <div style="text-align: right; margin-top: 10px">
+                  <el-button size="mini" type="text" @click="visible = false">取消</el-button>
+                  <el-button type="primary" size="mini" @click="configTerminal(scope.row)">确定</el-button>
+                </div>
+                <el-button slot="reference" size="mini" type="text" icon="el-icon-s-platform">终端</el-button>
+              </el-popover>
+            <el-button v-permission="['kubernetes:cluster:update']" size="mini" type="text" icon="el-icon-edit"
+                       @click="handleUpdate(scope.row)">修改
             </el-button>
             <el-button v-permission="['kubernetes:cluster:delete']" size="mini" type="text" style="color: red"
                        icon="el-icon-delete" @click="handleDelete(scope.row)">释放
@@ -146,7 +184,7 @@
                 <el-input v-model="form.accessUrl" placeholder="请输入访问链接"/>
               </el-form-item>
             </el-col>
-            <el-col :span="24" v-if="form.accessWay == 'CONFIG_FILE'" >
+            <el-col :span="24" v-if="form.accessWay == 'CONFIG_FILE'">
               <el-form-item label="文件" prop="file">
                 <el-upload
                   ref="fileRefs"
@@ -192,8 +230,9 @@
 import {add, del, importing, info, page, update} from '@/api/kubernetes/cluster'
 import {nestedGetQuery} from "@/utils";
 import Create from "@/views/kubernetes/create";
-import ControlPanel from "@/views/kubernetes/control-panel";
+import ControlPanel from "@/views/kubernetes/pod";
 import Terminal from "@/views/kubernetes/terminal";
+import {list as searchHostList} from "@/api/machine/machine";
 
 export default {
   name: 'Kubernetes',
@@ -214,13 +253,16 @@ export default {
       // 弹出层标题
       title: '',
       // 是否显示弹出层
+      visible: false,
       open: false,
       isEdit: false,
       createClusterVisible: false,
       controlPanelVisible: false,
       terminalVisible: false,
+      searchLoading: false,
       // 类型数据字典
       typeOptions: [],
+      hostList: [],
       dataList: [],
       // 查询参数
       queryParams: {
@@ -243,6 +285,7 @@ export default {
       ],
       configFileList: [],
       importUrl: '',
+      machineUuid: '',
       // 表单参数
       form: {},
       // 表单校验
@@ -335,21 +378,15 @@ export default {
     },
     terminalHandler(row) {
       this.terminalVisible = true
-      info(row.id).then(response => {
-        if (response.code === 2000) {
-          const data = response.data
-          debugger
-          if (data.masterNodeList.length > 0) {
-            this.$nextTick(() => {
-              this.$refs.Terminal.init(data.masterNodeList.pop().machineUuid)
-            })
-          } else {
-            this.msgError('Master节点为空')
-          }
-        } else {
-          this.msgError(response.msg)
-        }
-      })
+      if (row.machineUuid != null && row.machineUuid != '') {
+        this.$nextTick(() => {
+          this.$refs.Terminal.init(row.machineUuid)
+        })
+      } else {
+        //需要配置要访问的终端
+        this.$refs.node-popover-`row.id`.click
+        this.msgError('Master节点为空')
+      }
     },
     // 多选框选中数据
     handleSelectionChange(selection) {
@@ -385,6 +422,9 @@ export default {
                 this.msgSuccess('修改成功')
                 this.open = false
                 this.getList()
+                this.$nextTick(() => {
+                  this.$refs.Terminal.init(row.machineUuid)
+                })
               } else {
                 this.msgError(response.msg)
               }
@@ -401,6 +441,29 @@ export default {
             })
           }
         }
+      })
+    },
+    configTerminal(row){
+      row.machineUuid = this.machineUuid
+      update({'clusterDTO':row}).then(response => {
+        if (response.code === 2000) {
+          this.hostList = response.data
+          this.getList()
+        } else {
+          this.msgError(response.msg)
+        }
+        this.searchLoading = false
+      })
+    },
+    getHostList(name) {
+      this.searchLoading = true
+      searchHostList({'name': name}).then(response => {
+        if (response.code === 2000) {
+          this.hostList = response.data
+        } else {
+          this.msgError(response.msg)
+        }
+        this.searchLoading = false
       })
     },
     /** 删除按钮操作 */

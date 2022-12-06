@@ -64,9 +64,9 @@ cd devops-platform-vue
 npm install
 npm run dev
 ```
-## 相关文档
+## 相关组件
 
-- [详细设计文档]()
+- [vue2-brace-editor](https://www.npmjs.com/package/vue2-brace-editor)
 
 ## 相关证书
 

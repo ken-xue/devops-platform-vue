@@ -55,3 +55,25 @@ export function del(data) {
         data: data
     })
 }
+
+export function podList(data) {
+  return request({
+    url: 'kubernetes/cluster/pod/list',
+    method: 'get',
+    params: data
+  })
+}
+export function namespaceList(data) {
+  return request({
+    url: 'kubernetes/namespace/list',
+    method: 'get',
+    params: data
+  })
+}
+export function describe(data) {
+  return request({
+    url: 'kubernetes/cluster/pod/describe',
+    method: 'get',
+    params: data
+  })
+}
