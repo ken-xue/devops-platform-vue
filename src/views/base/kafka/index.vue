@@ -107,7 +107,7 @@
                             </el-col>
                             <el-col :span="24">
                                 <el-form-item label="别名" prop="name">
-                                    <el-input v-model="form.name" placeholder="请输入别名"/>
+                                    <el-input :disabled="form.name=='SYSTEM_DEFAULT'" v-model="form.name" placeholder="请输入别名"/>
                                 </el-form-item>
                             </el-col>
                             <el-col :span="24">
@@ -136,7 +136,7 @@
 <script>
 import { add, del, info, page, update } from '@/api/middleware/minio'
 import { nestedGetQuery } from "@/utils";
-import MinioCreate from '@/views/middleware/minio/minio-create'
+import MinioCreate from '@/views/base/minio/minio-create'
 
 export default {
     name: 'minio',

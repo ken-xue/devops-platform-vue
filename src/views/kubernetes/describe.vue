@@ -1,8 +1,8 @@
 <template>
   <div>
   <el-drawer :with-header="false" title="Pod" size="70%" :visible.sync="open" :destroy-on-close="true" append-to-body @close="cancel">
-    <el-card class="box-card">
-      <div style="width: 100%;height: 90%">
+    <el-card class="box-card" style="height: calc(100% - 10px)">
+<!--      <div style="width: 100%;height: 90%">-->
          <AceEditor
            v-model="describe"
            width="100%"
@@ -15,10 +15,9 @@
            :onChange="onChange"
            name="editor"
            :readOnly="true"
-           :maxLines="100"
            :editorProps="{$blockScrolling: true}"
          />
-       </div>
+<!--       </div>-->
     </el-card>
   </el-drawer>
   </div>

@@ -47,7 +47,7 @@
 <!--                     @click="handleCreate">创建集群-->
 <!--          </el-button>-->
         </el-form-item>
-        <el-table type="mini" v-loading="loading" :data="dataList" @selection-change="handleSelectionChange">
+        <el-table height="600" type="mini" v-loading="loading" :data="dataList" @selection-change="handleSelectionChange">
           <el-table-column type="selection" width="45" align="center"/>
           <el-table-column
             fixed
@@ -61,6 +61,7 @@
             </template>
           </el-table-column>
           <el-table-column
+            fixed
             label="Pod名称"
             prop="name"
             :show-overflow-tooltip="true"

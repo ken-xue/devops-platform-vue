@@ -98,7 +98,7 @@
 
 <script>
 import {list as searchHostList} from "@/api/machine/machine";
-import MinioCreateLogger from "@/views/middleware/minio/minio-create-logger";
+import MinioCreateLogger from "@/views/base/minio/minio-create-logger";
 
 export default {
   name: 'MinioCreate',

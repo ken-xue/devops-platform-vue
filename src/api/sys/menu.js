@@ -28,7 +28,7 @@ export function getMenuSelect(data) {
 // 查询menu详细
 export function getMenu(data) {
   return request({
-    url: '/sys/menu/info/',
+    url: '/sys/menu/info',
     method: 'get',
     params: data
   })
