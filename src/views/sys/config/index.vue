@@ -85,7 +85,7 @@
             <el-col :span="24">
               <el-form-item label="配置信息">
                 <div class="editor-container">
-                  <json-editor ref="jsonEditor" v-model="form.config"/>
+                  <json-editor ref="jsonEditor" v-model="config"/>
                 </div>
               </el-form-item>
             </el-col>
@@ -152,6 +152,7 @@ export default {
       total: 0,
       // 弹出层标题
       title: '',
+      config: '',
       // 是否显示弹出层
       open: false,
       isEdit: false,
@@ -168,10 +169,10 @@ export default {
         }
       },
       options: [{
-        value: '1',
+        value: true,
         label: '是'
       }, {
-        value: '0',
+        value: false,
         label: '否'
       }],
       // 表单参数
@@ -244,7 +245,8 @@ export default {
       info(row.id).then(response => {
         this.form.id = response.data.id
         this.form.name = response.data.name,
-          this.form.config = JSON.parse(response.data.config),
+          this.config = JSON.parse(response.data.config),
+          // this.form.config = response.data.config,
           this.form.remark = response.data.remark,
           this.form.deletable = response.data.deletable,
           this.form.editable = response.data.editable,
@@ -258,6 +260,8 @@ export default {
       this.submitLoading = true
       this.$refs['form'].validate(valid => {
         if (valid) {
+          this.form.config = this.config
+          console.log(this.form)
           if (this.form.id !== undefined) {
             update({"configDTO": this.form}).then(response => {
               if (response.code === 2000) {
