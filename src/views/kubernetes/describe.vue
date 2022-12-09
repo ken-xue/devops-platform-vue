@@ -1,32 +1,35 @@
 <template>
   <div>
-  <el-drawer :with-header="false" title="Pod" size="70%" :visible.sync="open" :destroy-on-close="true" append-to-body @close="cancel">
+  <el-drawer :with-header="false" title="Pod" size="70%" :visible.sync="open" :destroy-on-close="true" append-to-body>
     <el-card class="box-card" style="height: calc(100% - 10px)">
-<!--      <div style="width: 100%;height: 90%">-->
+      <div style="width: 100%;height: calc(100% - 10px);">
          <AceEditor
            v-model="describe"
            width="100%"
+           :height="'800px'"
            :fontSize="14"
            :showPrintMargin="true"
            :showGutter="true"
            :highlightActiveLine="true"
-           mode="yaml"
+           mode="json"
            theme="monokai"
            :onChange="onChange"
            name="editor"
            :readOnly="true"
            :editorProps="{$blockScrolling: true}"
          />
-<!--       </div>-->
+       </div>
     </el-card>
   </el-drawer>
   </div>
 </template>
 
 <script>
-import {namespaceList, podList,describe} from "@/api/kubernetes/cluster";
+import {describe} from "@/api/kubernetes/cluster";
 
 import {Ace as AceEditor, Split as SplitEditor} from 'vue2-brace-editor';
+import 'brace/mode/json';
+import 'brace/theme/monokai';
 
 export default {
   name: 'Describe',
@@ -46,6 +49,7 @@ export default {
       attachVisible: false,
       describe: '',
       clusterId: 0,
+      maxHeight: 0
     }
   },
   created() {
@@ -67,7 +71,11 @@ export default {
         }
         this.searchLoading = false
       })
-    }
+    },
+    onChange() {
+
+    },
+
   }
 }
 </script>

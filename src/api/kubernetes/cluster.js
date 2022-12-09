@@ -63,6 +63,15 @@ export function podList(data) {
     params: data
   })
 }
+
+export function resources(data) {
+  return request({
+    url: 'kubernetes/cluster/resources',
+    method: 'get',
+    params: data
+  })
+}
+
 export function namespaceList(data) {
   return request({
     url: 'kubernetes/namespace/list',

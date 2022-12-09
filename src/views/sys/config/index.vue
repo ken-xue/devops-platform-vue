@@ -260,8 +260,8 @@ export default {
       this.submitLoading = true
       this.$refs['form'].validate(valid => {
         if (valid) {
-          this.form.config = this.config
-          console.log(this.form)
+          const cfg = JSON.stringify(JSON.parse(this.config));
+          this.form.config = cfg
           if (this.form.id !== undefined) {
             update({"configDTO": this.form}).then(response => {
               if (response.code === 2000) {
@@ -282,10 +282,10 @@ export default {
               } else {
                 this.msgError(response.msg)
               }
-              this.submitLoading = false
             })
           }
         }
+        this.submitLoading = false
       })
     },
     /** 删除按钮操作 */

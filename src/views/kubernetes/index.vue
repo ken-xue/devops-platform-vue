@@ -73,22 +73,22 @@
         <!--        />-->
         <el-table-column label="操作" min-width="100" align="center" class-name="small-padding fixed-width">
           <template slot-scope="scope">
-            <el-button v-permission="['kubernetes:cluster:delete']" size="mini" type="text" style="color: #000500"
-                       icon="el-icon-set-up" @click="controlPanel(scope.row)">Pod
+            <el-button v-permission="['kubernetes:cluster:delete']" size="mini" type="text" style="color: #0cd20c"
+                       icon="el-icon-set-up" @click="controlPanel(scope.row)">资源
             </el-button>
 
             <a target="_blank" :href="scope.row.dashboard">
               <el-button v-permission="['kubernetes:cluster:dashboard']" size="mini" type="text"
-                         icon="el-icon-s-promotion">dashboard
+                         icon="el-icon-s-promotion">面板
               </el-button>
             </a>
 
             <el-button v-if="scope.row.machineUuid != '' && scope.row.machineUuid != null"
-                       v-permission="['kubernetes:cluster:update']" size="mini" type="text" icon="el-icon-s-platform"
+                       v-permission="['kubernetes:cluster:update']" size="mini" type="text" icon="el-icon-s-platform" style="color: #000500"
                        @click="terminalHandler(scope.row)">终端
             </el-button>
 
-              <el-popover v-if="scope.row.machineUuid == '' || scope.row.machineUuid == null" placement="top"
+              <el-popover v-show="scope.row.machineUuid == '' || scope.row.machineUuid == null" placement="top"
                 width="200"
                 :trigger="click">
 <!--                <el-tooltip content='如果机器不存在则需要先将机器添加进列表'>-->
@@ -96,7 +96,6 @@
 <!--                </el-tooltip>-->
                 <p>需要先将机器添加进列表</p>
                   <el-select
-
                     v-model="machineUuid"
                     filterable
                     remote
@@ -104,7 +103,6 @@
                     placeholder="请输入关键词"
                     :remote-method="getHostList"
                     :loading="searchLoading">
-
                     <el-option
                       v-for="item in hostList"
                       :key="item.uuid"
@@ -120,13 +118,14 @@
                   <el-button size="mini" type="text" @click="visible = false">取消</el-button>
                   <el-button type="primary" size="mini" @click="configTerminal(scope.row)">确定</el-button>
                 </div>
-                <el-button slot="reference" size="mini" type="text" icon="el-icon-s-platform">终端</el-button>
+                <el-button slot="reference" size="mini" style="color: #000500" type="text" icon="el-icon-s-platform">终端</el-button>
               </el-popover>
+
             <el-button v-permission="['kubernetes:cluster:update']" size="mini" type="text" icon="el-icon-edit"
                        @click="handleUpdate(scope.row)">修改
             </el-button>
             <el-button v-permission="['kubernetes:cluster:delete']" size="mini" type="text" style="color: red"
-                       icon="el-icon-delete" @click="handleDelete(scope.row)">释放
+                       icon="el-icon-delete" @click="handleDelete(scope.row)">删除
             </el-button>
           </template>
         </el-table-column>
@@ -230,7 +229,7 @@
 import {add, del, importing, info, page, update} from '@/api/kubernetes/cluster'
 import {nestedGetQuery} from "@/utils";
 import Create from "@/views/kubernetes/create";
-import ControlPanel from "@/views/kubernetes/pod";
+import ControlPanel from "@/views/kubernetes/resource";
 import Terminal from "@/views/kubernetes/terminal";
 import {list as searchHostList} from "@/api/machine/machine";
 
